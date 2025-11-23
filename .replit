@@ -37,6 +37,10 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
+localPort = 8888
+externalPort = 3003
+
+[[ports]]
 localPort = 41849
 externalPort = 3001
 
@@ -50,6 +54,6 @@ externalPort = 3002
 JWT_SECRET = "91PhAAQFbN+u+g/mbUKS6i9eSnABgCELv2FBtR7Ocvo="
 
 [deployment]
-build = ["sh", "-c", "npm run build"]
-run = ["sh", "-c", "npm run start"]
+build = ["sh", "-c", "cd valifi && npm run build"]
+run = ["sh", "-c", "cd valifi && npm run start"]
 deploymentTarget = "cloudrun"
