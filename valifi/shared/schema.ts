@@ -378,6 +378,12 @@ export const insertP2POrderSchema = createInsertSchema(p2pOrders);
 export const insertLoanApplicationSchema = createInsertSchema(loanApplications);
 export const insertBankAccountSchema = createInsertSchema(bankAccounts);
 export const insertExchangeOrderSchema = createInsertSchema(exchangeOrders);
+export const insertKycRecordSchema = createInsertSchema(kycRecords);
+export const insertValifiCardSchema = createInsertSchema(valifiCards);
+export const insertP2PPaymentMethodSchema = createInsertSchema(p2pPaymentMethods);
+export const insertP2PChatMessageSchema = createInsertSchema(p2pChatMessages);
+export const insertP2PDisputeSchema = createInsertSchema(p2pDisputes);
+export const insertP2PReviewSchema = createInsertSchema(p2pReviews);
 
 // Type exports for frontend
 export type User = typeof users.$inferSelect;

@@ -1,6 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-border: hsl(0 0% 90.98%);
+  --color-background: hsl(0 0% 94.12%);
+  --color-foreground: hsl(0 0% 10.2%);
+  --color-card: hsl(0 0% 98.82%);
+  --color-card-foreground: hsl(0 0% 0%);
+  --color-primary: hsl(342 85.11% 52.55%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(0 0% 76.86%);
+  --color-secondary-foreground: hsl(0 0% 10.2%);
+  --color-muted: hsl(0 0% 89.02%);
+  --color-muted-foreground: hsl(0 0% 12.94%);
+  --color-accent: hsl(0 0% 100%);
+  --color-accent-foreground: hsl(0 0% 10.2%);
+  --color-destructive: hsl(0 0% 0%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-input: hsl(0 0% 70.98%);
+  --color-ring: hsl(0 0% 41.96%);
+}
 
 /* LIGHT MODE */
 :root {

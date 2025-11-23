@@ -12,5 +12,11 @@ export default defineConfig({
       '@': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './frontend/src'),
       '@shared': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './shared'),
     },
+    preserveSymlinks: false,
+  },
+  server: {
+    fs: {
+      allow: ['..'],
+    },
   },
 })
