@@ -13,19 +13,19 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Backend API Server"
+args = "Valifi Frontend"
 
 [[workflows.workflow]]
-name = "Backend API Server"
+name = "Valifi Frontend"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd valifi && NODE_ENV=production npx tsx backend/src/index.ts"
+args = "cd valifi && NODE_ENV=development npx tsx backend/src/index.ts"
 waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[ports]]
 localPort = 4983
@@ -34,6 +34,10 @@ externalPort = 3000
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 41849
+externalPort = 3001
 
 [userenv]
 
