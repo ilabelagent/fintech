@@ -103,10 +103,40 @@ The platform uses 18 core fintech tables:
 
 ### Prerequisites
 - Node.js 20.x or higher
-- PostgreSQL 14.x or higher
-- npm or yarn package manager
+- PostgreSQL 14.x or higher (Replit provides this automatically)
+- npm package manager
 
-### Installation
+### Development Setup (Replit)
+
+On Replit, the database is automatically provisioned. Just:
+
+1. **Install dependencies** (if not already installed)
+   ```bash
+   npm install
+   ```
+
+2. **Push database schema** (creates all tables)
+   ```bash
+   npm run db:push
+   ```
+   If you get a data-loss warning, use:
+   ```bash
+   npm run db:push -- --force
+   ```
+
+3. **Start development server** (already configured in workflow)
+   ```bash
+   npm run dev
+   ```
+   The app runs on port 5000 with:
+   - **Hot reload enabled**: Frontend (Vite HMR) + Backend (tsx watch)
+   - **Dev error logging**: Detailed API errors in browser console
+
+4. **Access the platform**
+   - App automatically opens in Replit webview
+   - Register a new account or login
+
+### Local Development Setup
 
 1. **Clone the repository**
    ```bash
@@ -121,39 +151,67 @@ The platform uses 18 core fintech tables:
 
 3. **Set up environment variables**
    
-   Create a `.env` file or set environment variables:
+   Create a `.env` file:
    ```env
    # Database
    DATABASE_URL=postgresql://user:password@localhost:5432/valifi
    
-   # Authentication
-   JWT_SECRET=your-secure-jwt-secret-min-32-chars
+   # Authentication (minimum 32 characters)
+   JWT_SECRET=your-secure-jwt-secret-min-32-chars-here
    
    # Application
-   NODE_ENV=production
+   NODE_ENV=development
    PORT=5000
    ```
 
-4. **Initialize database**
+4. **Start local PostgreSQL** (if using Docker)
+   ```bash
+   docker run -d \
+     --name valifi-postgres \
+     -e POSTGRES_PASSWORD=postgres \
+     -e POSTGRES_DB=valifi \
+     -p 5432:5432 \
+     postgres:16
+   ```
+   Update `DATABASE_URL` to: `postgresql://postgres:postgres@localhost:5432/valifi`
+
+5. **Initialize database**
    ```bash
    npm run db:push
    ```
 
-5. **Create Super Admin account**
+6. **Create Super Admin account** (optional)
    ```bash
    export ADMIN_EMAIL=your-email@example.com
    export ADMIN_PASSWORD=your-secure-password
    npx tsx backend/src/scripts/createAdmin.ts --role=SuperAdmin
    ```
 
-6. **Start the application**
+7. **Start the application**
    ```bash
    npm run dev
    ```
 
-7. **Access the platform**
+8. **Access the platform**
    - Open your browser to `http://localhost:5000`
-   - Login with Super Admin credentials
+   - Register a new account or login with admin credentials
+
+### Development Workflow
+
+**Hot Reload is enabled by default:**
+- Frontend changes: Instant update via Vite HMR
+- Backend changes: Auto-restart via tsx watch mode
+- No manual restarts needed during development
+
+**Dev Error Overlay:**
+- All API errors are logged to browser console with full details
+- Includes status code, URL, and response body
+- Only active in development mode
+
+**Database Migrations:**
+- Never write manual SQL migrations
+- Use `npm run db:push` to sync schema changes
+- If conflicts occur, use `npm run db:push -- --force`
 
 ## API Endpoints
 

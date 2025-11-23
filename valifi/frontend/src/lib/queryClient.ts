@@ -3,6 +3,16 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
+    
+    if (import.meta.env.DEV) {
+      console.error(`[API Error] ${res.status} ${res.url}`, {
+        status: res.status,
+        statusText: res.statusText,
+        url: res.url,
+        response: text,
+      });
+    }
+    
     throw new Error(`${res.status}: ${text}`);
   }
 }
@@ -67,6 +77,11 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: false,
+      onError: (error) => {
+        if (import.meta.env.DEV) {
+          console.error("[Mutation Error]", error);
+        }
+      },
     },
   },
 });
