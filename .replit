@@ -55,5 +55,5 @@ JWT_SECRET = "91PhAAQFbN+u+g/mbUKS6i9eSnABgCELv2FBtR7Ocvo="
 
 [deployment]
 build = ["sh", "-c", "cd valifi && npm run build"]
-run = ["sh", "-c", "cd valifi && npm run start"]
+run = ["sh", "-c", "cd valifi && PORT=8888 NODE_ENV=production node dist/index.js "]
 deploymentTarget = "cloudrun"
