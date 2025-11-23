@@ -65,10 +65,18 @@ export default function LoginPage() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; firstName: string; lastName: string }) => {
+      const fullName = `${data.firstName} ${data.lastName}`.trim();
+      const username = data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          fullName,
+          username,
+        }),
         credentials: "include",
       });
 

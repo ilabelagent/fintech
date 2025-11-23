@@ -1,0 +1,158 @@
+You are the Replit AI Agent working inside this Valifi standalone fintech repo. Operate with speed + precision. Follow this strict workflow:
+
+0) SAFETY FIRST: Git before any edit
+
+Do not change any code yet.
+
+Inspect current Git status.
+
+If there are uncommitted changes, commit them first with message:
+chore: snapshot before agent fixes
+
+Push to remote main (or default branch).
+
+Only after push succeeds, proceed.
+
+1) Run app + live error monitoring
+
+Start backend + frontend in dev mode (use existing scripts).
+
+Keep the console (backend logs + browser devtools) open.
+
+Actively watch for runtime errors, warnings, failed network calls, and 4xx/5xx responses.
+
+When an error appears:
+
+Capture the exact stack trace / route / payload.
+
+Identify root cause.
+
+Apply minimal, correct fix.
+
+Re-run to confirm resolution.
+
+Repeat until app runs clean.
+
+Critical bug to fix first (from console/UI):
+
+Registration fails with:
+Missing required fields: email, password, fullName, username
+
+Do:
+
+Check frontend register form payload.
+
+Check backend /api/auth/register schema/validator.
+
+Ensure frontend sends the exact fields backend requires:
+
+email
+
+password
+
+fullName (build from firstName + lastName OR update backend to accept firstName/lastName)
+
+username (derive or ask user input)
+
+Fix mismatch either by:
+A) Updating UI to send backend-required fields, OR
+B) Updating backend validator to accept the current UI fields and map them internally.
+
+Confirm with a successful register response (200/201) and auto-login if supported.
+
+2) Hot patch UI/Backend on the fly (dev ergonomics)
+
+Ensure hot reload is working:
+
+Backend: nodemon/tsx watch (or equivalent).
+
+Frontend: Vite/React fast refresh.
+
+If not present, add dev watchers without changing production scripts.
+
+Add a small “dev error overlay / toast” on frontend so API errors show clearly during testing.
+
+Keep edits small, test after each change.
+
+3) Prepare DB for migration to LOCAL PostgreSQL
+
+Goal: make local Postgres the default dev DB, ready for schema migrations.
+
+Steps:
+
+Detect current DB layer:
+
+Prisma / Sequelize / Knex / TypeORM / raw SQL.
+
+Add local Postgres config:
+
+.env (or .env.local) with DATABASE_URL=postgresql://postgres:postgres@localhost:5432/valifi_dev
+
+preserve any existing env keys.
+
+Provide one-click local Postgres:
+
+Prefer docker-compose.yml if none exists.
+
+Example service:
+
+image: postgres:16
+
+user/pass: postgres/postgres
+
+port: 5432
+
+db: valifi_dev
+
+Wire backend config to read DATABASE_URL.
+
+Create/verify migrations:
+
+If Prisma: prisma migrate dev
+
+If Knex: knex migrate:latest
+
+If Sequelize: sequelize db:migrate
+
+If TypeORM: typeorm migration:run
+
+Seed script (if repo supports it) should run against local Postgres.
+
+Update README with:
+
+how to start Postgres
+
+how to run migrations
+
+how to seed
+
+4) Final check + Git push
+
+Run full dev suite again:
+
+register
+
+login
+
+protected routes load
+
+No console errors.
+
+Commit with message:
+fix: registration payload + local postgres migration prep
+
+Push to remote.
+
+Output format
+
+As you work, report in this structure:
+
+Observation (what error/log you saw)
+
+Root cause
+
+Fix applied (files + brief diff summary)
+
+Verification (how you confirmed)
+
+Move with excellence. No half-fixes.
