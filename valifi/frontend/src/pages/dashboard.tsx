@@ -33,7 +33,7 @@ const DEFAULT_WIDGETS = [
     id: 'portfolio-overview', 
     name: 'Portfolio Overview', 
     type: 'stats',
-    description: 'Total balance and profit/loss tracking',
+    description: 'Total balance and asset allocation across all holdings',
     icon: 'wallet',
     defaultSize: { w: 4, h: 2 }
   },
@@ -41,7 +41,7 @@ const DEFAULT_WIDGETS = [
     id: 'live-market-prices', 
     name: 'Live Market Prices', 
     type: 'market',
-    description: 'Real-time crypto and stock prices',
+    description: 'Real-time cryptocurrency and precious metals prices',
     icon: 'trending-up',
     defaultSize: { w: 4, h: 2 }
   },
@@ -49,15 +49,15 @@ const DEFAULT_WIDGETS = [
     id: 'recent-transactions', 
     name: 'Recent Transactions', 
     type: 'activity',
-    description: 'Latest 10 transactions',
+    description: 'Latest transactions across all accounts',
     icon: 'clock',
     defaultSize: { w: 6, h: 3 }
   },
   { 
     id: 'news-feeds', 
-    name: 'News Feeds', 
+    name: 'Market News', 
     type: 'news',
-    description: 'Jesus Cartel releases and market news',
+    description: 'Latest financial and cryptocurrency market updates',
     icon: 'newspaper',
     defaultSize: { w: 6, h: 3 }
   },
@@ -65,7 +65,7 @@ const DEFAULT_WIDGETS = [
     id: 'performance-charts', 
     name: 'Performance Charts', 
     type: 'chart',
-    description: 'Historical profit visualization',
+    description: 'Historical portfolio performance and trends',
     icon: 'activity',
     defaultSize: { w: 12, h: 3 }
   },
@@ -224,9 +224,9 @@ export default function Dashboard() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Kingdom Dashboard</h2>
+            <h2 className="text-3xl font-bold">Dashboard</h2>
             <p className="text-muted-foreground">
-              Customize your command center with drag-and-drop widgets
+              Manage your financial universe with customizable widgets
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -293,68 +293,18 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Access common features quickly</CardDescription>
+            <CardDescription>Access your financial services</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/blockchain")}
-                data-testid="button-dashboard-quick-wallet"
+                onClick={() => setLocation("/exchange")}
+                data-testid="button-dashboard-quick-exchange"
               >
-                <Wallet className="w-6 h-6" />
-                <span className="text-sm font-medium">Create Wallet</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/trading")}
-                data-testid="button-dashboard-quick-trade"
-              >
-                <TrendingUp className="w-6 h-6" />
-                <span className="text-sm font-medium">Quick Trade</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/blockchain")}
-                data-testid="button-dashboard-quick-mint"
-              >
-                <Image className="w-6 h-6" />
-                <span className="text-sm font-medium">Mint NFT</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/spectrum-plans")}
-                data-testid="button-dashboard-quick-stake"
-              >
-                <Coins className="w-6 h-6" />
-                <span className="text-sm font-medium">Stake</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/metals")}
-                data-testid="button-dashboard-quick-gold"
-              >
-                <Gem className="w-6 h-6" />
-                <span className="text-sm font-medium">Buy Gold</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/trading-bots")}
-                data-testid="button-dashboard-quick-bot"
-              >
-                <Bot className="w-6 h-6" />
-                <span className="text-sm font-medium">Deploy Bot</span>
+                <ArrowRightLeft className="w-6 h-6" />
+                <span className="text-sm font-medium">Exchange</span>
               </Button>
 
               <Button
@@ -364,17 +314,67 @@ export default function Dashboard() {
                 data-testid="button-dashboard-quick-p2p"
               >
                 <Users className="w-6 h-6" />
-                <span className="text-sm font-medium">P2P Trade</span>
+                <span className="text-sm font-medium">P2P Trading</span>
               </Button>
 
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/exchange")}
-                data-testid="button-dashboard-quick-exchange"
+                onClick={() => setLocation("/payments")}
+                data-testid="button-dashboard-quick-payments"
               >
-                <ArrowRightLeft className="w-6 h-6" />
-                <span className="text-sm font-medium">Exchange</span>
+                <Wallet className="w-6 h-6" />
+                <span className="text-sm font-medium">Payments</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-auto flex-col gap-2 py-4"
+                onClick={() => setLocation("/loans")}
+                data-testid="button-dashboard-quick-loans"
+              >
+                <TrendingUp className="w-6 h-6" />
+                <span className="text-sm font-medium">Loans</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-auto flex-col gap-2 py-4"
+                onClick={() => setLocation("/precious-metals")}
+                data-testid="button-dashboard-quick-precious-metals"
+              >
+                <Gem className="w-6 h-6" />
+                <span className="text-sm font-medium">Precious Metals</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-auto flex-col gap-2 py-4"
+                onClick={() => setLocation("/bank-accounts")}
+                data-testid="button-dashboard-quick-bank-accounts"
+              >
+                <Bot className="w-6 h-6" />
+                <span className="text-sm font-medium">Bank Accounts</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-auto flex-col gap-2 py-4"
+                onClick={() => setLocation("/card")}
+                data-testid="button-dashboard-quick-card"
+              >
+                <Image className="w-6 h-6" />
+                <span className="text-sm font-medium">Valifi Cards</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-auto flex-col gap-2 py-4"
+                onClick={() => setLocation("/assets")}
+                data-testid="button-dashboard-quick-assets"
+              >
+                <Coins className="w-6 h-6" />
+                <span className="text-sm font-medium">Portfolio</span>
               </Button>
             </div>
           </CardContent>

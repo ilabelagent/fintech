@@ -102,7 +102,7 @@ export default function KycPage() {
       case "approved": return "Your identity has been verified and approved.";
       case "pending": return "Your KYC submission is under review. This typically takes 1-2 business days.";
       case "rejected": return "Your KYC submission was rejected. Please review the reasons and resubmit.";
-      default: return "Complete KYC verification to access all Kingdom features.";
+      default: return "Complete KYC verification to access all platform features.";
     }
   };
 
@@ -127,7 +127,7 @@ export default function KycPage() {
               KYC & Compliance
             </h1>
             <p className="text-muted-foreground mt-1" data-testid="text-subtitle">
-              Identity verification and regulatory compliance for Kingdom citizens
+              Identity verification and regulatory compliance for platform users
             </p>
           </div>
           {(!kycStatus || kycStatus.verificationStatus === "rejected") && (
