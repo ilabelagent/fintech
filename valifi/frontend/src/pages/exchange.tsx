@@ -134,12 +134,12 @@ export default function ExchangePage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold divine-gradient-text flex items-center gap-2">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
             <Coins className="h-8 w-8" />
             Exchange Platform
           </h1>
           <p className="text-muted-foreground mt-1">
-            Procure coins with advanced order book and liquidity pools
+            Trade cryptocurrencies with advanced order book and liquidity pools
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

@@ -157,7 +157,7 @@ export default function PaymentsPage() {
               Payments & Transactions
             </h1>
             <p className="text-muted-foreground mt-1" data-testid="text-subtitle">
-              Fiat and cryptocurrency payment processing for the Kingdom
+              Send and receive fiat and cryptocurrency payments instantly
             </p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
