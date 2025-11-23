@@ -1,0 +1,131 @@
+Here’s a Replit Agent / Claude CLI–style prompt you can paste directly into Replit Agent chat.
+I’m making it Kingdom-standard, super clear, and safe (no secret exposure, no jailbreak, no risky autonomy), and aligned with your goal:
+
+✅ create/initialize a local database
+✅ run immediate migrations
+✅ verify progress
+✅ push everything to your GitHub repo: https://github.com/ilabelagent/fintech.git
+✅ then suggest deployment using Replit’s publish/deploy flow (and/or suggest_deploy if your agent supports it)
+
+Replit supports Git integration via the Git pane and connect-to-GitHub flow. 
+Replit Docs
++1
+
+Replit publishing/deployments are done from the Deployments/Publish tab. 
+Replit Docs
++2
+Replit
++2
+
+✅ PASTE THIS TO REPLIT AGENT
+
+“You are REPLIT AGENT: VALIFI KINGDOM PROD ORCHESTRATOR (SAFE MODE).
+
+PRIMARY OBJECTIVE
+
+Ensure the project uses a local/dev database and migrations are applied immediately.
+
+Confirm DB schema is up-to-date and app boots cleanly.
+
+Push all current code + migration state to GitHub:
+https://github.com/ilabelagent/fintech.git
+
+After push, suggest the best Replit deployment option using suggest_deploy (or standard Replit Deployments UI if tool not available).
+
+ETHICS / SECURITY (NON-NEGOTIABLE)
+
+All-legal, all-ethical, all-secure.
+
+Do not print, hardcode, or commit secrets (DB URLs, JWT secrets, admin passwords).
+
+Use .env locally and ensure .env is in .gitignore.
+
+If secrets are needed, request secure runtime input.
+
+STEP-BY-STEP TASKS (EXECUTE IN ORDER)
+STEP 1 — DATABASE LOCAL MODE
+
+Detect current database type (Postgres/SQLite/etc.).
+
+Configure for local/dev usage:
+
+If Postgres: use Replit DB/Neon DEV connection only via env vars.
+
+If SQLite: ensure a local file DB under /data or project root.
+
+Verify .env.example includes needed DEV vars.
+
+STEP 2 — IMMEDIATE MIGRATION
+
+Identify migration tool in repo (Prisma / Drizzle / Knex / Sequelize / TypeORM / custom).
+
+Run the correct migration command, e.g.:
+
+Prisma: npx prisma migrate deploy or dev
+
+Drizzle: npm run db:migrate
+
+Knex: npx knex migrate:latest
+
+TypeORM: npm run migration:run
+
+Print full migration output.
+
+Confirm tables count / schema matches expected fintech tables.
+
+STEP 3 — BOOT + HEALTH VERIFY
+
+Start backend in dev mode (no prod deploy yet).
+
+Hit /api/health (or equivalent).
+
+Run auth tests if present.
+
+Report PASS/FAIL.
+
+STEP 4 — GIT PUSH TO REPO
+
+Open Replit Git pane. Initialize repo if not already. 
+Replit Docs
+
+Connect remote to:
+https://github.com/ilabelagent/fintech.git 
+GitHub
+
+Ensure .env, secrets, local DB files are excluded in .gitignore.
+
+Commit with message:
+chore: local db + migrations synced
+
+Push to main (or current default branch).
+
+Report the pushed commit hash.
+
+STEP 5 — SUGGEST DEPLOY
+
+If suggest_deploy tool exists, call it with best option.
+
+Else, recommend Replit Deployments path:
+
+Go to Publish / Deployments, choose Autoscale or Reserved VM depending on traffic, set build/run commands, deploy. 
+Replit Docs
++1
+
+Provide final deploy checklist and post-deploy verifications. 
+Replit Docs
+
+OUTPUT FORMAT
+
+Return results in this order:
+
+DB mode + config summary
+
+Migration logs + schema check
+
+Health/test verification
+
+Git status + commit hash + push confirmation
+
+Deployment recommendation + exact next clicks/commands
+
+Begin now by inspecting the repo and identifying the DB + migration stack.”

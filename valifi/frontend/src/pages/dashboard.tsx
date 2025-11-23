@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { PortfolioOverview } from "@/components/dashboard-widgets/PortfolioOverview";
-import { TradingBotStatus } from "@/components/dashboard-widgets/TradingBotStatus";
 import { LiveMarketPrices } from "@/components/dashboard-widgets/LiveMarketPrices";
 import { RecentTransactions } from "@/components/dashboard-widgets/RecentTransactions";
 import { NewsFeeds } from "@/components/dashboard-widgets/NewsFeeds";
@@ -23,7 +22,6 @@ import { PerformanceCharts } from "@/components/dashboard-widgets/PerformanceCha
 
 const WIDGET_COMPONENTS: Record<string, any> = {
   'portfolio-overview': PortfolioOverview,
-  'trading-bot-status': TradingBotStatus,
   'live-market-prices': LiveMarketPrices,
   'recent-transactions': RecentTransactions,
   'news-feeds': NewsFeeds,
@@ -37,14 +35,6 @@ const DEFAULT_WIDGETS = [
     type: 'stats',
     description: 'Total balance and profit/loss tracking',
     icon: 'wallet',
-    defaultSize: { w: 4, h: 2 }
-  },
-  { 
-    id: 'trading-bot-status', 
-    name: 'Trading Bot Status', 
-    type: 'stats',
-    description: 'Active bots and win rates',
-    icon: 'bot',
     defaultSize: { w: 4, h: 2 }
   },
   { 

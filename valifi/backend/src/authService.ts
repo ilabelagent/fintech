@@ -5,7 +5,11 @@ import { storage } from "./storage";
 import { insertUserSchema, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
-const JWT_SECRET = process.env.JWT_SECRET || "a-much-more-secure-secret-key-that-is-at-least-32-characters-long";
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET environment variable must be set and at least 32 characters long");
+}
 
 export const generateToken = (userId: string) => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
@@ -34,31 +38,35 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 export async function setupAuth(app: Express) {
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const validation = insertUserSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ message: "Invalid user data", error: validation.error.toString() });
-      }
+      const { email, password, fullName, username } = req.body;
 
-      const { email, password, firstName, lastName } = validation.data;
+      if (!email || !password || !fullName || !username) {
+        return res.status(400).json({ message: "Missing required fields: email, password, fullName, username" });
+      }
 
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
         return res.status(409).json({ message: "User with this email already exists" });
       }
 
+      const existingUsername = await storage.getUserByUsername(username);
+      if (existingUsername) {
+        return res.status(409).json({ message: "Username already taken" });
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = await storage.upsertUser({
+      const newUser = await storage.createUser({
         email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        profileImageUrl: "", // Default empty
-        isAdmin: false,
+        passwordHash: hashedPassword,
+        fullName,
+        username,
+        profilePhotoUrl: "", // Default empty
       });
 
       const token = generateToken(newUser.id);
-      res.status(201).json({ message: "User registered successfully", token });
+      const { passwordHash: _, ...userWithoutPassword } = newUser;
+      res.status(201).json({ message: "User registered successfully", token, user: userWithoutPassword });
     } catch (error) {
       console.error("Error registering user:", error);
       res.status(500).json({ message: "Registration failed" });
@@ -74,13 +82,14 @@ export async function setupAuth(app: Express) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
       if (!isPasswordValid) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
       const token = generateToken(user.id);
-      res.json({ message: "Logged in successfully", token });
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ message: "Logged in successfully", token, user: userWithoutPassword });
     } catch (error) {
       console.error("Error logging in user:", error);
       res.status(500).json({ message: "Login failed" });
