@@ -1,0 +1,316 @@
+REPLIT AI — VALIFI FINTECH FULL REFACTOR MANDATE
+(Use business-logic.md + data-models.md as the ONLY source of truth)
+
+You are the Replit AI Lead Engineer for the Valifi Fintech Platform.
+
+Your mission is to refactor the entire backend and UI to match EXACTLY the specifications found in:
+
+📄 business-logic.md
+
+
+business-logic
+
+📄 data-models.md
+
+
+data-models
+
+These two documents are the authoritative source of truth for all features, rules, flows, database structure, and user experiences.
+
+🚀 PHASE A — SYSTEM AUDIT (MANDATORY BEFORE CODING)
+
+Backend Audit
+
+Discover all routes, controllers, services, DB models currently in repo.
+
+Compare each to the official models in data-models.md.
+
+Produce a table:
+
+Route
+
+Matches spec?
+
+Missing fields?
+
+Wrong logic?
+
+Needs replacement?
+
+Frontend Audit
+
+List all sidebar routes + pages + components.
+
+Mark each as:
+
+VALID (in business logic doc)
+
+INVALID (not in doc → remove)
+
+PARTIALLY IMPLEMENTED
+
+Output:
+“Valifi Audit Report (Backend + Frontend)”
+
+🚀 PHASE B — REMOVE NON-FINTECH MODULES
+
+DELETE the following across frontend + backend:
+
+❌ Prayer Center
+❌ Jesus Cartel Publishing
+❌ Guardian Angel
+❌ Quantum Computing
+❌ Bot Marketplace
+❌ Trading Bots Arsenal (unless truly coded)
+❌ TWinn Celebrity
+❌ VIP Forum
+❌ Community Forum (unless business-logic.md allows it)
+❌ Precious Metals (if not backed by spec)
+❌ Digital Assets section if not implemented with real models
+❌ Swap, CoinMixer, etc. unless real
+❌ Any page showing “Kingdom”, “Holy”, “Prophetic”, etc.
+
+ONLY KEEP PAGES that match business-logic.md.
+Everything else must be deleted at UI, routes, imports, menus, and backend endpoints.
+
+🚀 PHASE C — ENFORCE TRUE BACKEND MODELS EXACTLY AS IN data-models.md
+
+Implement or correct these real models:
+
+User
+
+UserSettings
+
+ActiveSession
+
+Asset
+
+InvestmentLog
+
+Transaction
+
+P2POffer
+
+P2POrder
+
+P2PChatMessage
+
+BankAccount
+
+LoanApplication
+
+ValifiCard
+
+Follow EXACT fields and ENUMs from:
+
+
+data-models
+
+Remove any old/incorrect tables.
+
+Run full migration generation after alignment.
+
+🚀 PHASE D — IMPLEMENT TRUE BUSINESS LOGIC EXACTLY AS IN business-logic.md
+
+Implement ALL backend logic exactly as defined:
+
+✅ Onboarding
+
+Create default USD cash asset
+
+KYC gates
+
+UserSettings created automatically
+
+✅ Investment Logic
+
+Spectrum Plans
+
+Staking
+
+ROI payouts
+
+Cron jobs
+
+Maturity/withdrawal flow
+
+✅ P2P Logic
+
+Sell offer escrow
+
+Buy order lifecycle
+
+Payment sent
+
+Release escrow
+
+Expiration jobs
+
+✅ Loans
+
+Eligibility rules
+
+Collateral binding
+
+Admin approval
+
+Repayment logic
+
+Late fees / late status
+
+ALL logic MUST USE the rules in:
+
+business-logic
+
+🚀 PHASE E — WIRE ALL FEATURES TO UI (NO PLACEHOLDERS)
+
+The following UI modules MUST be wired to real backend endpoints:
+
+1. Exchange Platform
+
+Must include:
+
+Admin Procurement Alert
+
+User verifies bank/wire details
+
+User confirms procurement
+
+Admin acknowledges payment
+
+System auto-allocates assets to wallet
+
+Update portfolio & transaction logs
+
+2. Portfolio & Assets
+
+Each MUST be fully wired:
+
+AssetList
+
+AssetDetails
+
+Holdings
+
+Investment logs
+
+Withdraw/maturity buttons
+
+Real charts from backend data
+
+3. Payments
+
+Bank accounts
+
+Deposits
+
+Withdrawals
+
+KYC gate
+
+Transaction logs
+
+4. P2P Trading
+
+Full lifecycle UI tied to backend rules.
+No placeholders.
+
+5. KYC/Compliance
+
+Upload docs
+
+Pending
+
+Admin review
+
+Reject reason
+
+Status lockouts
+
+6. Security Center
+
+Active sessions
+
+2FA enable/disable
+
+Login alerts
+
+7. Analytics & Reports
+
+Portfolio history
+
+ROI
+
+Transactions
+
+Daily change
+
+Market data integration
+
+🚀 PHASE F — FIX ROUTING & DEAD LINKS
+
+Fix issues seen in user screenshots:
+
+Digital Assets → 404 (fix or remove)
+
+Orders failing to load (fix endpoint or frontend call)
+
+Liquidity pools dead → remove or connect to real feature
+
+Stock/Bond/Metal pages reading static demo data → replace with backend-driven data
+
+🚀 PHASE G — PROFESSIONAL REBRAND
+
+Replace all UI text containing:
+
+“Kingdom”
+
+“Holy”
+
+“Prophetic”
+
+With clean global fintech language:
+
+“Valifi Fintech Platform”
+
+“Portfolio Overview”
+
+“Trading & Investment Services”
+
+“Financial Operations Center”
+
+🚀 PHASE H — RBAC IMPLEMENTATION
+
+Use backend roles:
+
+User
+
+Admin
+
+SuperAdmin
+
+Frontend must enforce:
+
+Admin-only views for KYC, loans, P2P disputes
+
+User-only flows locked behind KYC
+
+SuperAdmin dashboard only for system-level audit
+
+🚀 PHASE I — FINAL VALIDATION
+
+Replit must:
+
+Run all build commands
+
+Generate final migration
+
+Ensure no unused imports
+
+Ensure no 404 routes
+
+Confirm UI → backend full data connectivity
+
+Produce a final document:
+
+“VALIFI FINTECH — FULL IMPLEMENTATION REPORT”

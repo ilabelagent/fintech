@@ -3,8 +3,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import { setupAuth } from "./authService";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { spectrumService } from "./spectrumService";
-import { initializeMemorySystem, cleanupMemories, decayContext } from "./memoryIntegrationHook";
 
 const app = express();
 app.use(express.json());
@@ -44,36 +42,6 @@ app.use((req, res, next) => {
   await setupAuth(app);
   const server = await registerRoutes(app);
 
-  // Initialize Spectrum Investment Plans system
-  try {
-    await spectrumService.seedPlans();
-    spectrumService.startDailyCompoundingSchedule();
-    log("✓ Spectrum Investment Plans system initialized");
-  } catch (error) {
-    log("⚠ Warning: Failed to initialize Spectrum system:", error);
-  }
-
-  // Initialize Conversation Memory System
-  try {
-    // Use environment variable or generate session ID
-    const sessionId = process.env.SESSION_ID || `valifi-${Date.now()}`;
-    await initializeMemorySystem(sessionId);
-
-    // Setup periodic maintenance (every hour)
-    setInterval(async () => {
-      await decayContext(0.95); // 5% decay per hour
-    }, 60 * 60 * 1000);
-
-    // Setup daily cleanup (every 24 hours)
-    setInterval(async () => {
-      await cleanupMemories();
-    }, 24 * 60 * 60 * 1000);
-
-    log("✓ Conversation Memory System initialized");
-  } catch (error) {
-    log("⚠ Warning: Failed to initialize Memory system:", error);
-  }
-
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -85,11 +53,12 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
+  // Skip vite/static serving for API-only testing
+  // if (app.get("env") === "development") {
+  //   await setupVite(app, server);
+  // } else {
+  //   serveStatic(app);
+  // }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
