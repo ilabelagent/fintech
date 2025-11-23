@@ -2,6 +2,7 @@ modules = ["nodejs-20", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["undollar"]
 
 [workflows]
 runButton = "Project"
@@ -47,3 +48,8 @@ externalPort = 3002
 
 [userenv.shared]
 JWT_SECRET = "91PhAAQFbN+u+g/mbUKS6i9eSnABgCELv2FBtR7Ocvo="
+
+[deployment]
+build = ["sh", "-c", "npm run build"]
+run = ["sh", "-c", "npm run start"]
+deploymentTarget = "cloudrun"
