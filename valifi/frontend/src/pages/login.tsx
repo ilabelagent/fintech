@@ -66,9 +66,9 @@ export default function LoginPage() {
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; firstName: string; lastName: string }) => {
       const fullName = `${data.firstName} ${data.lastName}`.trim();
-      const username = data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      let username = data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
       
-      const res = await fetch("/api/auth/register", {
+      let res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -79,6 +79,24 @@ export default function LoginPage() {
         }),
         credentials: "include",
       });
+
+      if (!res.ok && res.status === 409) {
+        const error = await res.json();
+        if (error.message?.includes("Username already taken")) {
+          username = `${username}${Date.now().toString().slice(-6)}`;
+          res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: data.email,
+              password: data.password,
+              fullName,
+              username,
+            }),
+            credentials: "include",
+          });
+        }
+      }
 
       if (!res.ok) {
         const error = await res.json();
