@@ -13,7 +13,9 @@ import {
   adminUsers,
   kycRecords,
   activityLogs,
-  adminPermissions
+  adminPermissions,
+  otcTasks,
+  otcOrders
 } from "@shared/schema";
 import { eq, and, desc, count, sql } from "drizzle-orm";
 
@@ -253,5 +255,69 @@ export const storage = {
   async updateAdminPermissions(userId: string, updates: Partial<typeof adminPermissions.$inferInsert>) {
     const result = await db.update(adminPermissions).set(updates).where(eq(adminPermissions.userId, userId)).returning();
     return result[0];
+  },
+
+  // ============================================
+  // OTC (OVER-THE-COUNTER) PROCUREMENT METHODS
+  // ============================================
+
+  async getAllOTCTasks(limit: number = 50, offset: number = 0) {
+    return await db.select().from(otcTasks).limit(limit).offset(offset).orderBy(desc(otcTasks.createdAt));
+  },
+
+  async getActiveOTCTasks() {
+    return await db.select().from(otcTasks).where(eq(otcTasks.status, 'Open')).orderBy(desc(otcTasks.createdAt));
+  },
+
+  async getOTCTask(taskId: string) {
+    const result = await db.select().from(otcTasks).where(eq(otcTasks.id, taskId)).limit(1);
+    return result[0] || null;
+  },
+
+  async createOTCTask(task: typeof otcTasks.$inferInsert) {
+    const result = await db.insert(otcTasks).values(task).returning();
+    return result[0];
+  },
+
+  async updateOTCTask(taskId: string, updates: Partial<typeof otcTasks.$inferInsert>) {
+    const result = await db.update(otcTasks).set(updates).where(eq(otcTasks.id, taskId)).returning();
+    return result[0];
+  },
+
+  async deleteOTCTask(taskId: string) {
+    await db.delete(otcTasks).where(eq(otcTasks.id, taskId));
+    return true;
+  },
+
+  async getUserOTCOrders(userId: string) {
+    return await db.select().from(otcOrders).where(eq(otcOrders.userId, userId)).orderBy(desc(otcOrders.createdAt));
+  },
+
+  async getOTCOrdersByTask(taskId: string) {
+    return await db.select().from(otcOrders).where(eq(otcOrders.taskId, taskId)).orderBy(desc(otcOrders.createdAt));
+  },
+
+  async getAllOTCOrders(limit: number = 50, offset: number = 0) {
+    return await db.select().from(otcOrders).limit(limit).offset(offset).orderBy(desc(otcOrders.createdAt));
+  },
+
+  async getOTCOrder(orderId: string) {
+    const result = await db.select().from(otcOrders).where(eq(otcOrders.id, orderId)).limit(1);
+    return result[0] || null;
+  },
+
+  async createOTCOrder(order: typeof otcOrders.$inferInsert) {
+    const result = await db.insert(otcOrders).values(order).returning();
+    return result[0];
+  },
+
+  async updateOTCOrder(orderId: string, updates: Partial<typeof otcOrders.$inferInsert>) {
+    const result = await db.update(otcOrders).set(updates).where(eq(otcOrders.id, orderId)).returning();
+    return result[0];
+  },
+
+  async deleteOTCOrder(orderId: string) {
+    await db.delete(otcOrders).where(eq(otcOrders.id, orderId));
+    return true;
   },
 };
