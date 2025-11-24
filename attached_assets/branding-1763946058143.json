@@ -1,0 +1,120 @@
+{
+  "colorScheme": "dark",
+  "fonts": [
+    {
+      "family": "Inter",
+      "role": "body"
+    },
+    {
+      "family": "Roboto",
+      "role": "body"
+    },
+    {
+      "family": "Oxygen",
+      "role": "body"
+    },
+    {
+      "family": "Ubuntu",
+      "role": "body"
+    },
+    {
+      "family": "Fira Sans",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#B45AFF",
+    "accent": "#965CEB",
+    "background": "#1C1C1C",
+    "textPrimary": "#1C1C1C",
+    "link": "#965CEB"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Inter",
+      "heading": "Inter"
+    },
+    "fontStacks": {
+      "heading": [
+        "Inter",
+        "Roboto",
+        "sans-serif"
+      ],
+      "body": [
+        "Inter",
+        "Roboto",
+        "Oxygen",
+        "Ubuntu",
+        "Cantarell",
+        "Fira Sans",
+        "Droid Sans",
+        "Helvetica Neue",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Inter",
+        "Roboto",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "32px",
+      "h2": "32px",
+      "body": "14px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "8px"
+  },
+  "components": {
+    "input": {
+      "borderColor": "#CCCCCC",
+      "borderRadius": "8px"
+    },
+    "buttonPrimary": {
+      "background": "#1C1C1C",
+      "textColor": "#000000",
+      "borderRadius": "8px",
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "File saved at: attached_assets/favicon.ico",
+    "ogImage": "File saved at: attached_assets/ogImage.jpg"
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Logo #0 matches the brand name 'Lightning AI' and is located in the header, linking to the homepage, making it the most suitable choice.",
+    "confidence": 0.98
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "Start free",
+      "reasoning": "Button #0 has vibrant action-oriented text 'Start free' and is likely the primary CTA due to its clear call to action and prominence."
+    },
+    "secondary": {
+      "index": 1,
+      "text": "Login",
+      "reasoning": "Button #1 has a muted text color and is more subtle, indicating it serves as a secondary action (Login) rather than a primary call to action."
+    },
+    "confidence": 0.95
+  },
+  "personality": {
+    "tone": "modern",
+    "energy": "medium",
+    "targetAudience": "tech-savvy individuals and businesses interested in AI solutions."
+  },
+  "designSystem": {
+    "framework": "material",
+    "componentLibrary": "mui"
+  },
+  "confidence": {
+    "buttons": 0.95,
+    "colors": 0.9,
+    "overall": 0.925
+  }
+}
