@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { type kycRecords, insertKycRecordSchema } from "@shared/schema";
+import { type kycRecords, insertKYCRecordSchema } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,7 +29,7 @@ import { useState } from "react";
 
 type SelectKycRecord = typeof kycRecords.$inferSelect;
 
-const kycSubmitSchema = insertKycRecordSchema.omit({ userId: true }).extend({
+const kycSubmitSchema = insertKYCRecordSchema.omit({ userId: true }).extend({
   documentType: z.string().min(1, "Document type is required"),
 });
 

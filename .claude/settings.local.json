@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm --version:*)",
+      "Bash(/teamspace/studios/this_studio/.nvm/versions/node/v22.14.0/bin/npm --version)",
+      "Bash(/teamspace/studios/this_studio/.nvm/versions/node/v22.14.0/bin/npm install:*)",
+      "Bash(/teamspace/studios/this_studio/.nvm/versions/node/v22.14.0/bin/npm run build)",
+      "Bash(/teamspace/studios/this_studio/.nvm/versions/node/v22.14.0/bin/npm start)",
+      "Bash(curl:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(docker run:*)",
+      "Bash(docker start:*)",
+      "Bash(docker exec:*)",
+      "Bash(/teamspace/studios/this_studio/.nvm/versions/node/v22.14.0/bin/npm run db:push)",
+      "Bash(yes:*)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(DATABASE_URL=postgresql://postgres:postgres@localhost:5432/valifi npx drizzle-kit push:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
