@@ -11,9 +11,11 @@ import {
   bankAccounts,
   exchangeOrders,
   adminUsers,
-  kycRecords
+  kycRecords,
+  activityLogs,
+  adminPermissions
 } from "@shared/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, count, sql } from "drizzle-orm";
 
 export const storage = {
   // ============================================
@@ -196,7 +198,60 @@ export const storage = {
   },
 
   async isUserAdmin(userId: string) {
-    const admin = await this.getAdminUser(userId);
-    return admin !== null;
+    const user = await this.getUser(userId);
+    return user?.role === 'admin' || user?.role === 'superadmin';
+  },
+
+  async getAllUsers(limit: number = 50, offset: number = 0) {
+    const allUsers = await db.select().from(users).limit(limit).offset(offset).orderBy(desc(users.createdAt));
+    const totalCount = await db.select({ count: count() }).from(users);
+    return { users: allUsers, total: totalCount[0]?.count || 0 };
+  },
+
+  async updateUserRole(userId: string, role: 'user' | 'admin' | 'superadmin') {
+    const result = await db.update(users).set({ role }).where(eq(users.id, userId)).returning();
+    return result[0];
+  },
+
+  async updateUserKYCStatus(userId: string, kycStatus: string, rejectionReason?: string) {
+    const updates: any = { kycStatus };
+    if (rejectionReason) {
+      updates.kycRejectionReason = rejectionReason;
+    }
+    const result = await db.update(users).set(updates).where(eq(users.id, userId)).returning();
+    return result[0];
+  },
+
+  async deleteUser(userId: string) {
+    await db.delete(users).where(eq(users.id, userId));
+    return true;
+  },
+
+  async logActivity(activity: typeof activityLogs.$inferInsert) {
+    const result = await db.insert(activityLogs).values(activity).returning();
+    return result[0];
+  },
+
+  async getActivityLogs(limit: number = 50, offset: number = 0) {
+    return await db.select().from(activityLogs).limit(limit).offset(offset).orderBy(desc(activityLogs.createdAt));
+  },
+
+  async getUserActivityLogs(userId: string, limit: number = 20) {
+    return await db.select().from(activityLogs).where(eq(activityLogs.userId, userId)).limit(limit).orderBy(desc(activityLogs.createdAt));
+  },
+
+  async getAdminPermissions(userId: string) {
+    const result = await db.select().from(adminPermissions).where(eq(adminPermissions.userId, userId)).limit(1);
+    return result[0] || null;
+  },
+
+  async createAdminPermissions(permissions: typeof adminPermissions.$inferInsert) {
+    const result = await db.insert(adminPermissions).values(permissions).returning();
+    return result[0];
+  },
+
+  async updateAdminPermissions(userId: string, updates: Partial<typeof adminPermissions.$inferInsert>) {
+    const result = await db.update(adminPermissions).set(updates).where(eq(adminPermissions.userId, userId)).returning();
+    return result[0];
   },
 };
