@@ -104,6 +104,29 @@ export const twoFactorMethodEnum = pgEnum("two_factor_method", [
   "authenticator"
 ]);
 
+export const userRoleEnum = pgEnum("user_role", [
+  "user",
+  "admin",
+  "superadmin"
+]);
+
+export const activityTypeEnum = pgEnum("activity_type", [
+  "login",
+  "logout",
+  "kyc_submitted",
+  "kyc_approved",
+  "kyc_rejected",
+  "user_created",
+  "user_updated",
+  "user_deleted",
+  "role_changed",
+  "transaction_created",
+  "asset_purchased",
+  "loan_applied",
+  "card_applied",
+  "settings_updated"
+]);
+
 // ============================================
 // 1. CORE MODELS
 // ============================================
@@ -115,6 +138,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).unique().notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   profilePhotoUrl: text("profile_photo_url"),
+  role: userRoleEnum("role").default("user"),
   kycStatus: kycStatusEnum("kyc_status").default("Not Started"),
   kycRejectionReason: text("kyc_rejection_reason"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -141,6 +165,30 @@ export const activeSessions = pgTable("active_sessions", {
   ipAddress: inet("ip_address"),
   lastActive: timestamp("last_active", { withTimezone: true }).defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const activityLogs = pgTable("activity_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  actorId: varchar("actor_id").references(() => users.id), // Admin who performed the action
+  activityType: activityTypeEnum("activity_type").notNull(),
+  description: text("description"),
+  metadata: jsonb("metadata"), // Additional context (e.g., { targetUserId, oldValue, newValue })
+  ipAddress: inet("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const adminPermissions = pgTable("admin_permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  canManageUsers: boolean("can_manage_users").default(true),
+  canApproveKYC: boolean("can_approve_kyc").default(true),
+  canManageTransactions: boolean("can_manage_transactions").default(false),
+  canViewLogs: boolean("can_view_logs").default(true),
+  canBroadcastMessages: boolean("can_broadcast_messages").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
 // ============================================

@@ -92,14 +92,14 @@ export default function AssetsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/assets/user"] });
       toast({
         title: "Purchase Successful",
-        description: "Divine element added to your collection!",
+        description: "Digital asset added to your portfolio!",
       });
       setSelectedElement(null);
     },
     onError: (error: any) => {
       toast({
         title: "Purchase Failed",
-        description: error.message || "Failed to purchase element",
+        description: error.message || "Failed to purchase digital asset",
         variant: "destructive",
       });
     },
@@ -139,17 +139,17 @@ export default function AssetsPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex items-center gap-3 mb-6">
-        <Sparkles className="w-8 h-8 text-yellow-500" />
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-          Kingdom Assets
+        <Package className="w-8 h-8 text-primary" />
+        <h1 className="text-3xl font-bold">
+          Portfolio & Assets
         </h1>
       </div>
 
       <Tabs defaultValue="ethereal" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="ethereal" data-testid="tab-ethereal">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Ethereal Elements
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Digital Assets
           </TabsTrigger>
           <TabsTrigger value="metals" data-testid="tab-metals">
             <Coins className="w-4 h-4 mr-2" />
@@ -157,7 +157,7 @@ export default function AssetsPage() {
           </TabsTrigger>
           <TabsTrigger value="my-assets" data-testid="tab-my-assets">
             <Package className="w-4 h-4 mr-2" />
-            My Assets
+            My Portfolio
           </TabsTrigger>
         </TabsList>
 
@@ -165,9 +165,9 @@ export default function AssetsPage() {
         <TabsContent value="ethereal">
           <Card>
             <CardHeader>
-              <CardTitle>Divine Collectibles Marketplace</CardTitle>
+              <CardTitle>Digital Assets Marketplace</CardTitle>
               <CardDescription>
-                Browse and acquire ethereal elements with divine powers
+                Browse and acquire tokenized digital assets
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -215,7 +215,7 @@ export default function AssetsPage() {
                           <DialogHeader>
                             <DialogTitle>Acquire {element.name}</DialogTitle>
                             <DialogDescription>
-                              Add this divine element to your collection
+                              Add this digital asset to your portfolio
                             </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
@@ -260,7 +260,7 @@ export default function AssetsPage() {
               </div>
               {etherealElements.length === 0 && (
                 <p className="text-center text-muted-foreground py-12">
-                  No ethereal elements available yet. Check back soon for divine offerings!
+                  No digital assets available yet. Check back soon for new offerings!
                 </p>
               )}
             </CardContent>
@@ -387,8 +387,8 @@ export default function AssetsPage() {
             {userAssets?.etherealAssets && userAssets.etherealAssets.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>My Ethereal Elements</CardTitle>
-                  <CardDescription>Your divine collectibles</CardDescription>
+                  <CardTitle>My Digital Assets</CardTitle>
+                  <CardDescription>Your tokenized digital holdings</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -486,7 +486,7 @@ export default function AssetsPage() {
                   <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-xl font-semibold mb-2">No Assets Yet</h3>
                   <p className="text-muted-foreground mb-4">
-                    Start building your kingdom's wealth by acquiring ethereal elements or precious metals
+                    Start building your portfolio by acquiring digital assets or precious metals
                   </p>
                 </CardContent>
               </Card>

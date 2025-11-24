@@ -205,7 +205,7 @@ export default function AdminPage() {
       });
       toast({
         title: "Success",
-        description: "Ethereal element minted successfully!",
+        description: "Digital asset created successfully!",
       });
     },
     onError: (error: any) => {
@@ -254,7 +254,7 @@ export default function AdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Admin Control Panel</h1>
-          <p className="text-muted-foreground">Oversee the entire Kingdom</p>
+          <p className="text-muted-foreground">Manage platform operations and users</p>
         </div>
         <Dialog open={broadcastDialog} onOpenChange={setBroadcastDialog}>
           <DialogTrigger asChild>
@@ -396,8 +396,8 @@ export default function AdminPage() {
             Charities
           </TabsTrigger>
           <TabsTrigger value="ethereal" data-testid="tab-ethereal">
-            <Sparkles className="mr-2 h-4 w-4" />
-            Ethereal Elements
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Digital Assets
           </TabsTrigger>
         </TabsList>
 
@@ -411,7 +411,7 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle>User Management</CardTitle>
-              <CardDescription>Manage all users in the Kingdom</CardDescription>
+              <CardDescription>Manage all platform users</CardDescription>
             </CardHeader>
             <CardContent>
               {usersLoading ? (
