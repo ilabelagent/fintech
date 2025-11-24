@@ -151,12 +151,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {user && (
+        {user?.role === 'admin' && (
           <SidebarGroup>
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={location === '/admin'}>
                     <Link href="/admin">
                       <Settings className="w-4 h-4" />
                       <span>Admin Panel</span>
