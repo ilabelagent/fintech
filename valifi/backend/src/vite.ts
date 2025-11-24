@@ -68,7 +68,8 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "..", "dist");
+  // In production, the bundle (index.js) and frontend assets are in the same dist/ folder
+  const distPath = path.resolve(import.meta.dirname);
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
