@@ -5,6 +5,15 @@ export async function initializeDatabase() {
   try {
     console.log('🔄 Initializing database...');
 
+    // Create KYC status enum if it doesn't exist
+    await pool.query(`
+      DO $$ BEGIN
+        CREATE TYPE kyc_status AS ENUM ('Not Started', 'Pending', 'Approved', 'Rejected', 'Resubmit Required');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `);
+
     // Create users table if it doesn't exist
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -14,10 +23,20 @@ export async function initializeDatabase() {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         profile_photo_url TEXT,
+        kyc_status kyc_status DEFAULT 'Not Started',
         kyc_rejection_reason TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
+    `);
+
+    // Add kyc_status column if it doesn't exist (for existing tables)
+    await pool.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN kyc_status kyc_status DEFAULT 'Not Started';
+      EXCEPTION
+        WHEN duplicate_column THEN null;
+      END $$;
     `);
 
     // Check if admin user exists using raw SQL
@@ -32,9 +51,9 @@ export async function initializeDatabase() {
       const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
       await pool.query(
-        `INSERT INTO users (email, password_hash, full_name, username, profile_photo_url)
-         VALUES ($1, $2, $3, $4, $5)`,
-        ['admin@valifi.com', hashedPassword, 'Valifi Administrator', 'admin', '']
+        `INSERT INTO users (email, password_hash, full_name, username, profile_photo_url, kyc_status)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        ['admin@valifi.com', hashedPassword, 'Valifi Administrator', 'admin', '', 'Not Started']
       );
 
       console.log('✅ Admin user created');

@@ -1,0 +1,224 @@
+2025-11-24 01:27:15.84
+c2399f08
+User
+}
+2025-11-24 01:27:15.84
+c2399f08
+User
+at async NodePgPreparedQuery.queryWithCache (file:///home/runner/workspace/node_modules/drizzle-orm/pg-core/session.js:39:16)
+2025-11-24 01:27:15.84
+c2399f08
+User
+hint: undefined,
+2025-11-24 01:27:15.84
+c2399f08
+User
+where: undefined,
+2025-11-24 01:27:15.84
+c2399f08
+User
+table: undefined,
+2025-11-24 01:27:15.84
+c2399f08
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:124:18
+2025-11-24 01:27:15.84
+c2399f08
+User
+params: [ 'joshuachiekezie34@gmail.com', 1 ],
+2025-11-24 01:27:15.84
+c2399f08
+User
+internalQuery: undefined,
+2025-11-24 01:27:15.84
+c2399f08
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-24 01:27:15.84
+c2399f08
+User
+Error registering user: DrizzleQueryError: Failed query: select "id", "full_name", "username", "email", "password_hash", "profile_photo_url", "kyc_status", "kyc_rejection_reason", "created_at", "updated_at" from "users" where "users"."email" = $1 limit $2
+2025-11-24 01:27:15.84
+c2399f08
+User
+constraint: undefined,
+2025-11-24 01:27:15.84
+c2399f08
+User
+routine: 'errorMissingColumn'
+2025-11-24 01:27:15.84
+c2399f08
+User
+at async file:///home/runner/workspace/valifi/dist/index.js:582:28 {
+2025-11-24 01:27:15.84
+c2399f08
+User
+}
+2025-11-24 01:27:15.84
+c2399f08
+User
+line: '3722',
+2025-11-24 01:27:15.84
+c2399f08
+User
+cause: error: column "kyc_status" does not exist
+2025-11-24 01:27:15.84
+c2399f08
+User
+at NodePgPreparedQuery.queryWithCache (file:///home/runner/workspace/node_modules/drizzle-orm/pg-core/session.js:41:15)
+2025-11-24 01:27:15.84
+c2399f08
+User
+code: '42703',
+2025-11-24 01:27:15.84
+c2399f08
+User
+12:27:15 AM [express] POST /api/auth/register 500 in 226ms :: {"message":"Registration failed"}
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:117:22
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async Object.getUserByEmail (file:///home/runner/workspace/valifi/dist/index.js:420:20)
+2025-11-24 01:29:02.55
+c2399f08
+User
+routine: 'errorMissingColumn'
+2025-11-24 01:29:02.55
+c2399f08
+User
+Error logging in user: DrizzleQueryError: Failed query: select "id", "full_name", "username", "email", "password_hash", "profile_photo_url", "kyc_status", "kyc_rejection_reason", "created_at", "updated_at" from "users" where "users"."email" = $1 limit $2
+2025-11-24 01:29:02.55
+c2399f08
+User
+schema: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+}
+2025-11-24 01:29:02.55
+c2399f08
+User
+dataType: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async file:///home/runner/workspace/valifi/dist/index.js:610:20 {
+2025-11-24 01:29:02.55
+c2399f08
+User
+file: 'parse_relation.c',
+2025-11-24 01:29:02.55
+c2399f08
+User
+detail: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+constraint: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+at NodePgPreparedQuery.queryWithCache (file:///home/runner/workspace/node_modules/drizzle-orm/pg-core/session.js:41:15)
+2025-11-24 01:29:02.55
+c2399f08
+User
+at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+2025-11-24 01:29:02.55
+c2399f08
+User
+table: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async NodePgPreparedQuery.queryWithCache (file:///home/runner/workspace/node_modules/drizzle-orm/pg-core/session.js:39:16)
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:124:18
+2025-11-24 01:29:02.55
+c2399f08
+User
+position: '86',
+2025-11-24 01:29:02.55
+c2399f08
+User
+where: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async file:///home/runner/workspace/valifi/dist/index.js:610:20 {
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async Object.getUserByEmail (file:///home/runner/workspace/valifi/dist/index.js:420:20)
+2025-11-24 01:29:02.55
+c2399f08
+User
+column: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-24 01:29:02.55
+c2399f08
+User
+hint: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+cause: error: column "kyc_status" does not exist
+2025-11-24 01:29:02.55
+c2399f08
+User
+}
+2025-11-24 01:29:02.55
+c2399f08
+User
+length: 110,
+2025-11-24 01:29:02.55
+c2399f08
+User
+line: '3722',
+2025-11-24 01:29:02.55
+c2399f08
+User
+code: '42703',
+2025-11-24 01:29:02.55
+c2399f08
+User
+internalQuery: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+severity: 'ERROR',
+2025-11-24 01:29:02.55
+c2399f08
+User
+internalPosition: undefined,
+2025-11-24 01:29:02.55
+c2399f08
+User
+query: 'select "id", "full_name", "username", "email", "password_hash", "profile_photo_url", "kyc_status", "kyc_rejection_reason", "created_at", "updated_at" from "users" where "users"."email" = $1 limit $2',
+2025-11-24 01:29:02.55
+c2399f08
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-24 01:29:02.55
+c2399f08
+User
+params: [ 'admin@valifi.com', 1 ],
+2025-11-24 01:29:02.55
+c2399f08
+User
+params: admin@valifi.com,1
+2025-11-24 01:29:02.55
+c2399f08
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:117:22
+2025-11-24 01:29:02.56
+c2399f08
+User
+12:29:02 AM [express] POST /api/auth/login 500 in 574ms :: {"message":"Login failed"}
