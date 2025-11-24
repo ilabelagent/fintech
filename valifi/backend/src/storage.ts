@@ -109,13 +109,37 @@ export const storage = {
   },
 
   async getUserP2POrders(userId: string) {
-    return await db.select().from(p2pOrders)
+    const allOrders = await db.select().from(p2pOrders).orderBy(desc(p2pOrders.createdAt));
+    return allOrders.filter((order: any) => order.buyerId === userId || order.sellerId === userId);
+  },
+
+  async getP2POffer(offerId: string) {
+    const result = await db.select().from(p2pOffers).where(eq(p2pOffers.id, offerId)).limit(1);
+    return result[0] || null;
+  },
+
+  async updateP2POffer(offerId: string, updates: Partial<typeof p2pOffers.$inferInsert>) {
+    const result = await db.update(p2pOffers).set(updates).where(eq(p2pOffers.id, offerId)).returning();
+    return result[0];
+  },
+
+  async updateP2POfferWithInventoryCheck(offerId: string, requestedAmount: any, newAvailable: any) {
+    // Atomic update with WHERE condition to prevent race conditions
+    // Only update if current availableAmount >= requestedAmount
+    const result = await db.update(p2pOffers)
+      .set({
+        availableAmount: newAvailable,
+        isActive: newAvailable > 0
+      })
       .where(
         and(
-          eq(p2pOrders.buyerId, userId)
+          eq(p2pOffers.id, offerId),
+          sql`${p2pOffers.availableAmount} >= ${requestedAmount}`
         )
       )
-      .orderBy(desc(p2pOrders.createdAt));
+      .returning();
+    
+    return result[0] || null;
   },
 
   async createP2POrder(order: typeof p2pOrders.$inferInsert) {
