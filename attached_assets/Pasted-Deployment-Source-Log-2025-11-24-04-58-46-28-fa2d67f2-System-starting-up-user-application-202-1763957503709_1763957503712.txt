@@ -1,0 +1,212 @@
+Deployment
+Source
+Log
+2025-11-24 04:58:46.28
+fa2d67f2
+System
+starting up user application
+2025-11-24 05:09:12.65
+ef1b9df2
+User
+file: 'parse_relation.c',
+2025-11-24 05:09:12.65
+ef1b9df2
+User
+4:09:12 AM [express] GET /api/p2p/orders 500 in 2171ms :: {"message":"Failed to fetch P2P orders"}
+2025-11-24 05:09:28.67
+ef1b9df2
+User
+4:09:28 AM [express] GET /api/auth/user 304 in 205ms :: {"id":"4ebc0f2f-67c3-4737-89eb-a5b221c768d3"…
+2025-11-24 05:09:29.06
+ef1b9df2
+User
+4:09:29 AM [express] GET /api/dashboard/config 304 in 1ms
+2025-11-24 05:09:29.08
+ef1b9df2
+User
+4:09:29 AM [express] GET /api/dashboard/preferences 304 in 1ms
+2025-11-24 05:09:56.23
+ef1b9df2
+User
+4:09:56 AM [express] POST /api/auth/register 409 in 182ms :: {"message":"User with this email alread…
+2025-11-24 05:09:58.69
+ef1b9df2
+User
+4:09:58 AM [express] POST /api/auth/register 409 in 26ms :: {"message":"User with this email already…
+2025-11-24 05:09:59.24
+ef1b9df2
+User
+4:09:59 AM [express] POST /api/auth/register 409 in 27ms :: {"message":"User with this email already…
+2025-11-24 05:10:00.05
+ef1b9df2
+User
+4:10:00 AM [express] POST /api/auth/register 409 in 26ms :: {"message":"User with this email already…
+2025-11-24 05:10:14.02
+ef1b9df2
+User
+4:10:14 AM [express] POST /api/auth/login 200 in 347ms :: {"message":"Logged in successfully","token…
+2025-11-24 05:10:16.40
+ef1b9df2
+User
+4:10:16 AM [express] GET /api/auth/user 304 in 25ms :: {"id":"4ebc0f2f-67c3-4737-89eb-a5b221c768d3",…
+2025-11-24 05:10:16.72
+ef1b9df2
+User
+4:10:16 AM [express] GET /api/dashboard/config 304 in 3ms
+2025-11-24 05:10:16.81
+ef1b9df2
+User
+4:10:16 AM [express] GET /api/dashboard/preferences 304 in 2ms
+2025-11-24 05:10:20.50
+ef1b9df2
+User
+4:10:20 AM [express] GET /api/p2p/offers 401 in 1ms
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async Object.getUserP2POrders (file:///home/runner/workspace/valifi/dist/index.js:588:23)
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+table: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+code: '42P01',
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+length: 110,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async file:///home/runner/workspace/valifi/dist/index.js:1288:22 {
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:117:22
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+file: 'parse_relation.c',
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+query: 'select "id", "offer_id", "buyer_id", "seller_id", "status", "fiat_amount", "crypto_amount", "payment_method", "created_at", "expires_at", "completed_at" from "p2p_orders" order by "p2p_orders"."created_at" desc',
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:124:18
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+line: '1449',
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async file:///home/runner/workspace/valifi/dist/index.js:1288:22 {
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+routine: 'parserOpenTable'
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+internalPosition: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async Object.getUserP2POrders (file:///home/runner/workspace/valifi/dist/index.js:588:23)
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+schema: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+cause: error: relation "p2p_orders" does not exist
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async file:///home/runner/workspace/node_modules/drizzle-orm/node-postgres/session.js:117:22
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+detail: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+dataType: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at NodePgPreparedQuery.queryWithCache (file:///home/runner/workspace/node_modules/drizzle-orm/pg-core/session.js:41:15)
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+Error fetching P2P orders: DrizzleQueryError: Failed query: select "id", "offer_id", "buyer_id", "seller_id", "status", "fiat_amount", "crypto_amount", "payment_method", "created_at", "expires_at", "completed_at" from "p2p_orders" order by "p2p_orders"."created_at" desc
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+constraint: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+severity: 'ERROR',
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+position: '159',
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+params: [],
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+params:
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+}
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+internalQuery: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+column: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+where: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+hint: undefined,
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+at async NodePgPreparedQuery.queryWithCache (file:///home/runner/workspace/node_modules/drizzle-orm/pg-core/session.js:39:16)
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+}
+2025-11-24 05:10:20.62
+ef1b9df2
+User
+4:10:20 AM [express] GET /api/p2p/orders 500 in 26ms :: {"message":"Failed to fetch P2P orders"}
