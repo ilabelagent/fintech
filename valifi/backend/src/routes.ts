@@ -454,6 +454,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ============================================
+  // P2P TRADING ROUTES
+  // ============================================
+  
+  // Get all P2P offers
+  app.get("/api/p2p/offers", isAuthenticated, async (req: any, res) => {
+    try {
+      const offers = await storage.getP2POffers();
+      res.json(offers);
+    } catch (error) {
+      console.error("Error fetching P2P offers:", error);
+      res.status(500).json({ message: "Failed to fetch P2P offers" });
+    }
+  });
+
+  // Create P2P offer
+  app.post("/api/p2p/offers", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const offer = await storage.createP2POffer({
+        ...req.body,
+        userId
+      });
+      
+      await storage.logActivity({
+        userId,
+        actorId: userId,
+        activityType: 'transaction_created',
+        description: `Created P2P ${req.body.offerType} offer`,
+        metadata: { offerId: offer.id },
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent')
+      });
+      
+      res.json(offer);
+    } catch (error) {
+      console.error("Error creating P2P offer:", error);
+      res.status(500).json({ message: "Failed to create P2P offer" });
+    }
+  });
+
+  // Get my P2P offers
+  app.get("/api/p2p/offers/mine", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const offers = await storage.getUserP2POffers(userId);
+      res.json(offers);
+    } catch (error) {
+      console.error("Error fetching user P2P offers:", error);
+      res.status(500).json({ message: "Failed to fetch user P2P offers" });
+    }
+  });
+
+  // Create P2P order (accept an offer)
+  app.post("/api/p2p/orders", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { offerId, cryptoAmount, paymentMethod } = req.body;
+      
+      // Get offer details
+      const selectedOffer = await storage.getP2POffer(offerId);
+      
+      if (!selectedOffer) {
+        return res.status(404).json({ message: "Offer not found" });
+      }
+      
+      if (!selectedOffer.isActive) {
+        return res.status(400).json({ message: "Offer is no longer active" });
+      }
+      
+      // Validate ownership - can't accept your own offer
+      if (selectedOffer.userId === userId) {
+        return res.status(400).json({ message: "Cannot accept your own offer" });
+      }
+      
+      // Validate amount against offer limits
+      if (cryptoAmount < selectedOffer.minAmount || cryptoAmount > selectedOffer.maxAmount) {
+        return res.status(400).json({ message: `Amount must be between ${selectedOffer.minAmount} and ${selectedOffer.maxAmount}` });
+      }
+      
+      // Check available inventory
+      if (cryptoAmount > selectedOffer.availableAmount) {
+        return res.status(400).json({ message: "Insufficient available amount" });
+      }
+      
+      // Calculate fiat amount from offer price
+      const fiatAmount = parseFloat((cryptoAmount * parseFloat(selectedOffer.price)).toFixed(2));
+      
+      // Atomically update offer inventory first (optimistic locking)
+      const newAvailable = parseFloat((parseFloat(selectedOffer.availableAmount) - cryptoAmount).toFixed(8));
+      const updatedOffer = await storage.updateP2POfferWithInventoryCheck(offerId, cryptoAmount, newAvailable);
+      
+      if (!updatedOffer) {
+        return res.status(409).json({ message: "Offer inventory changed. Please try again." });
+      }
+      
+      // Only create order if inventory update succeeded
+      const order = await storage.createP2POrder({
+        offerId,
+        buyerId: selectedOffer.offerType === 'SELL' ? userId : selectedOffer.userId,
+        sellerId: selectedOffer.offerType === 'BUY' ? userId : selectedOffer.userId,
+        fiatAmount,
+        cryptoAmount,
+        paymentMethod,
+        status: 'Pending Payment'
+      });
+      
+      await storage.logActivity({
+        userId,
+        actorId: userId,
+        activityType: 'transaction_created',
+        description: 'Created P2P order',
+        metadata: { orderId: order.id },
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent')
+      });
+      
+      res.json(order);
+    } catch (error) {
+      console.error("Error creating P2P order:", error);
+      res.status(500).json({ message: "Failed to create P2P order" });
+    }
+  });
+
+  // Get my P2P orders
+  app.get("/api/p2p/orders", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const orders = await storage.getUserP2POrders(userId);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching P2P orders:", error);
+      res.status(500).json({ message: "Failed to fetch P2P orders" });
+    }
+  });
+
+  // ============================================
   // WALLET ROUTES
   // ============================================
   
