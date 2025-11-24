@@ -1,0 +1,116 @@
+Published App Access
+Limit published app access to team members. Learn more
+
+
+Public
+
+Private
+Teams
+Build command
+Optional
+Compiles your app before it deploys
+cd valifi && npm run build
+Run command
+Starts your app after it deploys
+cd valifi && PORT=8888 NODE_ENV=production node dist/index.js
+Production database settings
+Beta
+Configure how your production database is created and populated when you publish. Production databases help protect your live data while you continue building. Learn more
+
+Copy your development database to production database
+What does copying your development database to production actually do?
+Replaces your production database with your development database, overwriting any existing production data.
+Useful during early development when iterating on database schema changes with no sensitive production data.
+This action cannot be undone, but you can always restore your database, learn more.
+Production app secrets
+
+SESSION_SECRET
+
+PZREn4SHxYxGoKNy6puesIwVgNgCrugCwFKCxHv4mOQi9TC2yQgScebF4gx9c9tPN1wdKaTchm9AKY0eS5lGIA==
+
+
+
+DATABASE_URL
+
+postgresql://neondb_owner:npg_rmhfe78UpIzD@ep-quiet-paper-ae7nrxyk.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require
+
+
+
+PGDATABASE
+
+neondb
+
+
+
+PGHOST
+
+ep-quiet-paper-ae7nrxyk.c-2.us-east-2.aws.neon.tech
+
+
+
+PGPORT
+
+5432
+
+
+
+PGUSER
+
+neondb_owner
+
+
+
+PGPASSWORD
+
+npg_rmhfe78UpIzD
+
+
+
+CONNECTORS_HOSTNAME
+
+connectors.replit.com
+
+
+
+REPLIT_CONNECTORS_HOSTNAME
+
+connectors.replit.com
+
+
+
+Add deployment secret
+App type
+
+
+Web Server
+
+Background Worker
+Port configuration
+Configure which port your app uses for incoming requests
+Pre-publishing security scan
+Beta
+Before publishing your app, run a security scan powered by our partner Semgrep to identify potential vulnerabilities. Learn more
+
+
+Cancel
+
+Publish
+Production
+Status
+workcodeready published 3 minutes ago
+
+Visibility
+Public
+Domain
+https://valifi-workcodeready.replit.app
+
+
+
+Buy a new domain
+Beta
+Type
+Reserved VM
+(0.5 vCPU / 2 GiB RAM)
+Database
+Production database connected
+Your production database is ready! Your app can now save and manage live user data securely.
