@@ -68,6 +68,22 @@ export const p2pOrderStatusEnum = pgEnum("p2p_order_status", [
   "Cancelled"
 ]);
 
+export const otcTaskStatusEnum = pgEnum("otc_task_status", [
+  "Open",
+  "In Progress",
+  "Completed",
+  "Cancelled"
+]);
+
+export const otcOrderStatusEnum = pgEnum("otc_order_status", [
+  "Claimed",
+  "Pending Proof",
+  "Under Review",
+  "Approved",
+  "Rejected",
+  "Paid"
+]);
+
 export const loanStatusEnum = pgEnum("loan_status", [
   "Pending", 
   "Approved", 
@@ -273,6 +289,48 @@ export const p2pChatMessages = pgTable("p2p_chat_messages", {
   senderId: varchar("sender_id").references(() => users.id).notNull(),
   message: text("message").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// ============================================
+// 5. OTC (OVER-THE-COUNTER) PROCUREMENT
+// ============================================
+
+export const otcTasks = pgTable("otc_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  adminId: varchar("admin_id").references(() => users.id).notNull(),
+  cryptoType: varchar("crypto_type", { length: 50 }).notNull(), // e.g., 'BTC', 'ETH', 'USDT'
+  amount: decimal("amount", { precision: 36, scale: 18 }).notNull(),
+  targetPrice: decimal("target_price", { precision: 36, scale: 2 }), // Optional price target
+  commissionPercentage: decimal("commission_percentage", { precision: 5, scale: 2 }).notNull(), // e.g., 2.5 for 2.5%
+  status: otcTaskStatusEnum("status").default("Open"),
+  maxClaimers: integer("max_claimers").default(1), // How many users can claim this task
+  currentClaimers: integer("current_claimers").default(0),
+  description: text("description"),
+  instructions: text("instructions"),
+  depositAddress: text("deposit_address"), // Where users should send crypto
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+});
+
+export const otcOrders = pgTable("otc_orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  taskId: varchar("task_id").references(() => otcTasks.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  status: otcOrderStatusEnum("status").default("Claimed"),
+  purchaseAmount: decimal("purchase_amount", { precision: 36, scale: 18 }),
+  purchasePrice: decimal("purchase_price", { precision: 36, scale: 2 }),
+  commissionEarned: decimal("commission_earned", { precision: 36, scale: 2 }),
+  proofOfPurchase: jsonb("proof_of_purchase"), // Screenshots, receipts
+  transactionHash: text("transaction_hash"), // Crypto TX hash
+  adminNotes: text("admin_notes"),
+  rejectionReason: text("rejection_reason"),
+  claimedAt: timestamp("claimed_at", { withTimezone: true }).defaultNow(),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
 export const p2pDisputes = pgTable("p2p_disputes", {
