@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { setupAuth } from "./authService";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { initializeDatabase } from "./init-db";
 
 const app = express();
 app.use(express.json());
@@ -39,6 +40,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize database (creates tables and admin user if needed)
+  await initializeDatabase();
+  
   await setupAuth(app);
   const server = await registerRoutes(app);
 
