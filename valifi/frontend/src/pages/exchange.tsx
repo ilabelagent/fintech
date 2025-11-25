@@ -12,7 +12,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { isFeatureEnabled } from "@/lib/featureFlags";
+import { ApiError, buildApiError, logClientError, trackEvent } from "@/lib/telemetry";
 import { insertExchangeOrderSchema, type ExchangeOrder, type LiquidityPool } from "@shared/schema";
 import {
   ArrowUpDown,
@@ -48,15 +50,18 @@ export default function ExchangePage() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPair, setSelectedPair] = useState("BTC/USDT");
+  const exchangeEnabled = isFeatureEnabled("exchange");
 
   const { data: orders, isLoading: ordersLoading, isError: ordersError, error: ordersErrorData, refetch: refetchOrders } = useQuery<ExchangeOrder[]>({
     queryKey: ["/api/exchange/orders"],
-    refetchInterval: 3000, // Real-time updates every 3 seconds
+    refetchInterval: exchangeEnabled ? 3000 : false, // Real-time updates every 3 seconds
+    enabled: exchangeEnabled,
   });
 
   const { data: pools, isLoading: poolsLoading } = useQuery<LiquidityPool[]>({
     queryKey: ["/api/exchange/pools"],
-    refetchInterval: 5000,
+    refetchInterval: exchangeEnabled ? 5000 : false,
+    enabled: exchangeEnabled,
   });
 
   const form = useForm<OrderForm>({
@@ -79,8 +84,13 @@ export default function ExchangePage() {
         credentials: "include",
       });
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create order");
+        const error = await buildApiError(response, "Failed to create order");
+        logClientError(error, {
+          requestId: error.requestId,
+          url: response.url,
+          metadata: { action: "create_exchange_order" },
+        });
+        throw error;
       }
       return response.json();
     },
@@ -90,6 +100,10 @@ export default function ExchangePage() {
         title: "Order Created",
         description: "Your exchange order has been placed successfully",
       });
+      trackEvent({
+        name: "exchange_order_created",
+        properties: { tradingPair: selectedPair },
+      });
       setDialogOpen(false);
       form.reset();
     },
@@ -98,6 +112,12 @@ export default function ExchangePage() {
         variant: "destructive",
         title: "Order Failed",
         description: error.message,
+      });
+
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, {
+        requestId,
+        metadata: { action: "create_exchange_order" },
       });
     },
   });
@@ -130,6 +150,22 @@ export default function ExchangePage() {
   const filledOrders = orders?.filter(o => o.status === "filled").length || 0;
   const totalVolume = orders?.reduce((sum, o) => sum + Number(o.total || 0), 0) || 0;
 
+  if (!exchangeEnabled) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Exchange temporarily unavailable</CardTitle>
+            <CardDescription>
+              Trading is disabled because the exchange backend is offline. You can still review other
+              areas of the app while we reconnect.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -144,7 +180,14 @@ export default function ExchangePage() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="gap-2" data-testid="button-create-order">
+            <Button
+              size="lg"
+              className="gap-2"
+              data-testid="button-create-order"
+              onClick={() =>
+                trackEvent({ name: "create_order_clicked", properties: { tradingPair: selectedPair } })
+              }
+            >
               <Sparkles className="h-4 w-4" />
               New Order
             </Button>

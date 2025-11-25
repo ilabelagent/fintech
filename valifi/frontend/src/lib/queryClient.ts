@@ -1,19 +1,28 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { ApiError, buildApiError, logClientError } from "./telemetry";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    
+    const error = await buildApiError(res, res.statusText);
+
     if (import.meta.env.DEV) {
       console.error(`[API Error] ${res.status} ${res.url}`, {
         status: res.status,
         statusText: res.statusText,
         url: res.url,
-        response: text,
+        response: error.message,
+        requestId: error.requestId,
       });
     }
-    
-    throw new Error(`${res.status}: ${text}`);
+
+    logClientError(error, {
+      requestId: error.requestId,
+      status: error.status,
+      url: res.url,
+      location: window.location.pathname,
+    });
+
+    throw error;
   }
 }
 
@@ -78,9 +87,8 @@ export const queryClient = new QueryClient({
     mutations: {
       retry: false,
       onError: (error) => {
-        if (import.meta.env.DEV) {
-          console.error("[Mutation Error]", error);
-        }
+        const requestId = error instanceof ApiError ? error.requestId : undefined;
+        logClientError(error, { requestId, metadata: { source: "mutation" } });
       },
     },
   },

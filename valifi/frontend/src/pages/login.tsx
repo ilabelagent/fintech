@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Crown } from "lucide-react";
 import { storage } from "@/lib/storage";
+import { buildApiError, logClientError, trackEvent } from "@/lib/telemetry";
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
@@ -26,6 +27,7 @@ export default function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
+      trackEvent({ name: "login_submitted" });
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,8 +36,13 @@ export default function LoginPage() {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Login failed");
+        const error = await buildApiError(res, "Login failed");
+        logClientError(error, {
+          requestId: error.requestId,
+          url: res.url,
+          metadata: { action: "login" },
+        });
+        throw error;
       }
 
       return await res.json();
@@ -51,6 +58,8 @@ export default function LoginPage() {
         description: "Welcome to Valifi!",
       });
 
+      trackEvent({ name: "login_success" });
+
       // Redirect to dashboard
       window.location.href = "/";
     },
@@ -60,14 +69,17 @@ export default function LoginPage() {
         description: error.message,
         variant: "destructive",
       });
+
+      logClientError(error, { metadata: { action: "login" } });
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; firstName: string; lastName: string }) => {
+      trackEvent({ name: "registration_submitted" });
       const fullName = `${data.firstName} ${data.lastName}`.trim();
       let username = data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
-      
+
       let res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -99,8 +111,13 @@ export default function LoginPage() {
       }
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Registration failed");
+        const error = await buildApiError(res, "Registration failed");
+        logClientError(error, {
+          requestId: error.requestId,
+          url: res.url,
+          metadata: { action: "register" },
+        });
+        throw error;
       }
 
       return await res.json();
@@ -116,6 +133,8 @@ export default function LoginPage() {
         description: "Welcome to Valifi!",
       });
 
+      trackEvent({ name: "registration_success" });
+
       // Redirect to dashboard
       window.location.href = "/";
     },
@@ -125,6 +144,8 @@ export default function LoginPage() {
         description: error.message,
         variant: "destructive",
       });
+
+      logClientError(error, { metadata: { action: "register" } });
     },
   });
 

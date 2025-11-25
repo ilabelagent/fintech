@@ -1,5 +1,5 @@
 // Valifi Fintech Platform - Standalone Application
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -24,9 +24,16 @@ import BankAccountsPage from "@/pages/bank-accounts";
 import KycPage from "@/pages/kyc";
 import SettingsPage from "@/pages/settings";
 import AdminPage from "@/pages/admin";
+import { useEffect } from "react";
+import { attachGlobalErrorHandlers, trackEvent, trackPageView } from "@/lib/telemetry";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const [location] = useLocation();
+
+  useEffect(() => {
+    trackPageView(location);
+  }, [location]);
 
   if (isLoading || !isAuthenticated) {
     return (
@@ -53,6 +60,7 @@ function Router() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
+                  trackEvent({ name: "logout_clicked" });
                   storage.clearToken();
                   window.location.href = "/";
                 }}
@@ -87,6 +95,10 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    attachGlobalErrorHandlers();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
