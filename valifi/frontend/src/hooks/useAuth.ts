@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { storage } from "@/lib/storage";
+import { buildApiError, logClientError } from "@/lib/telemetry";
 
 async function getAuthUser() {
   const token = storage.getToken();
@@ -13,7 +14,9 @@ async function getAuthUser() {
 
   if (!res.ok) {
     storage.clearToken();
-    throw new Error("Failed to fetch user");
+    const error = await buildApiError(res, "Failed to fetch user");
+    logClientError(error, { requestId: error.requestId, url: res.url });
+    throw error;
   }
 
   return await res.json();

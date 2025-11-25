@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { isFeatureEnabled } from "@/lib/featureFlags";
+import { ApiError, logClientError, trackEvent } from "@/lib/telemetry";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -73,6 +75,7 @@ export default function P2PTradingPage() {
   const [chatMessage, setChatMessage] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
   const { toast } = useToast();
+  const p2pEnabled = isFeatureEnabled("p2p");
 
   // Filters
   const [cryptoFilter, setCryptoFilter] = useState<string>("");
@@ -81,16 +84,20 @@ export default function P2PTradingPage() {
 
   // WebSocket connection
   useEffect(() => {
+    if (!p2pEnabled) return;
+
     const newSocket = io();
     setSocket(newSocket);
 
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [p2pEnabled]);
 
   // Subscribe to order updates
   useEffect(() => {
+    if (!p2pEnabled) return;
+
     if (socket && selectedOrder) {
       socket.emit("subscribe:p2p", selectedOrder.id);
 
@@ -113,27 +120,30 @@ export default function P2PTradingPage() {
         socket.off("p2p:order_update");
       };
     }
-  }, [socket, selectedOrder]);
+  }, [socket, selectedOrder, p2pEnabled]);
 
   // Fetch offers
   const { data: offers, isLoading: offersLoading } = useQuery({
     queryKey: ["/api/p2p/offers", typeFilter],
-    queryFn: () => {
+    enabled: p2pEnabled,
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (typeFilter) params.append("type", typeFilter);
-      return fetch(`/api/p2p/offers?${params}`).then(res => res.json());
+      const response = await apiRequest("GET", `/api/p2p/offers?${params}`);
+      return response.json();
     },
   });
 
   // Fetch user orders
   const { data: orders = [], isLoading: ordersLoading } = useQuery<any[]>({
     queryKey: ["/api/p2p/orders"],
+    enabled: p2pEnabled,
   });
 
   // Fetch chat messages for selected order
   const { data: messages = [] } = useQuery<any[]>({
     queryKey: ["/api/p2p/messages", selectedOrder?.id],
-    enabled: !!selectedOrder,
+    enabled: p2pEnabled && !!selectedOrder,
   });
 
   // Create offer mutation
@@ -149,37 +159,54 @@ export default function P2PTradingPage() {
   });
 
   const createOfferMutation = useMutation({
-    mutationFn: (data: CreateOfferFormData) => 
-      apiRequest("/api/p2p/offers", "POST", data),
-    onSuccess: () => {
+    mutationFn: (data: CreateOfferFormData) => apiRequest("POST", "/api/p2p/offers", data),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/p2p/offers"] });
       toast({ title: "Success", description: "Offer created successfully!" });
       createOfferForm.reset();
       setActiveTab("browse");
+      trackEvent({
+        name: "p2p_offer_created",
+        properties: { type: variables.type, cryptocurrency: variables.cryptocurrency },
+      });
     },
-    onError: (error: any) => {
-      toast({ 
-        title: "Error", 
+    onError: (error: any, variables) => {
+      toast({
+        title: "Error",
         description: error.message || "Failed to create offer",
-        variant: "destructive" 
+        variant: "destructive",
+      });
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, {
+        requestId,
+        metadata: { action: "create_offer", type: variables?.type, cryptocurrency: variables?.cryptocurrency },
       });
     },
   });
 
   // Accept offer mutation
   const acceptOfferMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/p2p/orders", "POST", data),
-    onSuccess: () => {
+    mutationFn: (data: any) => apiRequest("POST", "/api/p2p/orders", data),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
       toast({ title: "Success", description: "Order created! Funds are in escrow." });
       setSelectedOffer(null);
       setActiveTab("orders");
+      trackEvent({
+        name: "p2p_order_created",
+        properties: { offerId: variables?.offerId, role: variables?.type },
+      });
     },
-    onError: (error: any) => {
-      toast({ 
-        title: "Error", 
+    onError: (error: any, variables) => {
+      toast({
+        title: "Error",
         description: error.message || "Failed to create order",
-        variant: "destructive" 
+        variant: "destructive",
+      });
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, {
+        requestId,
+        metadata: { action: "create_order", offerId: variables?.offerId },
       });
     },
   });
@@ -187,48 +214,90 @@ export default function P2PTradingPage() {
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: (data: { orderId: string; message: string }) =>
-      apiRequest("/api/p2p/messages", "POST", data),
+      apiRequest("POST", "/api/p2p/messages", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/p2p/messages", selectedOrder?.id] });
       setChatMessage("");
+    },
+    onError: (error: any) => {
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, { requestId, metadata: { action: "p2p_send_message" } });
     },
   });
 
   // Mark as paid mutation
   const markPaidMutation = useMutation({
-    mutationFn: (orderId: string) => 
-      apiRequest(`/api/p2p/orders/${orderId}/mark-paid`, "POST", {}),
-    onSuccess: () => {
+    mutationFn: (orderId: string) => apiRequest("POST", `/api/p2p/orders/${orderId}/mark-paid`, {}),
+    onSuccess: (_, orderId) => {
       queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
       toast({ title: "Success", description: "Payment marked as sent!" });
+      trackEvent({ name: "p2p_mark_paid", properties: { orderId } });
+    },
+    onError: (error: any, orderId) => {
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, { requestId, metadata: { action: "mark_paid", orderId } });
+      toast({
+        title: "Error",
+        description: error.message || "Failed to mark payment",
+        variant: "destructive",
+      });
     },
   });
 
   // Release funds mutation
   const releaseFundsMutation = useMutation({
     mutationFn: (data: { orderId: string; txHash?: string }) =>
-      apiRequest(`/api/p2p/orders/${data.orderId}/release`, "POST", { txHash: data.txHash }),
-    onSuccess: () => {
+      apiRequest("POST", `/api/p2p/orders/${data.orderId}/release`, { txHash: data.txHash }),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
       toast({ title: "Success", description: "Funds released successfully!" });
+      trackEvent({ name: "p2p_release_funds", properties: { orderId: variables.orderId } });
+    },
+    onError: (error: any, variables) => {
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, { requestId, metadata: { action: "release_funds", orderId: variables?.orderId } });
+      toast({
+        title: "Error",
+        description: error.message || "Failed to release funds",
+        variant: "destructive",
+      });
     },
   });
 
   // Create dispute mutation
   const createDisputeMutation = useMutation({
-    mutationFn: (data: { orderId: string; reason: string }) =>
-      apiRequest("/api/p2p/disputes", "POST", data),
-    onSuccess: () => {
+    mutationFn: (data: { orderId: string; reason: string }) => apiRequest("POST", "/api/p2p/disputes", data),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
       toast({ title: "Dispute Created", description: "Support will review your case." });
+      trackEvent({ name: "p2p_dispute_created", properties: { orderId: variables.orderId } });
+    },
+    onError: (error: any, variables) => {
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, { requestId, metadata: { action: "create_dispute", orderId: variables?.orderId } });
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create dispute",
+        variant: "destructive",
+      });
     },
   });
 
   // Create review mutation
   const createReviewMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/p2p/reviews", "POST", data),
-    onSuccess: () => {
+    mutationFn: (data: any) => apiRequest("POST", "/api/p2p/reviews", data),
+    onSuccess: (_, variables) => {
       toast({ title: "Review Submitted", description: "Thank you for your feedback!" });
+      trackEvent({ name: "p2p_review_submitted", properties: { orderId: variables?.orderId } });
+    },
+    onError: (error: any, variables) => {
+      const requestId = error instanceof ApiError ? error.requestId : undefined;
+      logClientError(error, { requestId, metadata: { action: "create_review", orderId: variables?.orderId } });
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit review",
+        variant: "destructive",
+      });
     },
   });
 
@@ -268,6 +337,22 @@ export default function P2PTradingPage() {
       </Badge>
     );
   };
+
+  if (!p2pEnabled) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>P2P trading paused</CardTitle>
+            <CardDescription>
+              Peer-to-peer trades are temporarily disabled while we wait for the backend service. You can
+              still browse other areas of the product without disruption.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 dark:bg-gray-900">
