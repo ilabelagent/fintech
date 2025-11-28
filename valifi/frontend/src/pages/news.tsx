@@ -1,18 +1,32 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { queryClient } from "@/lib/queryClient";
-import { insertBlogPostSchema, type BlogPost } from "@shared/schema";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { queryClient } from '@/lib/queryClient';
+import { insertBlogPostSchema, type BlogPost } from '@shared/schema';
 import {
   Newspaper,
   TrendingUp,
@@ -22,14 +36,14 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
-  Crown
-} from "lucide-react";
-import { useState } from "react";
+  Crown,
+} from 'lucide-react';
+import { useState } from 'react';
 
 const postFormSchema = insertBlogPostSchema.omit({ authorId: true }).extend({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  content: z.string().min(10, "Content must be at least 10 characters"),
-  category: z.string().min(1, "Category is required"),
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  content: z.string().min(10, 'Content must be at least 10 characters'),
+  category: z.string().min(1, 'Category is required'),
 });
 
 type PostForm = z.infer<typeof postFormSchema>;
@@ -40,48 +54,53 @@ export default function NewsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
-  const { data: posts, isLoading, isError, refetch } = useQuery<BlogPost[]>({
-    queryKey: ["/api/blog/posts"],
+  const {
+    data: posts,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery<BlogPost[]>({
+    queryKey: ['/api/blog/posts'],
     refetchInterval: 10000,
   });
 
   const form = useForm<PostForm>({
     resolver: zodResolver(postFormSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      category: "announcement",
+      title: '',
+      content: '',
+      category: 'announcement',
       isPublished: false,
     },
   });
 
   const createPostMutation = useMutation({
     mutationFn: async (data: PostForm) => {
-      const response = await fetch("/api/blog/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/blog/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to create post");
+        throw new Error(error.message || 'Failed to create post');
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blog/posts"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/blog/posts'] });
       toast({
-        title: "Post Created",
-        description: "Blog post has been published",
+        title: 'Post Created',
+        description: 'Blog post has been published',
       });
       setDialogOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "Failed to Create Post",
+        variant: 'destructive',
+        title: 'Failed to Create Post',
         description: error.message,
       });
     },
@@ -89,14 +108,14 @@ export default function NewsPage() {
 
   // Calculate stats
   const totalPosts = posts?.length || 0;
-  const publishedPosts = posts?.filter(p => p.isPublished).length || 0;
+  const publishedPosts = posts?.filter((p) => p.isPublished).length || 0;
   const totalViews = posts?.reduce((sum, p) => sum + (p.viewCount || 0), 0) || 0;
 
   const categoryColors: Record<string, string> = {
-    announcement: "default",
-    update: "secondary",
-    feature: "outline",
-    tutorial: "default",
+    announcement: 'default',
+    update: 'secondary',
+    feature: 'outline',
+    tutorial: 'default',
   };
 
   return (
@@ -107,9 +126,7 @@ export default function NewsPage() {
             <Newspaper className="h-8 w-8" />
             Blog & News
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Exchange updates and platform announcements
-          </p>
+          <p className="text-muted-foreground mt-1">Exchange updates and platform announcements</p>
         </div>
         {user?.isAdmin && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -122,12 +139,13 @@ export default function NewsPage() {
             <DialogContent className="max-w-3xl">
               <DialogHeader>
                 <DialogTitle>Create Blog Post</DialogTitle>
-                <DialogDescription>
-                  Publish news and updates for the community
-                </DialogDescription>
+                <DialogDescription>Publish news and updates for the community</DialogDescription>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => createPostMutation.mutate(data))} className="space-y-4">
+                <form
+                  onSubmit={form.handleSubmit((data) => createPostMutation.mutate(data))}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="title"
@@ -238,7 +256,9 @@ export default function NewsPage() {
             <Newspaper className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-total-posts">{totalPosts}</div>
+            <div className="text-2xl font-bold" data-testid="text-total-posts">
+              {totalPosts}
+            </div>
             <p className="text-xs text-muted-foreground">All articles</p>
           </CardContent>
         </Card>
@@ -249,7 +269,9 @@ export default function NewsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-published-posts">{publishedPosts}</div>
+            <div className="text-2xl font-bold" data-testid="text-published-posts">
+              {publishedPosts}
+            </div>
             <p className="text-xs text-muted-foreground">Live articles</p>
           </CardContent>
         </Card>
@@ -260,7 +282,10 @@ export default function NewsPage() {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold covenant-gradient-text" data-testid="text-total-views">
+            <div
+              className="text-2xl font-bold covenant-gradient-text"
+              data-testid="text-total-views"
+            >
               {totalViews.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Article impressions</p>
@@ -273,7 +298,9 @@ export default function NewsPage() {
             <Crown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-categories">4</div>
+            <div className="text-2xl font-bold" data-testid="text-categories">
+              4
+            </div>
             <p className="text-xs text-muted-foreground">Content types</p>
           </CardContent>
         </Card>
@@ -295,7 +322,12 @@ export default function NewsPage() {
             <CardContent className="p-12 text-center">
               <AlertCircle className="h-8 w-8 mx-auto mb-4 text-destructive" />
               <p className="text-sm text-muted-foreground mb-4">Failed to load posts</p>
-              <Button onClick={() => refetch()} variant="outline" size="sm" data-testid="button-retry">
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                size="sm"
+                data-testid="button-retry"
+              >
                 <Newspaper className="mr-2 h-4 w-4" />
                 Retry
               </Button>
@@ -320,11 +352,16 @@ export default function NewsPage() {
               >
                 <CardHeader>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant={categoryColors[post.category || 'announcement'] as any} data-testid={`badge-category-${post.id}`}>
+                    <Badge
+                      variant={categoryColors[post.category || 'announcement'] as any}
+                      data-testid={`badge-category-${post.id}`}
+                    >
                       {post.category?.toUpperCase()}
                     </Badge>
                     {!post.isPublished && (
-                      <Badge variant="secondary" data-testid={`badge-draft-${post.id}`}>Draft</Badge>
+                      <Badge variant="secondary" data-testid={`badge-draft-${post.id}`}>
+                        Draft
+                      </Badge>
                     )}
                   </div>
                   <CardTitle className="line-clamp-2" data-testid={`text-title-${post.id}`}>
@@ -343,7 +380,10 @@ export default function NewsPage() {
                       </span>
                     </div>
                     {post.viewCount !== undefined && (
-                      <div className="flex items-center gap-1" data-testid={`text-views-${post.id}`}>
+                      <div
+                        className="flex items-center gap-1"
+                        data-testid={`text-views-${post.id}`}
+                      >
                         <Eye className="h-4 w-4" />
                         {post.viewCount}
                       </div>

@@ -1,19 +1,39 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { queryClient } from "@/lib/queryClient";
-import { insertForumThreadSchema, insertForumReplySchema, type ForumCategory, type ForumThread, type ForumReply } from "@shared/schema";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { queryClient } from '@/lib/queryClient';
+import {
+  insertForumThreadSchema,
+  insertForumReplySchema,
+  type ForumCategory,
+  type ForumThread,
+  type ForumReply,
+} from '@shared/schema';
 import {
   Users,
   MessageSquare,
@@ -25,18 +45,18 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
-  Shield
-} from "lucide-react";
-import { useState } from "react";
+  Shield,
+} from 'lucide-react';
+import { useState } from 'react';
 
 const threadFormSchema = insertForumThreadSchema.omit({ userId: true }).extend({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  content: z.string().min(10, "Content must be at least 10 characters"),
-  categoryId: z.string().min(1, "Category is required"),
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  content: z.string().min(10, 'Content must be at least 10 characters'),
+  categoryId: z.string().min(1, 'Category is required'),
 });
 
 const replyFormSchema = insertForumReplySchema.omit({ userId: true }).extend({
-  content: z.string().min(1, "Reply cannot be empty"),
+  content: z.string().min(1, 'Reply cannot be empty'),
   threadId: z.string().min(1),
 });
 
@@ -51,16 +71,16 @@ export default function CommunityPage() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<ForumCategory[]>({
-    queryKey: ["/api/forum/categories"],
+    queryKey: ['/api/forum/categories'],
   });
 
   const { data: threads, isLoading: threadsLoading } = useQuery<ForumThread[]>({
-    queryKey: ["/api/forum/threads"],
+    queryKey: ['/api/forum/threads'],
     refetchInterval: 5000,
   });
 
   const { data: replies } = useQuery<ForumReply[]>({
-    queryKey: ["/api/forum/replies"],
+    queryKey: ['/api/forum/replies'],
     enabled: !!selectedThread,
     refetchInterval: 3000,
   });
@@ -68,8 +88,8 @@ export default function CommunityPage() {
   const threadForm = useForm<ThreadForm>({
     resolver: zodResolver(threadFormSchema),
     defaultValues: {
-      title: "",
-      content: "",
+      title: '',
+      content: '',
       isPinned: false,
       isLocked: false,
     },
@@ -78,37 +98,37 @@ export default function CommunityPage() {
   const replyForm = useForm<ReplyForm>({
     resolver: zodResolver(replyFormSchema),
     defaultValues: {
-      content: "",
+      content: '',
     },
   });
 
   const createThreadMutation = useMutation({
     mutationFn: async (data: ThreadForm) => {
-      const response = await fetch("/api/forum/threads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/forum/threads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to create thread");
+        throw new Error(error.message || 'Failed to create thread');
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/forum/threads"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/forum/threads'] });
       toast({
-        title: "Thread Created",
-        description: "Your discussion thread has been posted",
+        title: 'Thread Created',
+        description: 'Your discussion thread has been posted',
       });
       setDialogOpen(false);
       threadForm.reset();
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "Failed to Create Thread",
+        variant: 'destructive',
+        title: 'Failed to Create Thread',
         description: error.message,
       });
     },
@@ -116,23 +136,23 @@ export default function CommunityPage() {
 
   const createReplyMutation = useMutation({
     mutationFn: async (data: ReplyForm) => {
-      const response = await fetch("/api/forum/replies", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/forum/replies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to post reply");
+        throw new Error(error.message || 'Failed to post reply');
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/forum/replies"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/forum/replies'] });
       toast({
-        title: "Reply Posted",
-        description: "Your response has been added",
+        title: 'Reply Posted',
+        description: 'Your response has been added',
       });
       replyForm.reset();
       setReplyingTo(null);
@@ -142,7 +162,7 @@ export default function CommunityPage() {
   // Calculate stats
   const totalThreads = threads?.length || 0;
   const totalReplies = replies?.length || 0;
-  const activeThreads = threads?.filter(t => !t.isLocked).length || 0;
+  const activeThreads = threads?.filter((t) => !t.isLocked).length || 0;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -152,9 +172,7 @@ export default function CommunityPage() {
             <Users className="h-8 w-8" />
             VIP Community Forum
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Private discussions for Kingdom members
-          </p>
+          <p className="text-muted-foreground mt-1">Private discussions for Kingdom members</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -166,12 +184,13 @@ export default function CommunityPage() {
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Start New Discussion</DialogTitle>
-              <DialogDescription>
-                Create a thread for VIP community members
-              </DialogDescription>
+              <DialogDescription>Create a thread for VIP community members</DialogDescription>
             </DialogHeader>
             <Form {...threadForm}>
-              <form onSubmit={threadForm.handleSubmit((data) => createThreadMutation.mutate(data))} className="space-y-4">
+              <form
+                onSubmit={threadForm.handleSubmit((data) => createThreadMutation.mutate(data))}
+                className="space-y-4"
+              >
                 <FormField
                   control={threadForm.control}
                   name="categoryId"
@@ -204,7 +223,11 @@ export default function CommunityPage() {
                     <FormItem>
                       <FormLabel>Title</FormLabel>
                       <FormControl>
-                        <Input placeholder="Discussion title" {...field} data-testid="input-title" />
+                        <Input
+                          placeholder="Discussion title"
+                          {...field}
+                          data-testid="input-title"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -262,7 +285,9 @@ export default function CommunityPage() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-total-threads">{totalThreads}</div>
+            <div className="text-2xl font-bold" data-testid="text-total-threads">
+              {totalThreads}
+            </div>
             <p className="text-xs text-muted-foreground">Community discussions</p>
           </CardContent>
         </Card>
@@ -273,7 +298,9 @@ export default function CommunityPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-active-threads">{activeThreads}</div>
+            <div className="text-2xl font-bold" data-testid="text-active-threads">
+              {activeThreads}
+            </div>
             <p className="text-xs text-muted-foreground">Open for replies</p>
           </CardContent>
         </Card>
@@ -284,7 +311,9 @@ export default function CommunityPage() {
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-total-replies">{totalReplies}</div>
+            <div className="text-2xl font-bold" data-testid="text-total-replies">
+              {totalReplies}
+            </div>
             <p className="text-xs text-muted-foreground">Community responses</p>
           </CardContent>
         </Card>
@@ -295,7 +324,9 @@ export default function CommunityPage() {
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-categories">{categories?.length || 0}</div>
+            <div className="text-2xl font-bold" data-testid="text-categories">
+              {categories?.length || 0}
+            </div>
             <p className="text-xs text-muted-foreground">Discussion topics</p>
           </CardContent>
         </Card>
@@ -303,8 +334,12 @@ export default function CommunityPage() {
 
       <Tabs defaultValue="threads" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="threads" data-testid="tab-threads">Discussions</TabsTrigger>
-          <TabsTrigger value="categories" data-testid="tab-categories">Categories</TabsTrigger>
+          <TabsTrigger value="threads" data-testid="tab-threads">
+            Discussions
+          </TabsTrigger>
+          <TabsTrigger value="categories" data-testid="tab-categories">
+            Categories
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="threads" className="space-y-4">
@@ -326,8 +361,8 @@ export default function CommunityPage() {
           ) : (
             <div className="grid gap-4">
               {threads.map((thread) => {
-                const threadReplies = replies?.filter(r => r.threadId === thread.id) || [];
-                
+                const threadReplies = replies?.filter((r) => r.threadId === thread.id) || [];
+
                 return (
                   <Card
                     key={thread.id}
@@ -340,13 +375,21 @@ export default function CommunityPage() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             {thread.isPinned && (
-                              <Badge variant="outline" className="gap-1" data-testid={`badge-pinned-${thread.id}`}>
+                              <Badge
+                                variant="outline"
+                                className="gap-1"
+                                data-testid={`badge-pinned-${thread.id}`}
+                              >
                                 <Star className="h-3 w-3" />
                                 Pinned
                               </Badge>
                             )}
                             {thread.isLocked && (
-                              <Badge variant="secondary" className="gap-1" data-testid={`badge-locked-${thread.id}`}>
+                              <Badge
+                                variant="secondary"
+                                className="gap-1"
+                                data-testid={`badge-locked-${thread.id}`}
+                              >
                                 <Lock className="h-3 w-3" />
                                 Locked
                               </Badge>
@@ -358,10 +401,16 @@ export default function CommunityPage() {
                               </Badge>
                             )}
                           </div>
-                          <CardTitle className="text-lg" data-testid={`text-thread-title-${thread.id}`}>
+                          <CardTitle
+                            className="text-lg"
+                            data-testid={`text-thread-title-${thread.id}`}
+                          >
                             {thread.title}
                           </CardTitle>
-                          <CardDescription className="mt-1 line-clamp-2" data-testid={`text-thread-content-${thread.id}`}>
+                          <CardDescription
+                            className="mt-1 line-clamp-2"
+                            data-testid={`text-thread-content-${thread.id}`}
+                          >
                             {thread.content}
                           </CardDescription>
                         </div>
@@ -369,7 +418,10 @@ export default function CommunityPage() {
                           <p data-testid={`text-thread-date-${thread.id}`}>
                             {new Date(thread.createdAt!).toLocaleDateString()}
                           </p>
-                          <p className="font-semibold mt-1" data-testid={`text-thread-replies-${thread.id}`}>
+                          <p
+                            className="font-semibold mt-1"
+                            data-testid={`text-thread-replies-${thread.id}`}
+                          >
                             {threadReplies.length} replies
                           </p>
                         </div>
@@ -400,12 +452,18 @@ export default function CommunityPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {categories.map((category) => {
-                const categoryThreads = threads?.filter(t => t.categoryId === category.id) || [];
-                
+                const categoryThreads = threads?.filter((t) => t.categoryId === category.id) || [];
+
                 return (
-                  <Card key={category.id} className="hover-elevate" data-testid={`card-category-${category.id}`}>
+                  <Card
+                    key={category.id}
+                    className="hover-elevate"
+                    data-testid={`card-category-${category.id}`}
+                  >
                     <CardHeader>
-                      <CardTitle data-testid={`text-category-name-${category.id}`}>{category.name}</CardTitle>
+                      <CardTitle data-testid={`text-category-name-${category.id}`}>
+                        {category.name}
+                      </CardTitle>
                       <CardDescription data-testid={`text-category-desc-${category.id}`}>
                         {category.description || 'No description'}
                       </CardDescription>
@@ -413,7 +471,10 @@ export default function CommunityPage() {
                     <CardContent>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Discussions</span>
-                        <Badge variant="outline" data-testid={`badge-category-count-${category.id}`}>
+                        <Badge
+                          variant="outline"
+                          data-testid={`badge-category-count-${category.id}`}
+                        >
                           {categoryThreads.length}
                         </Badge>
                       </div>
@@ -431,25 +492,34 @@ export default function CommunityPage() {
         <Dialog open={!!selectedThread} onOpenChange={() => setSelectedThread(null)}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{threads?.find(t => t.id === selectedThread)?.title}</DialogTitle>
+              <DialogTitle>{threads?.find((t) => t.id === selectedThread)?.title}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded-lg">
-                <p>{threads?.find(t => t.id === selectedThread)?.content}</p>
+                <p>{threads?.find((t) => t.id === selectedThread)?.content}</p>
               </div>
 
               <div className="space-y-3">
-                <h3 className="font-semibold">Replies ({replies?.filter(r => r.threadId === selectedThread).length || 0})</h3>
-                {replies?.filter(r => r.threadId === selectedThread).map((reply) => (
-                  <Card key={reply.id} data-testid={`card-reply-${reply.id}`}>
-                    <CardContent className="p-4">
-                      <p className="text-sm" data-testid={`text-reply-content-${reply.id}`}>{reply.content}</p>
-                      <p className="text-xs text-muted-foreground mt-2" data-testid={`text-reply-date-${reply.id}`}>
-                        {new Date(reply.createdAt!).toLocaleString()}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
+                <h3 className="font-semibold">
+                  Replies ({replies?.filter((r) => r.threadId === selectedThread).length || 0})
+                </h3>
+                {replies
+                  ?.filter((r) => r.threadId === selectedThread)
+                  .map((reply) => (
+                    <Card key={reply.id} data-testid={`card-reply-${reply.id}`}>
+                      <CardContent className="p-4">
+                        <p className="text-sm" data-testid={`text-reply-content-${reply.id}`}>
+                          {reply.content}
+                        </p>
+                        <p
+                          className="text-xs text-muted-foreground mt-2"
+                          data-testid={`text-reply-date-${reply.id}`}
+                        >
+                          {new Date(reply.createdAt!).toLocaleString()}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
               </div>
 
               <Form {...replyForm}>
@@ -476,7 +546,11 @@ export default function CommunityPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={createReplyMutation.isPending} data-testid="button-submit-reply">
+                  <Button
+                    type="submit"
+                    disabled={createReplyMutation.isPending}
+                    data-testid="button-submit-reply"
+                  >
                     {createReplyMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

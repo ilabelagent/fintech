@@ -1,15 +1,18 @@
 # REMOVAL CANDIDATES - Valifi Fintech Standalone Refactor
 
 ## Executive Summary
+
 This document identifies all components to be removed from the repository to create a standalone Valifi Fintech application focused solely on banking, wallets, investments, and financial services.
 
 ## 1. BLUE_ELITES/ - Luxury Platform
+
 **Path**: `/blue_elites/`
 **Has .git/**: No (checked - only main repo has .git)
 **Status**: ❌ REMOVE
 **Reason**: Separate luxury service marketplace platform, not part of Valifi fintech core
 **Size**: 246 TS/JS files, Next.js 15.1.6 application on port 3000
 **References Found**:
+
 - `agents/training/agent_trainer.py` - Training data references
 - `deployment/autonomous_builder.py` - Build scripts
 - `deployment/multi_system_orchestrator.py` - System orchestration
@@ -20,15 +23,18 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 2. LIGHTNING_MIGRATION/ - Separate Systems Migration
+
 **Path**: `/LIGHTNING_MIGRATION/`
 **Has .git/**: No
 **Status**: ❌ REMOVE
 **Reason**: Contains standalone migration packages for cyber-lab and jesus-cartel (unrelated to Valifi)
 
 ### 2a. cyber-lab-standalone/
+
 **Functionality**: Security lab, penetration testing, vulnerability scanning
 **Not Core to Valifi**: Yes (unless security features are explicitly part of Valifi banking)
 **References Found**:
+
 - `server/analyticsBot.ts` - BotCyberLab class (lines 1727-2041)
 - `server/agentOrchestrator.ts` - analytics_cyberlab node
 - `client/src/pages/analytics-intelligence.tsx` - CyberLab UI card
@@ -36,9 +42,11 @@ This document identifies all components to be removed from the repository to cre
 - `exports/` folder - Multiple bot references
 
 ### 2b. jesus-cartel-standalone/
+
 **Functionality**: Publishing platform, music releases, events, streaming
 **Not Core to Valifi**: Yes (entertainment/media platform)
 **References Found**:
+
 - `server/jesusCartelService.ts` - Full service implementation
 - `server/routes.ts` - API endpoints (lines 666-840)
 - `server/storage.ts` - Database schema exports
@@ -49,17 +57,20 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 3. EXTRACTED_KINGDOM_STANDARD/ - Trading Bot System
+
 **Path**: `/extracted_kingdom_standard/`
 **Has .git/**: No
 **Status**: ❌ REMOVE
 **Reason**: Trading bot system with backtesting, simulation, telegram signals
 **References Found**:
+
 - `agents/interface/conversational_interface.py` - kingdom_standard flag
 - `agents/orchestrator/master_orchestrator.py` - kingdom_standard output
 
 ---
 
 ## 4. EXTRACTED_PHP_EXCHANGE/ - Separate PHP Exchange
+
 **Path**: `/extracted_php_exchange/`
 **Has .git/**: No
 **Status**: ❌ REMOVE
@@ -69,11 +80,13 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 5. DEPLOYMENT/ - Agent Deployment Systems
+
 **Path**: `/deployment/`
 **Has .git/**: No
 **Status**: ❌ REMOVE
 **Reason**: Multi-system orchestration for Valifi + ComfyUI + blue_elites
 **Files**:
+
 - `autonomous_builder.py` - Blue elites builder
 - `multi_system_orchestrator.py` - Cross-system coordination
 - `deploy_limitless.sh` - Multi-system deployment
@@ -84,11 +97,13 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 6. AGENTS/ - Agent Orchestration Systems
+
 **Path**: `/agents/`
 **Has .git/**: No
 **Status**: ❌ REMOVE (unless core to Valifi fintech operations)
 **Reason**: LitServe multi-agent system for terminal automation
 **Contains**:
+
 - `/interface/` - Conversational interface
 - `/orchestrator/` - Master orchestrator, agent server
 - `/sdk_agent/` - SDK knowledge agent
@@ -98,16 +113,18 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 7. CLIENT UI - NON-VALIFI PAGES
+
 **Path**: `/client/src/pages/`
 **Status**: ❌ REMOVE FOLLOWING PAGES
 
 ### Pages to Remove:
+
 1. `trading-bots.tsx` - Trading bot management UI (273 references to bot functionality)
 2. `bot-marketplace.tsx` - Bot marketplace
 3. `celebrity-platform.tsx` - Celebrity platform
 4. `publishing.tsx` - Publishing platform
 5. `prayer-center.tsx` - Prayer center
-6. `tithing.tsx` - Tithing/charity system  
+6. `tithing.tsx` - Tithing/charity system
 7. `mixer.tsx` - Unknown mixer functionality
 8. `ethereal-elements.tsx` - Ethereal elements (unclear purpose)
 9. `quantum.tsx` - Quantum (unclear purpose)
@@ -117,6 +134,7 @@ This document identifies all components to be removed from the repository to cre
 13. `advanced-trading.tsx` - Advanced trading features (unless part of Valifi investment)
 
 ### Pages to Keep:
+
 - `dashboard.tsx` / `dashboard-new.tsx` - Main dashboard
 - `wallet-connect.tsx`, `wallet-security.tsx` - Wallet functionality
 - `assets.tsx` - Asset management
@@ -137,15 +155,18 @@ This document identifies all components to be removed from the repository to cre
 - `chat.tsx`, `agents.tsx` - Support features
 
 ### Dashboard Widgets to Remove:
+
 - `/client/src/components/dashboard-widgets/TradingBotStatus.tsx` - Trading bot widget
 
 ---
 
 ## 8. SERVER - NON-VALIFI SERVICES
+
 **Path**: `/server/`
 **Status**: ❌ REMOVE FOLLOWING FILES
 
 ### Files to Remove:
+
 1. `advancedTradingBot.ts` - Advanced trading bot (500+ lines)
 2. `tradingBotService.ts` - Trading bot service
 3. `analyticsBot.ts` - Contains BotCyberLab (2500+ lines - review for analytics to keep)
@@ -175,6 +196,7 @@ This document identifies all components to be removed from the repository to cre
 27. `streamingOrchestrationService.ts` - Streaming orchestration
 
 ### Files to Keep:
+
 - `authService.ts` - Authentication
 - `cryptoProcessorService.ts` - Crypto processing
 - `walletConnectService.ts` - Wallet connection
@@ -192,10 +214,12 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 9. DATABASE SCHEMA CLEANUP
+
 **Path**: `/shared/schema.ts`, `/exports/schema.ts`, `/server/storage.ts`
 **Status**: ⚠️ CLEAN (remove tables/types for removed features)
 
 ### Tables to Remove:
+
 - `tradingBots` - Trading bot definitions
 - `botExecutions` - Bot execution history
 - `botLearningSessions` - Bot learning
@@ -213,6 +237,7 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 10. ATTACHED_ASSETS/ - Documentation Files
+
 **Path**: `/attached_assets/`
 **Status**: ⚠️ REVIEW - Mostly documentation/temp files
 **Action**: Can be archived or removed (not code artifacts)
@@ -220,6 +245,7 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 11. TESTS/ - Python Agent Tests
+
 **Path**: `/tests/`
 **Status**: ❌ REMOVE (if agents are removed)
 **Files**: `test_agents.py`, `test_all_agents.py`
@@ -227,7 +253,9 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 12. ROOT DOCUMENTATION - TO UPDATE OR REMOVE
+
 **Files to Remove/Update**:
+
 - `AGENT_*.md` - Agent documentation (if agents removed)
 - `BLUE_ELITES_ANALYSIS.md` - Blue elites analysis
 - `BOT_*.md` - Bot documentation
@@ -237,6 +265,7 @@ This document identifies all components to be removed from the repository to cre
 - `VALIFI_KINGDOM_PLATFORM.md` - May need updating to reflect standalone Valifi
 
 **Files to Keep/Update**:
+
 - `README.md` - Update for Valifi standalone
 - `PAYMENT_SYSTEMS.md` - Keep (core to fintech)
 - `SETUP_AND_USAGE_GUIDE.md` - Update for Valifi
@@ -245,7 +274,9 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## 13. ROOT PYTHON FILES - Agent Scripts
+
 **Files to Remove**:
+
 - `all_in_one.py`, `client.py`, `s.py`, `server.py`, `set_run.py`, `sr.py`
 - `test_integration_simple.py`, `test_orchestrator_integration.ts`, `test_web_interface.py`
 - `start_agents.sh`, `s.sh`
@@ -255,6 +286,7 @@ This document identifies all components to be removed from the repository to cre
 ## SUMMARY
 
 ### Total Folders to Remove: 7
+
 1. blue_elites/
 2. LIGHTNING_MIGRATION/
 3. extracted_kingdom_standard/
@@ -264,12 +296,15 @@ This document identifies all components to be removed from the repository to cre
 7. tests/
 
 ### Total Client Pages to Remove: ~13
+
 (Trading bots, marketplace, celebrity, publishing, prayer, tithing, etc.)
 
 ### Total Server Files to Remove: ~27
+
 (Bot services, agent systems, jesus cartel, prayer, tithing, etc.)
 
 ### Database Tables to Remove: ~15
+
 (Bot tables, jesus cartel tables, prayer/tithing tables)
 
 ### Documentation Files to Clean: ~20+
@@ -277,6 +312,7 @@ This document identifies all components to be removed from the repository to cre
 ---
 
 ## NEXT STEPS
+
 1. Remove each folder systematically
 2. Clean up client UI pages
 3. Clean up server services

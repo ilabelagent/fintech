@@ -1,6 +1,6 @@
-import { Server as HttpServer } from "http";
-import { Server as SocketIOServer } from "socket.io";
-import type { Socket } from "socket.io";
+import { Server as HttpServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import type { Socket } from 'socket.io';
 
 /**
  * WebSocket Service for Real-Time Updates
@@ -12,77 +12,74 @@ export class WebSocketService {
   initialize(httpServer: HttpServer) {
     this.io = new SocketIOServer(httpServer, {
       cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
+        origin: '*',
+        methods: ['GET', 'POST'],
       },
     });
 
-    this.io.on("connection", (socket: Socket) => {
+    this.io.on('connection', (socket: Socket) => {
       console.log(`Client connected: ${socket.id}`);
 
       // Subscribe to channels
-      socket.on("subscribe:blockchain", () => {
-        socket.join("blockchain");
+      socket.on('subscribe:blockchain', () => {
+        socket.join('blockchain');
         console.log(`${socket.id} subscribed to blockchain events`);
       });
 
-      socket.on("subscribe:payments", () => {
-        socket.join("payments");
+      socket.on('subscribe:payments', () => {
+        socket.join('payments');
         console.log(`${socket.id} subscribed to payment events`);
       });
 
-      socket.on("subscribe:security", () => {
-        socket.join("security");
+      socket.on('subscribe:security', () => {
+        socket.join('security');
         console.log(`${socket.id} subscribed to security events`);
       });
 
-      socket.on("subscribe:agents", () => {
-        socket.join("agents");
+      socket.on('subscribe:agents', () => {
+        socket.join('agents');
         console.log(`${socket.id} subscribed to agent events`);
       });
 
-      socket.on("subscribe:quantum", () => {
-        socket.join("quantum");
+      socket.on('subscribe:quantum', () => {
+        socket.join('quantum');
         console.log(`${socket.id} subscribed to quantum events`);
       });
 
-      socket.on("subscribe:trading", () => {
-        socket.join("trading");
+      socket.on('subscribe:trading', () => {
+        socket.join('trading');
         console.log(`${socket.id} subscribed to trading events`);
       });
 
-      socket.on("subscribe:market", () => {
-        socket.join("market");
+      socket.on('subscribe:market', () => {
+        socket.join('market');
         console.log(`${socket.id} subscribed to market data`);
       });
 
-      socket.on("subscribe:p2p", (orderId: string) => {
+      socket.on('subscribe:p2p', (orderId: string) => {
         socket.join(`p2p:${orderId}`);
         console.log(`${socket.id} subscribed to P2P order ${orderId}`);
       });
 
-      socket.on("unsubscribe:p2p", (orderId: string) => {
+      socket.on('unsubscribe:p2p', (orderId: string) => {
         socket.leave(`p2p:${orderId}`);
         console.log(`${socket.id} unsubscribed from P2P order ${orderId}`);
       });
 
-      socket.on("disconnect", () => {
+      socket.on('disconnect', () => {
         console.log(`Client disconnected: ${socket.id}`);
       });
     });
 
-    console.log("WebSocket server initialized");
+    console.log('WebSocket server initialized');
   }
 
   /**
    * Emit blockchain event
    */
-  emitBlockchainEvent(event: {
-    type: "transaction" | "block" | "balance_update";
-    data: any;
-  }) {
+  emitBlockchainEvent(event: { type: 'transaction' | 'block' | 'balance_update'; data: any }) {
     if (this.io) {
-      this.io.to("blockchain").emit("blockchain:event", event);
+      this.io.to('blockchain').emit('blockchain:event', event);
     }
   }
 
@@ -90,11 +87,11 @@ export class WebSocketService {
    * Emit payment event
    */
   emitPaymentEvent(event: {
-    type: "payment_success" | "payment_failed" | "subscription_updated";
+    type: 'payment_success' | 'payment_failed' | 'subscription_updated';
     data: any;
   }) {
     if (this.io) {
-      this.io.to("payments").emit("payment:event", event);
+      this.io.to('payments').emit('payment:event', event);
     }
   }
 
@@ -102,12 +99,12 @@ export class WebSocketService {
    * Emit security event
    */
   emitSecurityEvent(event: {
-    type: "threat_detected" | "threat_resolved" | "scan_complete";
-    threatLevel: "none" | "low" | "medium" | "high" | "critical";
+    type: 'threat_detected' | 'threat_resolved' | 'scan_complete';
+    threatLevel: 'none' | 'low' | 'medium' | 'high' | 'critical';
     data: any;
   }) {
     if (this.io) {
-      this.io.to("security").emit("security:event", event);
+      this.io.to('security').emit('security:event', event);
     }
   }
 
@@ -115,12 +112,12 @@ export class WebSocketService {
    * Emit agent status update
    */
   emitAgentEvent(event: {
-    type: "status_change" | "task_complete" | "error";
+    type: 'status_change' | 'task_complete' | 'error';
     agentId: string;
     data: any;
   }) {
     if (this.io) {
-      this.io.to("agents").emit("agent:event", event);
+      this.io.to('agents').emit('agent:event', event);
     }
   }
 
@@ -128,12 +125,12 @@ export class WebSocketService {
    * Emit quantum job update
    */
   emitQuantumEvent(event: {
-    type: "job_queued" | "job_running" | "job_complete" | "job_failed";
+    type: 'job_queued' | 'job_running' | 'job_complete' | 'job_failed';
     jobId: string;
     data: any;
   }) {
     if (this.io) {
-      this.io.to("quantum").emit("quantum:event", event);
+      this.io.to('quantum').emit('quantum:event', event);
     }
   }
 
@@ -141,12 +138,12 @@ export class WebSocketService {
    * Emit trading bot event
    */
   emitTradingEvent(event: {
-    type: "bot_started" | "bot_stopped" | "bot_paused" | "execution_complete" | "pnl_update";
+    type: 'bot_started' | 'bot_stopped' | 'bot_paused' | 'execution_complete' | 'pnl_update';
     botId: string;
     data: any;
   }) {
     if (this.io) {
-      this.io.to("trading").emit("trading:event", event);
+      this.io.to('trading').emit('trading:event', event);
     }
   }
 
@@ -155,7 +152,7 @@ export class WebSocketService {
    */
   emitP2PChatMessage(orderId: string, message: any) {
     if (this.io) {
-      this.io.to(`p2p:${orderId}`).emit("p2p:message", message);
+      this.io.to(`p2p:${orderId}`).emit('p2p:message', message);
     }
   }
 
@@ -164,7 +161,7 @@ export class WebSocketService {
    */
   emitP2POrderUpdate(orderId: string, update: any) {
     if (this.io) {
-      this.io.to(`p2p:${orderId}`).emit("p2p:order_update", update);
+      this.io.to(`p2p:${orderId}`).emit('p2p:order_update', update);
     }
   }
 
@@ -173,7 +170,7 @@ export class WebSocketService {
    */
   emitMarketUpdate(prices: any[]) {
     if (this.io) {
-      this.io.to("market").emit("market:update", { type: 'market_update', prices });
+      this.io.to('market').emit('market:update', { type: 'market_update', prices });
     }
   }
 
@@ -182,7 +179,7 @@ export class WebSocketService {
    */
   emitDashboardUpdate(data: any) {
     if (this.io) {
-      this.io.emit("dashboard:update", data);
+      this.io.emit('dashboard:update', data);
     }
   }
 
@@ -201,32 +198,32 @@ export class WebSocketService {
   startMarketDataBroadcast() {
     setInterval(() => {
       const mockPrices = [
-        { 
-          symbol: "BTC/USD", 
+        {
+          symbol: 'BTC/USD',
           price: 43000 + Math.random() * 1000,
           change: (Math.random() - 0.5) * 200,
-          changePercent: (Math.random() - 0.5) * 5 
+          changePercent: (Math.random() - 0.5) * 5,
         },
-        { 
-          symbol: "ETH/USD", 
+        {
+          symbol: 'ETH/USD',
           price: 2200 + Math.random() * 200,
           change: (Math.random() - 0.5) * 50,
-          changePercent: (Math.random() - 0.5) * 4 
+          changePercent: (Math.random() - 0.5) * 4,
         },
-        { 
-          symbol: "AAPL", 
+        {
+          symbol: 'AAPL',
           price: 180 + Math.random() * 10,
           change: (Math.random() - 0.5) * 5,
-          changePercent: (Math.random() - 0.5) * 2 
+          changePercent: (Math.random() - 0.5) * 2,
         },
-        { 
-          symbol: "GOLD", 
+        {
+          symbol: 'GOLD',
           price: 2040 + Math.random() * 20,
           change: (Math.random() - 0.5) * 15,
-          changePercent: (Math.random() - 0.5) * 1 
+          changePercent: (Math.random() - 0.5) * 1,
         },
       ];
-      
+
       this.emitMarketUpdate(mockPrices);
     }, 3000);
   }

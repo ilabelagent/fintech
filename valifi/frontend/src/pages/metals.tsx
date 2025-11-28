@@ -1,19 +1,39 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { queryClient } from "@/lib/queryClient";
-import { insertMetalTradeSchema, type MetalInventory, type MetalTrade } from "@shared/schema";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { queryClient } from '@/lib/queryClient';
+import { insertMetalTradeSchema, type MetalInventory, type MetalTrade } from '@shared/schema';
 import {
   Coins,
   TrendingUp,
@@ -25,15 +45,15 @@ import {
   AlertCircle,
   CheckCircle2,
   Crown,
-  Sparkles
-} from "lucide-react";
-import { useState, useEffect } from "react";
+  Sparkles,
+} from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const tradeFormSchema = insertMetalTradeSchema.omit({ userId: true }).extend({
-  metalType: z.enum(["gold", "silver", "platinum", "palladium"]),
-  tradeType: z.enum(["buy", "sell"]),
-  weight: z.coerce.number().positive("Weight must be positive"),
-  pricePerOunce: z.coerce.number().positive("Price must be positive"),
+  metalType: z.enum(['gold', 'silver', 'platinum', 'palladium']),
+  tradeType: z.enum(['buy', 'sell']),
+  weight: z.coerce.number().positive('Weight must be positive'),
+  pricePerOunce: z.coerce.number().positive('Price must be positive'),
 });
 
 type TradeForm = z.infer<typeof tradeFormSchema>;
@@ -58,20 +78,20 @@ export default function MetalsPage() {
   });
 
   const { data: inventory, isLoading: inventoryLoading } = useQuery<MetalInventory[]>({
-    queryKey: ["/api/metals/inventory"],
+    queryKey: ['/api/metals/inventory'],
     refetchInterval: 5000,
   });
 
   const { data: trades, isLoading: tradesLoading } = useQuery<MetalTrade[]>({
-    queryKey: ["/api/metals/trades"],
+    queryKey: ['/api/metals/trades'],
     refetchInterval: 3000,
   });
 
   const form = useForm<TradeForm>({
     resolver: zodResolver(tradeFormSchema),
     defaultValues: {
-      metalType: "gold",
-      tradeType: "buy",
+      metalType: 'gold',
+      tradeType: 'buy',
       weight: 0,
       pricePerOunce: 0,
     },
@@ -79,32 +99,32 @@ export default function MetalsPage() {
 
   const createTradeMutation = useMutation({
     mutationFn: async (data: TradeForm) => {
-      const response = await fetch("/api/metals/trades", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/metals/trades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to create trade");
+        throw new Error(error.message || 'Failed to create trade');
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/metals/trades"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/metals/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/metals/trades'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/metals/inventory'] });
       toast({
-        title: "Trade Executed",
-        description: "Precious metals trade completed successfully",
+        title: 'Trade Executed',
+        description: 'Precious metals trade completed successfully',
       });
       setDialogOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "Trade Failed",
+        variant: 'destructive',
+        title: 'Trade Failed',
         description: error.message,
       });
     },
@@ -112,16 +132,17 @@ export default function MetalsPage() {
 
   // Calculate stats
   const totalInventory = inventory?.reduce((sum, i) => sum + Number(i.weight || 0), 0) || 0;
-  const totalValue = inventory?.reduce((sum, i) => sum + Number((i as any).marketValue || 0), 0) || 0;
+  const totalValue =
+    inventory?.reduce((sum, i) => sum + Number((i as any).marketValue || 0), 0) || 0;
   const totalTrades = trades?.length || 0;
-  const buyTrades = trades?.filter(t => t.tradeType === "buy").length || 0;
-  const sellTrades = trades?.filter(t => t.tradeType === "sell").length || 0;
+  const buyTrades = trades?.filter((t) => t.tradeType === 'buy').length || 0;
+  const sellTrades = trades?.filter((t) => t.tradeType === 'sell').length || 0;
 
   // Fetch real-time metal prices
   useEffect(() => {
     const fetchMetalPrices = async () => {
       try {
-        const metals = ["gold", "silver", "platinum", "palladium"];
+        const metals = ['gold', 'silver', 'platinum', 'palladium'];
         const pricePromises = metals.map(async (metal) => {
           const response = await fetch(`/api/market/metal/${metal}`);
           if (response.ok) {
@@ -130,18 +151,18 @@ export default function MetalsPage() {
           }
           return null;
         });
-        
+
         const results = await Promise.all(pricePromises);
         const prices: Record<string, number> = {};
-        results.forEach(result => {
+        results.forEach((result) => {
           if (result) prices[result.metal] = result.price;
         });
-        
+
         if (Object.keys(prices).length > 0) {
           setMetalPrices(prices);
         }
       } catch (error) {
-        console.error("Error fetching metal prices:", error);
+        console.error('Error fetching metal prices:', error);
       }
     };
 
@@ -172,12 +193,13 @@ export default function MetalsPage() {
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Execute Metals Trade</DialogTitle>
-              <DialogDescription>
-                Buy or sell precious metals at market prices
-              </DialogDescription>
+              <DialogDescription>Buy or sell precious metals at market prices</DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((data) => createTradeMutation.mutate(data))} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit((data) => createTradeMutation.mutate(data))}
+                className="space-y-4"
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -335,7 +357,10 @@ export default function MetalsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold covenant-gradient-text" data-testid="text-total-value">
+            <div
+              className="text-2xl font-bold covenant-gradient-text"
+              data-testid="text-total-value"
+            >
               ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground">Current market value</p>
@@ -348,7 +373,9 @@ export default function MetalsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500" data-testid="text-buy-trades">{buyTrades}</div>
+            <div className="text-2xl font-bold text-green-500" data-testid="text-buy-trades">
+              {buyTrades}
+            </div>
             <p className="text-xs text-muted-foreground">Purchase transactions</p>
           </CardContent>
         </Card>
@@ -359,7 +386,9 @@ export default function MetalsPage() {
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-500" data-testid="text-sell-trades">{sellTrades}</div>
+            <div className="text-2xl font-bold text-red-500" data-testid="text-sell-trades">
+              {sellTrades}
+            </div>
             <p className="text-xs text-muted-foreground">Sale transactions</p>
           </CardContent>
         </Card>
@@ -367,8 +396,12 @@ export default function MetalsPage() {
 
       <Tabs defaultValue="inventory" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="inventory" data-testid="tab-inventory">Inventory</TabsTrigger>
-          <TabsTrigger value="trades" data-testid="tab-trades">Trade History</TabsTrigger>
+          <TabsTrigger value="inventory" data-testid="tab-inventory">
+            Inventory
+          </TabsTrigger>
+          <TabsTrigger value="trades" data-testid="tab-trades">
+            Trade History
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-4">
@@ -384,27 +417,41 @@ export default function MetalsPage() {
               <CardContent className="p-12 text-center">
                 <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">No metals in inventory</p>
-                <p className="text-xs text-muted-foreground mt-1">Execute your first trade to build your portfolio</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Execute your first trade to build your portfolio
+                </p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {inventory.map((item) => (
-                <Card key={item.id} className="hover-elevate" data-testid={`card-inventory-${item.id}`}>
+                <Card
+                  key={item.id}
+                  className="hover-elevate"
+                  data-testid={`card-inventory-${item.id}`}
+                >
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2" data-testid={`text-metal-${item.id}`}>
+                      <CardTitle
+                        className="flex items-center gap-2"
+                        data-testid={`text-metal-${item.id}`}
+                      >
                         <Crown className="h-5 w-5 text-yellow-500" />
                         {item.metalType?.toUpperCase()}
                       </CardTitle>
-                      <Badge variant="outline">{(((item as any).metadata)?.storageLocation) || 'Vault'}</Badge>
+                      <Badge variant="outline">
+                        {(item as any).metadata?.storageLocation || 'Vault'}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Weight</p>
-                        <p className="font-mono font-semibold" data-testid={`text-weight-${item.id}`}>
+                        <p
+                          className="font-mono font-semibold"
+                          data-testid={`text-weight-${item.id}`}
+                        >
                           {Number(item.weight || 0).toFixed(4)} oz
                         </p>
                       </div>
@@ -417,12 +464,18 @@ export default function MetalsPage() {
                     </div>
                     <div className="p-3 bg-muted rounded-lg">
                       <p className="text-xs text-muted-foreground mb-1">Current Value</p>
-                      <p className="text-lg font-bold covenant-gradient-text" data-testid={`text-value-${item.id}`}>
+                      <p
+                        className="text-lg font-bold covenant-gradient-text"
+                        data-testid={`text-value-${item.id}`}
+                      >
                         ${Number((item as any).marketValue || 0).toLocaleString()}
                       </p>
                     </div>
                     {item.certificateUrl && (
-                      <p className="text-xs text-muted-foreground" data-testid={`text-cert-${item.id}`}>
+                      <p
+                        className="text-xs text-muted-foreground"
+                        data-testid={`text-cert-${item.id}`}
+                      >
                         Certificate: {item.certificateUrl}
                       </p>
                     )}
@@ -451,11 +504,17 @@ export default function MetalsPage() {
           ) : (
             <div className="space-y-3">
               {trades.map((trade) => (
-                <Card key={trade.id} className="hover-elevate" data-testid={`card-trade-${trade.id}`}>
+                <Card
+                  key={trade.id}
+                  className="hover-elevate"
+                  data-testid={`card-trade-${trade.id}`}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${trade.tradeType === 'buy' ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                        <div
+                          className={`p-2 rounded-lg ${trade.tradeType === 'buy' ? 'bg-green-500/10' : 'bg-red-500/10'}`}
+                        >
                           {trade.tradeType === 'buy' ? (
                             <TrendingUp className="h-5 w-5 text-green-500" />
                           ) : (
@@ -464,22 +523,34 @@ export default function MetalsPage() {
                         </div>
                         <div>
                           <p className="font-semibold" data-testid={`text-trade-metal-${trade.id}`}>
-                            {(((trade as any).metadata)?.metalType || 'Unknown')?.toUpperCase()}
+                            {((trade as any).metadata?.metalType || 'Unknown')?.toUpperCase()}
                           </p>
-                          <p className="text-xs text-muted-foreground" data-testid={`text-trade-date-${trade.id}`}>
+                          <p
+                            className="text-xs text-muted-foreground"
+                            data-testid={`text-trade-date-${trade.id}`}
+                          >
                             {new Date(trade.createdAt!).toLocaleString()}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <Badge variant={trade.tradeType === 'buy' ? 'default' : 'destructive'} data-testid={`badge-type-${trade.id}`}>
+                        <Badge
+                          variant={trade.tradeType === 'buy' ? 'default' : 'destructive'}
+                          data-testid={`badge-type-${trade.id}`}
+                        >
                           {trade.tradeType?.toUpperCase()}
                         </Badge>
                         <div className="mt-2 space-y-1">
-                          <p className="text-sm font-mono" data-testid={`text-trade-weight-${trade.id}`}>
+                          <p
+                            className="text-sm font-mono"
+                            data-testid={`text-trade-weight-${trade.id}`}
+                          >
                             {Number(trade.weight || 0).toFixed(4)} oz
                           </p>
-                          <p className="text-sm font-mono text-muted-foreground" data-testid={`text-trade-price-${trade.id}`}>
+                          <p
+                            className="text-sm font-mono text-muted-foreground"
+                            data-testid={`text-trade-price-${trade.id}`}
+                          >
                             ${Number(trade.pricePerOunce || 0).toFixed(2)}/oz
                           </p>
                         </div>

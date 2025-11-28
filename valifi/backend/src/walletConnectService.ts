@@ -1,9 +1,9 @@
 /**
  * WalletConnect Service for Valifi Kingdom
- * 
+ *
  * This service enables users to connect external Web3 wallets (MetaMask, Trust Wallet, Rainbow, Coinbase Wallet, etc.)
  * to the platform for seamless transaction signing and blockchain interactions.
- * 
+ *
  * Supported Wallets:
  * - MetaMask
  * - Trust Wallet
@@ -11,7 +11,7 @@
  * - Coinbase Wallet
  * - Ledger (via MetaMask or other bridges)
  * - Any EIP-1193 compatible wallet
- * 
+ *
  * Implementation Notes:
  * - Uses browser's window.ethereum (injected by wallets)
  * - Supports network switching
@@ -19,8 +19,8 @@
  * - Multi-account support
  */
 
-import { ethers } from "ethers";
-import { NETWORKS, type NetworkConfig } from "./web3Service";
+import { ethers } from 'ethers';
+import { NETWORKS, type NetworkConfig } from './web3Service';
 
 export interface WalletSession {
   id: string;
@@ -36,26 +36,26 @@ export class WalletConnectService {
    * Check if a Web3 wallet is available in the browser
    */
   static isWalletAvailable(): boolean {
-    return typeof window !== "undefined" && typeof (window as any).ethereum !== "undefined";
+    return typeof window !== 'undefined' && typeof (window as any).ethereum !== 'undefined';
   }
 
   /**
    * Detect which wallet is installed
    */
   static detectWallet(): string {
-    if (typeof window === "undefined" || !(window as any).ethereum) {
-      return "none";
+    if (typeof window === 'undefined' || !(window as any).ethereum) {
+      return 'none';
     }
 
     const ethereum = (window as any).ethereum;
-    
-    if (ethereum.isMetaMask) return "metamask";
-    if (ethereum.isTrust) return "trust";
-    if (ethereum.isRainbow) return "rainbow";
-    if (ethereum.isCoinbaseWallet) return "coinbase";
-    if (ethereum.isLedger) return "ledger";
-    
-    return "unknown";
+
+    if (ethereum.isMetaMask) return 'metamask';
+    if (ethereum.isTrust) return 'trust';
+    if (ethereum.isRainbow) return 'rainbow';
+    if (ethereum.isCoinbaseWallet) return 'coinbase';
+    if (ethereum.isLedger) return 'ledger';
+
+    return 'unknown';
   }
 
   /**
@@ -64,12 +64,12 @@ export class WalletConnectService {
    */
   static async connect(): Promise<string[]> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected. Please install MetaMask or another Web3 wallet.");
+      throw new Error('No Web3 wallet detected. Please install MetaMask or another Web3 wallet.');
     }
 
     const ethereum = (window as any).ethereum;
-    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+
     return accounts;
   }
 
@@ -78,12 +78,12 @@ export class WalletConnectService {
    */
   static async getChainId(): Promise<number> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected");
+      throw new Error('No Web3 wallet detected');
     }
 
     const ethereum = (window as any).ethereum;
-    const chainId = await ethereum.request({ method: "eth_chainId" });
-    
+    const chainId = await ethereum.request({ method: 'eth_chainId' });
+
     return parseInt(chainId, 16);
   }
 
@@ -92,7 +92,7 @@ export class WalletConnectService {
    */
   static async switchNetwork(network: string): Promise<void> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected");
+      throw new Error('No Web3 wallet detected');
     }
 
     const config = NETWORKS[network];
@@ -101,10 +101,10 @@ export class WalletConnectService {
     }
 
     const ethereum = (window as any).ethereum;
-    
+
     try {
       await ethereum.request({
-        method: "wallet_switchEthereumChain",
+        method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${config.chainId.toString(16)}` }],
       });
     } catch (switchError: any) {
@@ -122,13 +122,13 @@ export class WalletConnectService {
    */
   static async addNetwork(config: NetworkConfig): Promise<void> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected");
+      throw new Error('No Web3 wallet detected');
     }
 
     const ethereum = (window as any).ethereum;
-    
+
     await ethereum.request({
-      method: "wallet_addEthereumChain",
+      method: 'wallet_addEthereumChain',
       params: [
         {
           chainId: `0x${config.chainId.toString(16)}`,
@@ -150,13 +150,13 @@ export class WalletConnectService {
    */
   static async signTransaction(tx: any): Promise<string> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected");
+      throw new Error('No Web3 wallet detected');
     }
 
     const ethereum = (window as any).ethereum;
     const provider = new ethers.BrowserProvider(ethereum);
     const signer = await provider.getSigner();
-    
+
     const txResponse = await signer.sendTransaction(tx);
     return txResponse.hash;
   }
@@ -166,15 +166,15 @@ export class WalletConnectService {
    */
   static async signMessage(message: string, address: string): Promise<string> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected");
+      throw new Error('No Web3 wallet detected');
     }
 
     const ethereum = (window as any).ethereum;
     const signature = await ethereum.request({
-      method: "personal_sign",
+      method: 'personal_sign',
       params: [message, address],
     });
-    
+
     return signature;
   }
 
@@ -183,12 +183,12 @@ export class WalletConnectService {
    */
   static async getBalance(address: string): Promise<string> {
     if (!this.isWalletAvailable()) {
-      throw new Error("No Web3 wallet detected");
+      throw new Error('No Web3 wallet detected');
     }
 
     const ethereum = (window as any).ethereum;
     const provider = new ethers.BrowserProvider(ethereum);
-    
+
     const balance = await provider.getBalance(address);
     return ethers.formatEther(balance);
   }
@@ -200,7 +200,7 @@ export class WalletConnectService {
     if (!this.isWalletAvailable()) return;
 
     const ethereum = (window as any).ethereum;
-    ethereum.on("accountsChanged", callback);
+    ethereum.on('accountsChanged', callback);
   }
 
   /**
@@ -210,7 +210,7 @@ export class WalletConnectService {
     if (!this.isWalletAvailable()) return;
 
     const ethereum = (window as any).ethereum;
-    ethereum.on("chainChanged", callback);
+    ethereum.on('chainChanged', callback);
   }
 
   /**
@@ -220,10 +220,10 @@ export class WalletConnectService {
     // Note: Most wallets don't support programmatic disconnect
     // Users need to disconnect from the wallet extension
     // We can only clear our local session data
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("walletconnect_session");
-      localStorage.removeItem("wallet_address");
-      localStorage.removeItem("wallet_type");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('walletconnect_session');
+      localStorage.removeItem('wallet_address');
+      localStorage.removeItem('wallet_type');
     }
   }
 
@@ -231,28 +231,28 @@ export class WalletConnectService {
    * Server-side method: Create a new WalletConnect session
    */
   static async createSession(
-    userId: string, 
-    walletAddress: string, 
+    userId: string,
+    walletAddress: string,
     chainId: number,
-    walletType: string = "unknown"
+    walletType: string = 'unknown'
   ): Promise<WalletSession> {
     const networkMap: Record<number, string> = {
-      1: "ethereum",
-      137: "polygon",
-      56: "bsc",
-      42161: "arbitrum",
-      10: "optimism"
+      1: 'ethereum',
+      137: 'polygon',
+      56: 'bsc',
+      42161: 'arbitrum',
+      10: 'optimism',
     };
 
-    const network = networkMap[chainId] || "ethereum";
-    
+    const network = networkMap[chainId] || 'ethereum';
+
     return {
       id: `wc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       walletAddress,
       walletType,
       chainId,
       network,
-      isActive: true
+      isActive: true,
     };
   }
 
@@ -262,7 +262,7 @@ export class WalletConnectService {
   static async getSession(sessionId: string): Promise<WalletSession | null> {
     // In a real implementation, this would query the database
     // For now, we'll use localStorage on client side
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       const sessionData = localStorage.getItem(`wallet_session_${sessionId}`);
       if (sessionData) {
         return JSON.parse(sessionData);
@@ -276,11 +276,11 @@ export class WalletConnectService {
    */
   static async disconnectSession(sessionId: string): Promise<boolean> {
     // Clear local storage
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       localStorage.removeItem(`wallet_session_${sessionId}`);
-      localStorage.removeItem("walletconnect_session");
-      localStorage.removeItem("wallet_address");
-      localStorage.removeItem("wallet_type");
+      localStorage.removeItem('walletconnect_session');
+      localStorage.removeItem('wallet_address');
+      localStorage.removeItem('wallet_type');
     }
     return true;
   }
@@ -290,13 +290,13 @@ export class WalletConnectService {
    */
   static getNetworkFromChainId(chainId: number): string {
     const networkMap: Record<number, string> = {
-      1: "ethereum",
-      137: "polygon",
-      56: "bsc",
-      42161: "arbitrum",
-      10: "optimism"
+      1: 'ethereum',
+      137: 'polygon',
+      56: 'bsc',
+      42161: 'arbitrum',
+      10: 'optimism',
     };
-    return networkMap[chainId] || "ethereum";
+    return networkMap[chainId] || 'ethereum';
   }
 }
 

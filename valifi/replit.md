@@ -1,12 +1,15 @@
 # Valifi Fintech Platform
 
 ## Overview
+
 Valifi is a comprehensive standalone fintech application providing banking, investment, and financial services. This platform enables users to manage digital wallets, trade securities, invest in precious metals, and access various financial products through a single integrated interface.
 
 ## Recent Changes (v3.0.0)
+
 **Major Refactor (November 23, 2025)**: Complete transformation from multi-system monorepo to standalone banking and financial services application.
 
 ### What Changed
+
 - Removed 7 major system folders (blue_elites, LIGHTNING_MIGRATION, agents, deployment, etc.)
 - Removed ~13 non-fintech client pages (trading bots, celebrity platform, publishing, etc.)
 - Removed ~27 non-fintech server services
@@ -26,6 +29,7 @@ Focus: Banking and financial services only - no mock data, production-ready code
 ### Frontend Architecture
 
 **Framework & Styling**
+
 - React 18 with TypeScript using Vite as the build tool
 - TailwindCSS with custom design system inspired by Stripe and Coinbase
 - Shadcn/ui component library (New York style) with Radix UI primitives
@@ -33,16 +37,19 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - Custom color palette: divine gold accents (#FFD700), covenant blue, Kingdom standard theming
 
 **State Management**
+
 - TanStack Query (React Query) for server state and API caching
 - Wouter for client-side routing (lightweight alternative to React Router)
 - Custom hooks for authentication, mobile detection, and toast notifications
 
 **UI Components**
+
 - Complete Shadcn/ui component set: forms, dialogs, dropdowns, charts, calendars
 - Custom sidebar navigation with collapsible groups
 - Real-time WebSocket integration for live updates
 
 **Completed Pages (Production-Ready)**
+
 1. **Wallets & Blockchain** (/blockchain): Multi-chain wallet creation, import, balance display, transaction sending, ERC-20/ERC-721 deployment, NFT minting
 2. **Agent Orchestra** (/agents): 63+ AI agent monitoring, task execution, log viewing, agent creation (admin-only)
 3. **Jesus Cartel Publishing** (/publishing): Song upload, automated NFT + ERC-20 token deployment, full blockchain details display
@@ -54,18 +61,21 @@ Focus: Banking and financial services only - no mock data, production-ready code
 ### Backend Architecture
 
 **Core Server**
+
 - Express.js server with TypeScript
 - Replit Auth integration for authentication (OpenID Connect)
 - Session management with PostgreSQL-backed session store
 - Custom middleware for request logging and error handling
 
 **Multi-Agent Orchestration**
+
 - LangGraph state graph for coordinating 63+ specialized AI agents
 - Agent types: orchestrator, blockchain, payment, KYC, security, publishing, quantum, analytics, monitoring, Guardian Angel
 - Stateful workflows with persistent checkpointing
 - Agent router distributes tasks based on agent specialization
 
 **API Architecture**
+
 - RESTful endpoints organized by domain (wallets, transactions, NFTs, agents, songs, payments)
 - Zod schema validation on all inputs
 - Structured error handling with HTTP status codes
@@ -74,37 +84,43 @@ Focus: Banking and financial services only - no mock data, production-ready code
 ### Data Storage Solutions
 
 **Primary Database**
+
 - PostgreSQL via Neon serverless database (@neondatabase/serverless)
 - Drizzle ORM for type-safe database operations
 - Schema-first approach with automated migrations
 
 **Database Schema Design (2200+ lines, 50+ tables)**
 
-*Core Tables (Original)*
+_Core Tables (Original)_
+
 - Users table with Replit Auth integration (OpenID claims)
 - Wallets: multi-chain support with encrypted private key storage
 - Transactions: blockchain transaction tracking with status enums
 - NFTs & Tokens: ERC-721/ERC-20 contract tracking
 - Songs: Jesus Cartel publishing pipeline metadata
 
-*Kingdom Transformation Tables (NEW - October 2025)*
+_Kingdom Transformation Tables (NEW - October 2025)_
 
 **Dynamic Dashboard System** (3 tables)
+
 - userDashboardConfigs: Personalized dashboard layouts per user
 - dashboardWidgets: Available widget catalog (system + custom)
 - userWidgetPreferences: Widget positioning with unique(userId, widgetId) constraint
 
 **Admin Panel Infrastructure** (3 tables)
+
 - adminUsers: Role-based admin access (super_admin, admin, moderator, support)
 - adminAuditLogs: Immutable admin action tracking
 - adminBroadcasts: System-wide announcement delivery
 
 **Individual & Ethereal Assets** (3 tables)
+
 - individualAssets: User-owned real-world asset tracking
 - etherealElements: Divine/spiritual collectibles catalog
 - etherealOwnership: Element ownership with unique(userId, elementId) constraint
 
 **Bot Marketplace & Learning** (7 tables)
+
 - botMarketplaceListings: Trading bot sales/rentals
 - botRentals: Time-based bot rental tracking
 - botSubscriptions: Recurring bot access subscriptions
@@ -114,6 +130,7 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - botSkills: Unlockable bot capabilities
 
 **Celebrity Fan Platform** (6 tables)
+
 - celebrityProfiles: Verified celebrity accounts
 - fanFollows: Fan-celebrity relationships with unique(fanId, celebrityId)
 - fanStakes: Financial staking on celebrity success
@@ -122,46 +139,55 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - celebrityContent: Exclusive celebrity posts/media
 
 **Analytics & User Journey** (2 tables)
+
 - hitAnalytics: Page view and interaction tracking
 - userJourneys: Multi-step user flow analysis
 
 **Help System** (2 tables)
+
 - helpArticles: Knowledge base content
 - guideSteps: Step-by-step interactive tutorials
 
 **Discord-Style Forum** (4 tables)
+
 - forumServers: Community server instances
 - forumChannels: Text/voice channels per server
 - channelMessages: Real-time chat messages
 - privateSessionRequests: Admin-approved private sessions
 
 **Account Management** (3 tables)
+
 - jointAccounts: Shared multi-user accounts
 - accountMerges: Account consolidation tracking
 - stakingPools: Community staking pools with unique(poolId, userId) participants
 
 **AI Chat Personas** (3 tables)
+
 - chatbotPersonas: AI personality templates
 - personaAssignments: User-session persona mapping with unique(userId, sessionId)
 - personaTraining: Persona behavior training data
 
 **Distribution & Music** (3 tables)
+
 - distributionTracks: Multi-platform music distribution
 - youtubeVideos: YouTube upload tracking
 - streamingAnalytics: Platform-specific streaming metrics
 
 **Guardian Angel Enhancement** (4 tables)
+
 - backgroundChecks: User verification requests
 - publicDirectory: Searchable user profiles
 - bankruptcyRecords: Financial history tracking
 - creditReports: Credit score monitoring
 
 **Trading Bot Arsenal** (3 tables)
+
 - tradingSystemMemory: Bot state persistence
 - tradingStrategies: Custom strategy definitions
 - botPerformanceMetrics: Historical performance analytics
 
 **P2P Trading System** (6 tables - NEW October 2025)
+
 - p2pOffers: User buy/sell crypto offers with payment methods and limits
 - p2pOrders: Peer-to-peer trade orders with escrow, buyer/seller tracking
 - p2pPaymentMethods: User payment method registry with verification status
@@ -170,27 +196,32 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - p2pReviews: Post-trade rating system with comments
 
 **WalletConnect Sessions** (1 table - NEW October 2025)
+
 - walletConnectSessions: External wallet session management (MetaMask, Trust, Rainbow, Coinbase)
 
-*Data Integrity Features*
+_Data Integrity Features_
+
 - Composite unique constraints on all join tables to prevent duplicate relationships
 - Foreign key relationships with cascade rules for data consistency
 - Timestamp tracking for audit trails (createdAt, updatedAt)
 - Status enums for workflow state management
 
 **Session Storage**
+
 - PostgreSQL sessions table for Replit Auth
 - Redis integration ready (configured but optional)
 
 ### Authentication & Authorization
 
 **Authentication Strategy**
+
 - Replit Auth (OpenID Connect) as primary authentication
 - Session-based auth with secure HTTP-only cookies
 - JWT tokens for API authentication (infrastructure present)
 - OAuth provider support (Google, GitHub, Twitter - configured)
 
 **Security Measures**
+
 - Encryption service using AES-256-GCM for sensitive data (private keys, mnemonics)
 - User-specific encryption keys derived via PBKDF2
 - Master encryption key requirement enforced at startup
@@ -200,6 +231,7 @@ Focus: Banking and financial services only - no mock data, production-ready code
 ### External Service Integrations
 
 **Blockchain Networks**
+
 - Ethers.js v6 for Web3 interactions
 - Multi-chain support: Ethereum, Polygon, BSC, Arbitrum, Optimism
 - Network configurations with RPC endpoints and explorers
@@ -208,12 +240,14 @@ Focus: Banking and financial services only - no mock data, production-ready code
 
 **Payment Systems (Complete Infrastructure)**
 
-*Fiat Payments* (3 processors)
+_Fiat Payments_ (3 processors)
+
 - Stripe: cards, ACH, webhooks for real-time updates (`payments` table)
 - PayPal SDK: orders, subscriptions, payouts
 - Plaid: bank account linking and transfers
 
-*Crypto Payments* (5 processors + Direct Blockchain)
+_Crypto Payments_ (5 processors + Direct Blockchain)
+
 - BitPay: invoice generation with QR codes
 - Binance Pay: merchant integration
 - Bybit: crypto payment processing
@@ -221,7 +255,8 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - Luno: deposit/withdrawal APIs
 - Direct Blockchain: Web3Service for ETH, ERC-20 transfers across 5 networks (`cryptoPayments` table)
 
-*P2P Trading System* (6 tables - NEW October 2025)
+_P2P Trading System_ (6 tables - NEW October 2025)
+
 - p2pOffers: User buy/sell crypto offers with payment methods
 - p2pOrders: Peer-to-peer trade orders with escrow support
 - p2pPaymentMethods: User payment method registry (bank_transfer, PayPal, Venmo, etc.)
@@ -230,7 +265,8 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - p2pReviews: Post-trade rating system (1-5 stars)
 - API: 18 endpoints for offers, orders, chat, disputes, reviews
 
-*WalletConnect Integration* (NEW October 2025)
+_WalletConnect Integration_ (NEW October 2025)
+
 - External wallet connection (MetaMask, Trust, Rainbow, Coinbase)
 - Multi-network support via browser wallet injection
 - Session management with database persistence (`walletConnectSessions` table)
@@ -238,6 +274,7 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - API: 4 endpoints for session management and wallet operations
 
 **Trading & Market Data**
+
 - Armor Wallet SDK: MPC-TEE Web3 wallet with AI trading, natural language execution
 - Trading Bot System: 7 active strategies with stateful persistence
   - Grid Trading: automated buy/sell at price intervals with boundary detection
@@ -251,42 +288,49 @@ Focus: Banking and financial services only - no mock data, production-ready code
 - Broker APIs: Alpaca (paper & live trading), Interactive Brokers Gateway
 
 **AI & ML Services**
+
 - Anthropic Claude (@anthropic-ai/sdk)
 - Google Gemini (@google/genai)
 - LangChain Core & LangGraph for agent workflows
 - Custom Guardian Angel security bot with threat detection
 
 **KYC & Compliance**
+
 - Sumsub API: biometric verification, document scanning, liveness detection
 - AML transaction monitoring
 - Sanctions screening
 - Automated compliance workflows
 
 **Quantum Computing**
+
 - IBM Quantum API integration
 - Portfolio optimization algorithms
 - Risk analysis computations
 - Quantum-resistant encryption preparation
 
 **Content & Publishing**
+
 - Jesus Cartel automated pipeline: Song → NFT (ERC-721) → Token (ERC-20)
 - IPFS metadata storage for NFTs
 - Smart contract deployment automation
 - Liquidity pool initialization
 
 **Real-Time Infrastructure**
+
 - Socket.IO WebSocket server for live updates
 - Channel subscriptions: blockchain, payments, security, agents, quantum
 - Alchemy webhooks for blockchain event monitoring
 - DEX aggregator price feeds
 
 **Security & Monitoring**
+
 - Guardian Angel Bot: ML threat detection, penetration testing, attack simulations
 - Immutable security event audit log
 - Threat level classification: none, low, medium, high, critical
 - Automated incident response workflows
 
 **Development & Deployment**
+
 - Vite dev server with HMR
 - Replit-specific plugins: runtime error overlay, cartographer, dev banner
 - TypeScript strict mode with path aliases

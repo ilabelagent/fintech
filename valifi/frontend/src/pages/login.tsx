@@ -1,41 +1,41 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { Crown } from "lucide-react";
-import { storage } from "@/lib/storage";
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { useMutation } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { Sparkles } from 'lucide-react';
+import { storage } from '@/lib/storage';
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   // Login state
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
   // Register state
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [registerFirstName, setRegisterFirstName] = useState("");
-  const [registerLastName, setRegisterLastName] = useState("");
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerFirstName, setRegisterFirstName] = useState('');
+  const [registerLastName, setRegisterLastName] = useState('');
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Login failed");
+        throw new Error(error.message || 'Login failed');
       }
 
       return await res.json();
@@ -47,34 +47,39 @@ export default function LoginPage() {
       }
 
       toast({
-        title: "Login Successful",
-        description: "Welcome to Valifi!",
+        title: 'Login Successful',
+        description: 'Welcome to Valifi!',
       });
 
       // Redirect to dashboard
-      window.location.href = "/";
+      window.location.href = '/';
     },
     onError: (error: Error) => {
       toast({
-        title: "Login Failed",
+        title: 'Login Failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; firstName: string; lastName: string }) => {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+    }) => {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Registration failed");
+        throw new Error(error.message || 'Registration failed');
       }
 
       return await res.json();
@@ -86,18 +91,18 @@ export default function LoginPage() {
       }
 
       toast({
-        title: "Registration Successful",
-        description: "Welcome to Valifi!",
+        title: 'Registration Successful',
+        description: 'Welcome to Valifi!',
       });
 
       // Redirect to dashboard
-      window.location.href = "/";
+      window.location.href = '/';
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration Failed",
+        title: 'Registration Failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -118,19 +123,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFD700]/10 via-background to-blue-950/20 dark:from-[#FFD700]/5 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-background to-purple-50 dark:from-blue-950/20 dark:via-background dark:to-purple-950/20 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Crown className="w-16 h-16 mx-auto text-[#FFD700] mb-4" />
-          <h1 className="text-4xl font-bold mb-2" style={{
-            background: "linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text"
-          }}>
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+            <Sparkles className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
             Valifi
           </h1>
-          <p className="text-muted-foreground">Advanced fintech platform</p>
+          <p className="text-muted-foreground">Professional Financial Platform</p>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
@@ -171,16 +173,16 @@ export default function LoginPage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#FFD700] text-black hover:bg-[#FFA500]"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                     disabled={loginMutation.isPending}
                   >
-                    {loginMutation.isPending ? "Logging in..." : "Login"}
+                    {loginMutation.isPending ? 'Logging in...' : 'Login'}
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
                     className="w-full"
-                    onClick={() => setLocation("/")}
+                    onClick={() => setLocation('/')}
                   >
                     Back to Home
                   </Button>
@@ -246,16 +248,16 @@ export default function LoginPage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#FFD700] text-black hover:bg-[#FFA500]"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                     disabled={registerMutation.isPending}
                   >
-                    {registerMutation.isPending ? "Registering..." : "Create Account"}
+                    {registerMutation.isPending ? 'Registering...' : 'Create Account'}
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
                     className="w-full"
-                    onClick={() => setLocation("/")}
+                    onClick={() => setLocation('/')}
                   >
                     Back to Home
                   </Button>

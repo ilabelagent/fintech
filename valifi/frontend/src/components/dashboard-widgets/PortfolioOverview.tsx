@@ -1,29 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Wallet, TrendingUp, TrendingDown } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function PortfolioOverview() {
   const { data: wallets, isLoading } = useQuery({
-    queryKey: ["/api/wallets"],
+    queryKey: ['/api/wallets'],
   });
 
   const { data: transactions } = useQuery({
-    queryKey: ["/api/transactions"],
+    queryKey: ['/api/transactions'],
   });
 
-  const totalBalance = (wallets && Array.isArray(wallets)) ? wallets.reduce((sum: number, wallet: any) => {
-    return sum + parseFloat(wallet.balance || "0");
-  }, 0) : 0;
+  const totalBalance =
+    wallets && Array.isArray(wallets)
+      ? wallets.reduce((sum: number, wallet: any) => {
+          return sum + parseFloat(wallet.balance || '0');
+        }, 0)
+      : 0;
 
   const calculateProfitLoss = () => {
     if (!transactions || !Array.isArray(transactions)) return { value: 0, percentage: 0 };
-    
+
     const recentTx = transactions.slice(0, 10);
     const profit = recentTx.reduce((sum: number, tx: any) => {
-      return sum + (parseFloat(tx.profit || "0"));
+      return sum + parseFloat(tx.profit || '0');
     }, 0);
-    
+
     const percentage = totalBalance > 0 ? (profit / totalBalance) * 100 : 0;
     return { value: profit, percentage };
   };
@@ -69,8 +72,12 @@ export function PortfolioOverview() {
             )}
             <div>
               <p className="text-xs text-muted-foreground">Profit/Loss</p>
-              <p className={`text-lg font-semibold ${isProfit ? 'text-green-500' : 'text-red-500'}`} data-testid="text-profit-loss">
-                {isProfit ? '+' : ''}{profitLoss.value.toFixed(2)} ({profitLoss.percentage.toFixed(2)}%)
+              <p
+                className={`text-lg font-semibold ${isProfit ? 'text-green-500' : 'text-red-500'}`}
+                data-testid="text-profit-loss"
+              >
+                {isProfit ? '+' : ''}
+                {profitLoss.value.toFixed(2)} ({profitLoss.percentage.toFixed(2)}%)
               </p>
             </div>
           </div>

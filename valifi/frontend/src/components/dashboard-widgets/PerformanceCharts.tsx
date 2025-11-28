@@ -1,26 +1,39 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Activity } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { Activity } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function PerformanceCharts() {
   const { data: executions, isLoading } = useQuery({
-    queryKey: ["/api/bot-executions"],
+    queryKey: ['/api/bot-executions'],
   });
 
-  const chartData = (executions && Array.isArray(executions)) 
-    ? executions.slice(0, 30).reverse().map((exec: any, index: number) => ({
-        name: `T${index + 1}`,
-        profit: parseFloat(exec.profit || "0"),
-      }))
-    : [];
+  const chartData =
+    executions && Array.isArray(executions)
+      ? executions
+          .slice(0, 30)
+          .reverse()
+          .map((exec: any, index: number) => ({
+            name: `T${index + 1}`,
+            profit: parseFloat(exec.profit || '0'),
+          }))
+      : [];
 
-  const totalProfit = (executions && Array.isArray(executions))
-    ? executions.reduce((sum: number, exec: any) => {
-        return sum + parseFloat(exec.profit || "0");
-      }, 0)
-    : 0;
+  const totalProfit =
+    executions && Array.isArray(executions)
+      ? executions.reduce((sum: number, exec: any) => {
+          return sum + parseFloat(exec.profit || '0');
+        }, 0)
+      : 0;
 
   if (isLoading) {
     return (
@@ -48,7 +61,10 @@ export function PerformanceCharts() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground">Total Profit</p>
-              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-500' : 'text-red-500'}`} data-testid="text-total-profit">
+              <p
+                className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                data-testid="text-total-profit"
+              >
                 ${totalProfit.toFixed(2)}
               </p>
             </div>
@@ -65,17 +81,17 @@ export function PerformanceCharts() {
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis dataKey="name" className="text-xs" />
               <YAxis className="text-xs" />
-              <Tooltip 
-                contentStyle={{ 
+              <Tooltip
+                contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="profit" 
-                stroke="hsl(var(--primary))" 
+              <Line
+                type="monotone"
+                dataKey="profit"
+                stroke="hsl(var(--primary))"
                 strokeWidth={2}
                 dot={{ fill: 'hsl(var(--primary))', r: 3 }}
               />

@@ -1,6 +1,6 @@
-import type { ArmorWallet } from "@shared/schema";
-import { storage } from "./storage";
-import { encryptionService } from "./encryptionService";
+import type { ArmorWallet } from '@shared/schema';
+import { storage } from './storage';
+import { encryptionService } from './encryptionService';
 
 /**
  * Armor Wallet Integration Service
@@ -9,14 +9,14 @@ import { encryptionService } from "./encryptionService";
  */
 
 export interface ArmorWalletConfig {
-  walletType: "standard" | "trading";
+  walletType: 'standard' | 'trading';
   chains: string[]; // e.g., ["solana", "ethereum", "base", "polygon"]
   dailyLimit?: number;
   requiresTwoFa?: boolean;
 }
 
 export interface ArmorTradeRequest {
-  action: "swap" | "transfer" | "dca" | "limit_order";
+  action: 'swap' | 'transfer' | 'dca' | 'limit_order';
   fromToken: string;
   toToken?: string;
   amount: number;
@@ -32,7 +32,7 @@ export interface ArmorTradeRequest {
 
 export interface ArmorTradeResult {
   txHash: string;
-  status: "pending" | "success" | "failed";
+  status: 'pending' | 'success' | 'failed';
   amountIn: number;
   amountOut?: number;
   fees: number;
@@ -41,7 +41,7 @@ export interface ArmorTradeResult {
 
 class ArmorWalletService {
   private apiKey: string | null = null;
-  private baseUrl = "https://api.armorwallet.ai"; // Placeholder - use actual API URL
+  private baseUrl = 'https://api.armorwallet.ai'; // Placeholder - use actual API URL
 
   constructor() {
     this.apiKey = process.env.ARMOR_API_KEY || null;
@@ -54,7 +54,7 @@ class ArmorWalletService {
   async initializeApi(userId: string): Promise<string> {
     if (!this.apiKey) {
       throw new Error(
-        "Armor API key not configured. Please stake your Codex NFT at codex.armorwallet.ai and retrieve API key via @ArmorWalletBot on Telegram"
+        'Armor API key not configured. Please stake your Codex NFT at codex.armorwallet.ai and retrieve API key via @ArmorWalletBot on Telegram'
       );
     }
 
@@ -66,20 +66,17 @@ class ArmorWalletService {
   /**
    * Create Armor Wallet (standard or trading)
    */
-  async createWallet(
-    userId: string,
-    config: ArmorWalletConfig
-  ): Promise<ArmorWallet> {
+  async createWallet(userId: string, config: ArmorWalletConfig): Promise<ArmorWallet> {
     if (!this.apiKey) {
-      throw new Error("Armor API key required");
+      throw new Error('Armor API key required');
     }
 
     // Call Armor API to create wallet
     const response = await fetch(`${this.baseUrl}/v1/wallets`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Armor-Api-Key": this.apiKey,
+        'Content-Type': 'application/json',
+        'X-Armor-Api-Key': this.apiKey,
       },
       body: JSON.stringify({
         type: config.walletType,
@@ -105,7 +102,7 @@ class ArmorWalletService {
       armorApiKey: encryptionService.encrypt(this.apiKey, userId),
       metadata: {
         armorWalletId: data.wallet_id,
-        createdVia: "mcp-integration",
+        createdVia: 'mcp-integration',
       },
     });
 
@@ -115,34 +112,26 @@ class ArmorWalletService {
   /**
    * Execute AI-powered trade using natural language
    */
-  async executeTrade(
-    walletId: string,
-    request: ArmorTradeRequest
-  ): Promise<ArmorTradeResult> {
+  async executeTrade(walletId: string, request: ArmorTradeRequest): Promise<ArmorTradeResult> {
     const wallet = await storage.getArmorWallet(walletId);
     if (!wallet) {
-      throw new Error("Armor wallet not found");
+      throw new Error('Armor wallet not found');
     }
 
     // Decrypt API key
-    const apiKey = encryptionService.decrypt(
-      wallet.armorApiKey || "",
-      wallet.userId
-    );
+    const apiKey = encryptionService.decrypt(wallet.armorApiKey || '', wallet.userId);
 
     // Check daily limit
     if (wallet.dailyLimit && request.amount > parseFloat(wallet.dailyLimit)) {
-      throw new Error(
-        `Trade amount ${request.amount} exceeds daily limit ${wallet.dailyLimit}`
-      );
+      throw new Error(`Trade amount ${request.amount} exceeds daily limit ${wallet.dailyLimit}`);
     }
 
     // Execute trade via Armor API
     const response = await fetch(`${this.baseUrl}/v1/trades`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Armor-Api-Key": apiKey,
+        'Content-Type': 'application/json',
+        'X-Armor-Api-Key': apiKey,
       },
       body: JSON.stringify({
         wallet_id: (wallet.metadata as any)?.armorWalletId,
@@ -181,11 +170,11 @@ class ArmorWalletService {
     token: string,
     amountPerInterval: number,
     intervalHours: number,
-    chain: string = "ethereum"
+    chain: string = 'ethereum'
   ): Promise<void> {
     await this.executeTrade(walletId, {
-      action: "dca",
-      fromToken: "USDT",
+      action: 'dca',
+      fromToken: 'USDT',
       toToken: token,
       amount: amountPerInterval,
       chain,
@@ -203,11 +192,11 @@ class ArmorWalletService {
     targetPrice: number,
     stopLoss?: number,
     takeProfit?: number,
-    chain: string = "ethereum"
+    chain: string = 'ethereum'
   ): Promise<void> {
     await this.executeTrade(walletId, {
-      action: "limit_order",
-      fromToken: "USDT",
+      action: 'limit_order',
+      fromToken: 'USDT',
       toToken: token,
       amount,
       chain,
@@ -225,19 +214,16 @@ class ArmorWalletService {
   async getPortfolio(walletId: string): Promise<any> {
     const wallet = await storage.getArmorWallet(walletId);
     if (!wallet) {
-      throw new Error("Armor wallet not found");
+      throw new Error('Armor wallet not found');
     }
 
-    const apiKey = encryptionService.decrypt(
-      wallet.armorApiKey || "",
-      wallet.userId
-    );
+    const apiKey = encryptionService.decrypt(wallet.armorApiKey || '', wallet.userId);
 
     const response = await fetch(
       `${this.baseUrl}/v1/wallets/${(wallet.metadata as any)?.armorWalletId}/portfolio`,
       {
         headers: {
-          "X-Armor-Api-Key": apiKey,
+          'X-Armor-Api-Key': apiKey,
         },
       }
     );
@@ -258,10 +244,10 @@ class ArmorWalletService {
     fromToken: string,
     toToken: string,
     amount: number,
-    chain: string = "ethereum"
+    chain: string = 'ethereum'
   ): Promise<ArmorTradeResult> {
     return this.executeTrade(walletId, {
-      action: "swap",
+      action: 'swap',
       fromToken,
       toToken,
       amount,
@@ -276,24 +262,21 @@ class ArmorWalletService {
   async naturalLanguageTrade(
     walletId: string,
     command: string,
-    chain: string = "ethereum"
+    chain: string = 'ethereum'
   ): Promise<ArmorTradeResult> {
     const wallet = await storage.getArmorWallet(walletId);
     if (!wallet) {
-      throw new Error("Armor wallet not found");
+      throw new Error('Armor wallet not found');
     }
 
-    const apiKey = encryptionService.decrypt(
-      wallet.armorApiKey || "",
-      wallet.userId
-    );
+    const apiKey = encryptionService.decrypt(wallet.armorApiKey || '', wallet.userId);
 
     // Armor AI parses natural language and executes
     const response = await fetch(`${this.baseUrl}/v1/ai/execute`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Armor-Api-Key": apiKey,
+        'Content-Type': 'application/json',
+        'X-Armor-Api-Key': apiKey,
       },
       body: JSON.stringify({
         wallet_id: (wallet.metadata as any)?.armorWalletId,

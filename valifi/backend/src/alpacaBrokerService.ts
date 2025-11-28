@@ -132,7 +132,9 @@ class AlpacaBrokerService {
       const paper = config?.paper !== undefined ? config.paper : true;
 
       if (!keyId || !secretKey) {
-        throw new Error('Alpaca API credentials not provided. Set ALPACA_API_KEY and ALPACA_SECRET_KEY environment variables.');
+        throw new Error(
+          'Alpaca API credentials not provided. Set ALPACA_API_KEY and ALPACA_SECRET_KEY environment variables.'
+        );
       }
 
       this.config = {
@@ -317,9 +319,9 @@ class AlpacaBrokerService {
     this.ensureInitialized();
     try {
       const { symbol, timeframe, start, end, limit } = params;
-      
+
       console.log(`[AlpacaBroker] Fetching historical bars for ${symbol} (${timeframe})`);
-      
+
       const bars = await this.alpaca!.getBarsV2(symbol, {
         timeframe,
         start,
@@ -379,9 +381,9 @@ class AlpacaBrokerService {
       }
 
       // Subscribe to trades and quotes
-      symbols.forEach(symbol => {
+      symbols.forEach((symbol) => {
         this.streamCallbacks.set(symbol, onData);
-        
+
         this.dataStream.onStockTrade((trade: any) => {
           if (trade.Symbol === symbol) {
             const callback = this.streamCallbacks.get(symbol);
@@ -438,7 +440,7 @@ class AlpacaBrokerService {
       if (symbols) {
         this.dataStream.unsubscribeFromTrades(symbols);
         this.dataStream.unsubscribeFromQuotes(symbols);
-        symbols.forEach(symbol => this.streamCallbacks.delete(symbol));
+        symbols.forEach((symbol) => this.streamCallbacks.delete(symbol));
         console.log(`[AlpacaBroker] Stopped streaming for: ${symbols.join(', ')}`);
       } else {
         await this.dataStream.disconnect();
@@ -468,19 +470,19 @@ class AlpacaBrokerService {
     this.ensureInitialized();
     try {
       const positions = await this.getPositions();
-      
+
       let totalPnL = 0;
       let totalCostBasis = 0;
-      
-      const positionsWithPnL = positions.map(pos => {
+
+      const positionsWithPnL = positions.map((pos) => {
         const pnl = parseFloat(pos.unrealized_pl);
         const costBasis = parseFloat(pos.cost_basis);
         const marketValue = parseFloat(pos.market_value);
         const pnlPercent = (pnl / costBasis) * 100;
-        
+
         totalPnL += pnl;
         totalCostBasis += costBasis;
-        
+
         return {
           symbol: pos.symbol,
           qty: parseFloat(pos.qty),
@@ -521,7 +523,12 @@ class AlpacaBrokerService {
   /**
    * Execute a limit order
    */
-  async limitOrder(symbol: string, qty: number, side: 'buy' | 'sell', limitPrice: number): Promise<Order> {
+  async limitOrder(
+    symbol: string,
+    qty: number,
+    side: 'buy' | 'sell',
+    limitPrice: number
+  ): Promise<Order> {
     return this.placeOrder({
       symbol,
       qty,
@@ -535,7 +542,12 @@ class AlpacaBrokerService {
   /**
    * Execute a stop order
    */
-  async stopOrder(symbol: string, qty: number, side: 'buy' | 'sell', stopPrice: number): Promise<Order> {
+  async stopOrder(
+    symbol: string,
+    qty: number,
+    side: 'buy' | 'sell',
+    stopPrice: number
+  ): Promise<Order> {
     return this.placeOrder({
       symbol,
       qty,

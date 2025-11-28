@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { BarChart3, FileText, Sparkles, FileCode, Shield, Building2 } from "lucide-react";
-import { Link } from "wouter";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { BarChart3, FileText, Sparkles, FileCode, Shield, Building2 } from 'lucide-react';
+import { Link } from 'wouter';
 
 export default function AnalyticsIntelligence() {
   return (
@@ -15,9 +15,12 @@ export default function AnalyticsIntelligence() {
               Advanced Analytics, AI Predictions, Security Testing & Banking Integration
             </p>
           </div>
-          <Badge variant="default" className="flex items-center gap-1" data-testid="badge-analytics-count">
-            <BarChart3 className="h-3 w-3" />
-            6 Tools
+          <Badge
+            variant="default"
+            className="flex items-center gap-1"
+            data-testid="badge-analytics-count"
+          >
+            <BarChart3 className="h-3 w-3" />6 Tools
           </Badge>
         </div>
       </div>
@@ -31,7 +34,9 @@ export default function AnalyticsIntelligence() {
                   <BarChart3 className="h-4 w-4 text-primary" />
                   Portfolio Analytics
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-portfolio-analytics-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-portfolio-analytics-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Performance metrics & risk analysis</CardDescription>
             </CardHeader>
@@ -51,7 +56,9 @@ export default function AnalyticsIntelligence() {
                   <FileText className="h-4 w-4 text-primary" />
                   Transaction History
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-tx-history-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-tx-history-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Complete transaction analysis</CardDescription>
             </CardHeader>
@@ -71,7 +78,9 @@ export default function AnalyticsIntelligence() {
                   <Sparkles className="h-4 w-4 text-primary" />
                   Divine Oracle
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-oracle-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-oracle-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>AI predictions & market sentiment</CardDescription>
             </CardHeader>
@@ -91,7 +100,9 @@ export default function AnalyticsIntelligence() {
                   <FileCode className="h-4 w-4 text-primary" />
                   Word Bot
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-word-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-word-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>NLP & text processing</CardDescription>
             </CardHeader>
@@ -111,7 +122,9 @@ export default function AnalyticsIntelligence() {
                   <Shield className="h-4 w-4 text-primary" />
                   CyberLab
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-cyberlab-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-cyberlab-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Penetration testing & security</CardDescription>
             </CardHeader>
@@ -131,7 +144,9 @@ export default function AnalyticsIntelligence() {
                   <Building2 className="h-4 w-4 text-primary" />
                   Banking Integration
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-banking-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-banking-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Traditional bank integration</CardDescription>
             </CardHeader>

@@ -1,26 +1,54 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { queryClient } from "@/lib/queryClient";
-import { TrendingUp, TrendingDown, DollarSign, Globe, ArrowRightLeft, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { queryClient } from '@/lib/queryClient';
+import { TrendingUp, TrendingDown, DollarSign, Globe, ArrowRightLeft, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 const orderFormSchema = z.object({
-  pair: z.string().min(1, "Currency pair is required"),
-  orderType: z.enum(["buy", "sell"]),
-  quantity: z.coerce.number().positive("Quantity must be positive"),
+  pair: z.string().min(1, 'Currency pair is required'),
+  orderType: z.enum(['buy', 'sell']),
+  quantity: z.coerce.number().positive('Quantity must be positive'),
 });
 
 type OrderForm = z.infer<typeof orderFormSchema>;
@@ -44,21 +72,30 @@ interface FinancialOrder {
   createdAt: Date;
 }
 
-const popularPairs = ["USD/EUR", "USD/GBP", "USD/JPY", "EUR/GBP", "EUR/JPY", "GBP/JPY", "AUD/USD", "USD/CAD"];
+const popularPairs = [
+  'USD/EUR',
+  'USD/GBP',
+  'USD/JPY',
+  'EUR/GBP',
+  'EUR/JPY',
+  'GBP/JPY',
+  'AUD/USD',
+  'USD/CAD',
+];
 
 export default function ForexPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPair, setSelectedPair] = useState("USD/EUR");
+  const [selectedPair, setSelectedPair] = useState('USD/EUR');
   const [forexData, setForexData] = useState<ForexData | null>(null);
 
   const { data: orders, isLoading: ordersLoading } = useQuery<FinancialOrder[]>({
-    queryKey: ["/api/financial/orders"],
+    queryKey: ['/api/financial/orders'],
     refetchInterval: 3000,
   });
 
-  const forexOrders = orders?.filter(o => o.symbol.includes("/")) || [];
+  const forexOrders = orders?.filter((o) => o.symbol.includes('/')) || [];
 
   useEffect(() => {
     const fetchForexData = async () => {
@@ -69,7 +106,7 @@ export default function ForexPage() {
           setForexData(data);
         }
       } catch (error) {
-        console.error("Error fetching forex data:", error);
+        console.error('Error fetching forex data:', error);
       }
     };
     fetchForexData();
@@ -81,50 +118,52 @@ export default function ForexPage() {
     resolver: zodResolver(orderFormSchema),
     defaultValues: {
       pair: selectedPair,
-      orderType: "buy",
+      orderType: 'buy',
       quantity: 1000,
     },
   });
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: OrderForm) => {
-      const response = await fetch("/api/financial/forex/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/financial/forex/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to place order");
+        throw new Error(error.message || 'Failed to place order');
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/financial/orders"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/financial/orders'] });
       toast({
-        title: "Order Executed",
-        description: "Forex order placed successfully",
+        title: 'Order Executed',
+        description: 'Forex order placed successfully',
       });
       setDialogOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "Order Failed",
+        variant: 'destructive',
+        title: 'Order Failed',
         description: error.message,
       });
     },
   });
 
-  const totalVolume = forexOrders.reduce((sum, o) => sum + parseFloat(o.totalValue || "0"), 0);
-  const buyOrders = forexOrders.filter(o => o.orderType === "buy").length;
-  const sellOrders = forexOrders.filter(o => o.orderType === "sell").length;
+  const totalVolume = forexOrders.reduce((sum, o) => sum + parseFloat(o.totalValue || '0'), 0);
+  const buyOrders = forexOrders.filter((o) => o.orderType === 'buy').length;
+  const sellOrders = forexOrders.filter((o) => o.orderType === 'sell').length;
 
   const mockChartData = Array.from({ length: 30 }, (_, i) => ({
     date: `${i}h`,
-    rate: forexData ? forexData.price + (Math.random() - 0.5) * 0.02 : 1.1 + (Math.random() - 0.5) * 0.02,
+    rate: forexData
+      ? forexData.price + (Math.random() - 0.5) * 0.02
+      : 1.1 + (Math.random() - 0.5) * 0.02,
   }));
 
   return (
@@ -152,7 +191,10 @@ export default function ForexPage() {
               <DialogDescription>Buy or sell currency pairs</DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((data) => createOrderMutation.mutate(data))} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit((data) => createOrderMutation.mutate(data))}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="pair"
@@ -166,8 +208,10 @@ export default function ForexPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {popularPairs.map(pair => (
-                            <SelectItem key={pair} value={pair}>{pair}</SelectItem>
+                          {popularPairs.map((pair) => (
+                            <SelectItem key={pair} value={pair}>
+                              {pair}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -203,19 +247,26 @@ export default function ForexPage() {
                     <FormItem>
                       <FormLabel>Amount (units)</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" placeholder="1000" data-testid="input-quantity" />
+                        <Input
+                          {...field}
+                          type="number"
+                          placeholder="1000"
+                          data-testid="input-quantity"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button 
-                  type="submit" 
-                  className="w-full divine-gradient" 
+                <Button
+                  type="submit"
+                  className="w-full divine-gradient"
                   disabled={createOrderMutation.isPending}
                   data-testid="button-submit-order"
                 >
-                  {createOrderMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {createOrderMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Execute Order
                 </Button>
               </form>
@@ -243,7 +294,9 @@ export default function ForexPage() {
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500" data-testid="text-buy-orders">{buyOrders}</div>
+            <div className="text-2xl font-bold text-green-500" data-testid="text-buy-orders">
+              {buyOrders}
+            </div>
             <p className="text-xs text-muted-foreground">Long positions</p>
           </CardContent>
         </Card>
@@ -253,7 +306,9 @@ export default function ForexPage() {
             <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-500" data-testid="text-sell-orders">{sellOrders}</div>
+            <div className="text-2xl font-bold text-red-500" data-testid="text-sell-orders">
+              {sellOrders}
+            </div>
             <p className="text-xs text-muted-foreground">Short positions</p>
           </CardContent>
         </Card>
@@ -263,7 +318,9 @@ export default function ForexPage() {
             <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-total-orders">{forexOrders.length}</div>
+            <div className="text-2xl font-bold" data-testid="text-total-orders">
+              {forexOrders.length}
+            </div>
             <p className="text-xs text-muted-foreground">Executed trades</p>
           </CardContent>
         </Card>
@@ -281,15 +338,19 @@ export default function ForexPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {popularPairs.map(pair => (
-                  <SelectItem key={pair} value={pair}>{pair}</SelectItem>
+                {popularPairs.map((pair) => (
+                  <SelectItem key={pair} value={pair}>
+                    {pair}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {forexData && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-3xl font-bold" data-testid="text-forex-rate">{forexData.price.toFixed(5)}</span>
+                  <span className="text-3xl font-bold" data-testid="text-forex-rate">
+                    {forexData.price.toFixed(5)}
+                  </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
@@ -322,7 +383,13 @@ export default function ForexPage() {
                 <XAxis dataKey="date" />
                 <YAxis domain={['auto', 'auto']} />
                 <Tooltip />
-                <Line type="monotone" dataKey="rate" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="rate"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -342,15 +409,20 @@ export default function ForexPage() {
           ) : forexOrders.length > 0 ? (
             <div className="space-y-4">
               {forexOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg" data-testid={`order-${order.id}`}>
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                  data-testid={`order-${order.id}`}
+                >
                   <div>
                     <p className="font-medium">{order.symbol}</p>
                     <p className="text-sm text-muted-foreground">
-                      {order.orderType.toUpperCase()} {order.quantity} units @ {parseFloat(order.price).toFixed(5)}
+                      {order.orderType.toUpperCase()} {order.quantity} units @{' '}
+                      {parseFloat(order.price).toFixed(5)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <Badge variant={order.status === "executed" ? "default" : "secondary"}>
+                    <Badge variant={order.status === 'executed' ? 'default' : 'secondary'}>
                       {order.status}
                     </Badge>
                     <p className="text-sm text-muted-foreground mt-1">

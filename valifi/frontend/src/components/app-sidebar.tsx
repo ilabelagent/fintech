@@ -7,12 +7,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 import {
   Home,
   Wallet,
   Bot,
-  Music,
   Shield,
   CreditCard,
   FileCheck,
@@ -22,11 +21,9 @@ import {
   ShieldCheck,
   Users,
   MessageSquare,
-  Crown,
   Newspaper,
   ArrowLeftRight,
   ArrowUpDown,
-  Settings,
   Link2,
   Sparkles,
   LayoutDashboard,
@@ -34,183 +31,140 @@ import {
   Globe,
   Landmark,
   PiggyBank,
-  Gem,
-  Heart,
-} from "lucide-react";
-import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+  Settings,
+  LineChart,
+  Database,
+  Building2,
+} from 'lucide-react';
+import { Link, useLocation } from 'wouter';
+import { useAuth } from '@/hooks/useAuth';
 
 const tradingItems = [
   {
-    title: "Exchange Platform",
-    url: "/exchange",
+    title: 'Exchange',
+    url: '/exchange',
     icon: ArrowLeftRight,
   },
   {
-    title: "Trading Bots Arsenal",
-    url: "/trading-bots",
+    title: 'Trading Bots',
+    url: '/trading-bots',
     icon: Bot,
   },
   {
-    title: "Bot Marketplace",
-    url: "/bot-marketplace",
+    title: 'Bot Marketplace',
+    url: '/bot-marketplace',
     icon: Sparkles,
-    testId: "link-bot-marketplace",
+    testId: 'link-bot-marketplace',
   },
   {
-    title: "Spectrum Investment Plans",
-    url: "/spectrum-plans",
-    icon: Gem,
-    testId: "link-spectrum-plans",
-  },
-  {
-    title: "Kingdom Assets",
-    url: "/assets",
-    icon: Sparkles,
-    testId: "link-assets",
-  },
-  {
-    title: "Ethereal Elements",
-    url: "/ethereal-elements",
-    icon: Sparkles,
-    testId: "link-ethereal-elements",
-  },
-  {
-    title: "Financial Services",
-    url: "/financial-services",
+    title: 'Financial Services',
+    url: '/financial-services',
     icon: TrendingUp,
   },
   {
-    title: "Advanced Trading",
-    url: "/advanced-trading",
+    title: 'Advanced Trading',
+    url: '/advanced-trading',
     icon: Zap,
   },
   {
-    title: "Metals & Gold",
-    url: "/metals",
-    icon: Crown,
+    title: 'Precious Metals',
+    url: '/metals',
+    icon: Coins,
   },
   {
-    title: "Stock Trading",
-    url: "/stocks",
+    title: 'Stocks',
+    url: '/stocks',
     icon: BarChart3,
   },
   {
-    title: "Forex Trading",
-    url: "/forex",
+    title: 'Forex',
+    url: '/forex',
     icon: Globe,
   },
   {
-    title: "Bond Marketplace",
-    url: "/bonds",
+    title: 'Bonds',
+    url: '/bonds',
     icon: Landmark,
   },
   {
-    title: "Retirement Planning",
-    url: "/retirement",
+    title: 'Retirement',
+    url: '/retirement',
     icon: PiggyBank,
-  },
-  {
-    title: "Legacy Trading",
-    url: "/trading",
-    icon: TrendingUp,
   },
 ];
 
 const blockchainItems = [
   {
-    title: "Wallets & Blockchain",
-    url: "/blockchain",
+    title: 'Wallets',
+    url: '/blockchain',
     icon: Wallet,
   },
   {
-    title: "WalletConnect",
-    url: "/wallet-connect",
+    title: 'WalletConnect',
+    url: '/wallet-connect',
     icon: Link2,
   },
   {
-    title: "Wallet Security",
-    url: "/wallet-security",
+    title: 'Security',
+    url: '/wallet-security',
     icon: ShieldCheck,
   },
   {
-    title: "Coin Mixer",
-    url: "/mixer",
+    title: 'Privacy Mixer',
+    url: '/mixer',
     icon: ShieldCheck,
   },
 ];
 
 const communityItems = [
   {
-    title: "TWinn Celebrity Platform",
-    url: "/twinn",
-    icon: Sparkles,
-    testId: "link-twinn",
-  },
-  {
-    title: "VIP Forum",
-    url: "/community",
+    title: 'Community',
+    url: '/community',
     icon: Users,
   },
   {
-    title: "AI Chat",
-    url: "/chat",
+    title: 'AI Assistant',
+    url: '/chat',
     icon: MessageSquare,
   },
   {
-    title: "Blog & News",
-    url: "/news",
+    title: 'News & Updates',
+    url: '/news',
     icon: Newspaper,
   },
 ];
 
 const platformItems = [
   {
-    title: "Prayer Center",
-    url: "/prayer-center",
-    icon: Heart,
-    testId: "link-prayer-center",
-  },
-  {
-    title: "Agent Orchestra",
-    url: "/agents",
+    title: 'AI Agents',
+    url: '/agents',
     icon: Bot,
   },
   {
-    title: "Jesus Cartel Publishing",
-    url: "/publishing",
-    icon: Music,
-  },
-  {
-    title: "Guardian Angel",
-    url: "/security",
+    title: 'Security Center',
+    url: '/security',
     icon: Shield,
   },
   {
-    title: "Analytics & Intelligence",
-    url: "/analytics-intelligence",
-    icon: TrendingUp,
+    title: 'Analytics',
+    url: '/analytics-intelligence',
+    icon: LineChart,
   },
   {
-    title: "Payments",
-    url: "/payments",
+    title: 'Payments',
+    url: '/payments',
     icon: CreditCard,
   },
   {
-    title: "P2P Trading",
-    url: "/p2p",
+    title: 'P2P Trading',
+    url: '/p2p',
     icon: ArrowUpDown,
-    testId: "link-p2p",
+    testId: 'link-p2p',
   },
   {
-    title: "KYC/Compliance",
-    url: "/kyc",
+    title: 'KYC/Compliance',
+    url: '/kyc',
     icon: FileCheck,
-  },
-  {
-    title: "Quantum Computing",
-    url: "/quantum",
-    icon: Zap,
   },
 ];
 
@@ -222,15 +176,22 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg font-serif divine-gradient-text">
-            Valifi Kingdom
+          <SidebarGroupLabel className="text-lg font-bold">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Valifi
+              </span>
+            </div>
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-4">
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  data-active={location === "/"}
+                  data-active={location === '/'}
                   className="data-[active=true]:bg-sidebar-accent"
                 >
                   <Link href="/">
@@ -242,13 +203,13 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  data-active={location === "/dashboard-new"}
+                  data-active={location === '/dashboard-new'}
                   className="data-[active=true]:bg-sidebar-accent"
                   data-testid="link-dashboard-new"
                 >
                   <Link href="/dashboard-new">
                     <LayoutDashboard className="h-4 w-4" />
-                    <span>Custom Dashboard</span>
+                    <span>Advanced Dashboard</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -256,8 +217,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Trading & Markets */}
         <SidebarGroup>
-          <SidebarGroupLabel>Trading & Finance</SidebarGroupLabel>
+          <SidebarGroupLabel>Trading & Markets</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {tradingItems.map((item) => (
@@ -266,6 +228,7 @@ export function AppSidebar() {
                     asChild
                     data-active={location === item.url}
                     className="data-[active=true]:bg-sidebar-accent"
+                    data-testid={item.testId}
                   >
                     <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
@@ -278,8 +241,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Blockchain */}
         <SidebarGroup>
-          <SidebarGroupLabel>Blockchain</SidebarGroupLabel>
+          <SidebarGroupLabel>Blockchain & Wallets</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {blockchainItems.map((item) => (
@@ -300,6 +264,31 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Platform Services */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Platform Services</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {platformItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    data-active={location === item.url}
+                    className="data-[active=true]:bg-sidebar-accent"
+                    data-testid={item.testId}
+                  >
+                    <Link href={item.url}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Community */}
         <SidebarGroup>
           <SidebarGroupLabel>Community</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -322,28 +311,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Platform Services</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {platformItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    data-active={location === item.url}
-                    className="data-[active=true]:bg-sidebar-accent"
-                  >
-                    <Link href={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
+        {/* Admin Section - Only show for admin users */}
         {user?.isAdmin && (
           <SidebarGroup>
             <SidebarGroupLabel>Administration</SidebarGroupLabel>
@@ -352,12 +320,13 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    data-active={location === "/admin"}
+                    data-active={location === '/admin'}
                     className="data-[active=true]:bg-sidebar-accent"
+                    data-testid="link-admin"
                   >
-                    <Link href="/admin" data-testid="link-admin">
+                    <Link href="/admin">
                       <Settings className="h-4 w-4" />
-                      <span>Admin Control Panel</span>
+                      <span>Admin Panel</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

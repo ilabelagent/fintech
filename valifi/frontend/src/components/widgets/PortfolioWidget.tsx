@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Wallet, TrendingUp, TrendingDown } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const COLORS = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#6366f1'];
 
@@ -11,13 +11,16 @@ export default function PortfolioWidget() {
     queryKey: ['/api/wallets'],
   });
 
-  const totalBalance = wallets?.reduce((sum, w) => sum + parseFloat(w.balance || "0"), 0) || 0;
-  
-  const portfolioData = wallets?.map((wallet, idx) => ({
-    name: wallet.network,
-    value: parseFloat(wallet.balance || "0"),
-    color: COLORS[idx % COLORS.length]
-  })).filter(item => item.value > 0) || [];
+  const totalBalance = wallets?.reduce((sum, w) => sum + parseFloat(w.balance || '0'), 0) || 0;
+
+  const portfolioData =
+    wallets
+      ?.map((wallet, idx) => ({
+        name: wallet.network,
+        value: parseFloat(wallet.balance || '0'),
+        color: COLORS[idx % COLORS.length],
+      }))
+      .filter((item) => item.value > 0) || [];
 
   if (isLoading) {
     return (
@@ -55,7 +58,7 @@ export default function PortfolioWidget() {
               <span>+12.5%</span>
             </div>
           </div>
-          
+
           {portfolioData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -72,16 +75,12 @@ export default function PortfolioWidget() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  formatter={(value: any) => `$${parseFloat(value).toFixed(2)}`}
-                />
+                <Tooltip formatter={(value: any) => `$${parseFloat(value).toFixed(2)}`} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No portfolio data
-            </div>
+            <div className="text-center py-8 text-muted-foreground">No portfolio data</div>
           )}
         </div>
       </CardContent>

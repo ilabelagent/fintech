@@ -32,6 +32,7 @@ The Valifi Kingdom Platform is a **complete AI-powered multi-agent system** with
 ### ✅ Test Results: 100% Pass Rate
 
 All 16 tests passed successfully:
+
 - ✅ Health Checks: 4/4
 - ✅ Terminal Agent: 3/3
 - ✅ SDK Agent: 3/3
@@ -66,24 +67,25 @@ curl -X POST http://localhost:8000/api/chat \
 
 ### Web Interface Endpoints
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Web UI** | http://localhost:8000 | Main interface - open in browser |
-| **WebSocket** | ws://localhost:8000/ws | Real-time chat connection |
-| **REST API** | http://localhost:8000/api/chat | HTTP API endpoint |
-| **Health Check** | http://localhost:8000/health | Service status |
+| Service          | URL                            | Description                      |
+| ---------------- | ------------------------------ | -------------------------------- |
+| **Web UI**       | http://localhost:8000          | Main interface - open in browser |
+| **WebSocket**    | ws://localhost:8000/ws         | Real-time chat connection        |
+| **REST API**     | http://localhost:8000/api/chat | HTTP API endpoint                |
+| **Health Check** | http://localhost:8000/health   | Service status                   |
 
 ### Agent Endpoints (Direct Access)
 
-| Agent | URL | API Docs |
-|-------|-----|----------|
+| Agent              | URL                           | API Docs                   |
+| ------------------ | ----------------------------- | -------------------------- |
 | **Terminal Agent** | http://localhost:8001/predict | http://localhost:8001/docs |
-| **SDK Agent** | http://localhost:8002/predict | http://localhost:8002/docs |
-| **Orchestrator** | http://localhost:8003/predict | http://localhost:8003/docs |
+| **SDK Agent**      | http://localhost:8002/predict | http://localhost:8002/docs |
+| **Orchestrator**   | http://localhost:8003/predict | http://localhost:8003/docs |
 
 ### Network Access
 
 All services are bound to `0.0.0.0`, meaning they're accessible from:
+
 - **Localhost**: http://localhost:8000
 - **Network**: http://YOUR_IP_ADDRESS:8000
 - **External**: If firewall allows, accessible from internet
@@ -101,6 +103,7 @@ Navigate to: **http://localhost:8000**
 Try these natural language prompts:
 
 **File Operations:**
+
 ```
 List all Python files in the project
 Show me the project structure
@@ -108,6 +111,7 @@ What files are in the logs directory
 ```
 
 **Git Operations:**
+
 ```
 Show me the git status
 What branches do we have
@@ -115,6 +119,7 @@ Show recent commits
 ```
 
 **SDK Questions:**
+
 ```
 How do I create a LitServe API?
 Explain LitAI LLM usage
@@ -122,6 +127,7 @@ Show me deployment best practices
 ```
 
 **General Help:**
+
 ```
 What can you help me with?
 How do I deploy agents?
@@ -226,8 +232,8 @@ const response = await fetch('http://localhost:8000/api/chat', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     message: 'list python files',
-    session_id: 'js_session'
-  })
+    session_id: 'js_session',
+  }),
 });
 
 const data = await response.json();
@@ -237,10 +243,12 @@ console.log(data.response);
 const ws = new WebSocket('ws://localhost:8000/ws');
 
 ws.onopen = () => {
-  ws.send(JSON.stringify({
-    message: 'hello',
-    session_id: 'ws_session'
-  }));
+  ws.send(
+    JSON.stringify({
+      message: 'hello',
+      session_id: 'ws_session',
+    })
+  );
 };
 
 ws.onmessage = (event) => {
@@ -323,6 +331,7 @@ python test_web_interface.py
 ```
 
 This tests:
+
 - ✅ Health checks for all services
 - ✅ Terminal Agent functionality
 - ✅ SDK Agent responses
@@ -347,11 +356,13 @@ Overall: 16/16 tests passed (100.0%)
 ### Manual Testing
 
 **Test Web Interface:**
+
 ```bash
 curl http://localhost:8000/health
 ```
 
 **Test Terminal Agent:**
+
 ```bash
 curl -X POST http://localhost:8001/predict \
   -H "Content-Type: application/json" \
@@ -359,6 +370,7 @@ curl -X POST http://localhost:8001/predict \
 ```
 
 **Test SDK Agent:**
+
 ```bash
 curl -X POST http://localhost:8002/predict \
   -H "Content-Type: application/json" \
@@ -366,6 +378,7 @@ curl -X POST http://localhost:8002/predict \
 ```
 
 **Test Orchestrator:**
+
 ```bash
 curl -X POST http://localhost:8003/predict \
   -H "Content-Type: application/json" \
@@ -379,16 +392,19 @@ curl -X POST http://localhost:8003/predict \
 ### Services Not Starting
 
 **Check if ports are in use:**
+
 ```bash
 ss -tulpn | grep -E "(8000|8001|8002|8003)"
 ```
 
 **Kill processes on ports:**
+
 ```bash
 fuser -k 8000/tcp 8001/tcp 8002/tcp 8003/tcp
 ```
 
 **Restart services:**
+
 ```bash
 cd /teamspace/studios/this_studio/valifi
 bash deployment/deploy_all.sh restart
@@ -397,11 +413,13 @@ bash deployment/deploy_all.sh restart
 ### Web Interface Not Loading
 
 1. **Check service is running:**
+
    ```bash
    curl http://localhost:8000/health
    ```
 
 2. **Check logs:**
+
    ```bash
    tail -50 logs/interface.log
    ```
@@ -415,11 +433,13 @@ bash deployment/deploy_all.sh restart
 ### Agents Not Responding
 
 1. **Check all services are running:**
+
    ```bash
    ps aux | grep -E "(conversational_agent|intelligent_sdk_agent|master_orchestrator|conversational_interface)"
    ```
 
 2. **Check logs for errors:**
+
    ```bash
    tail -50 logs/terminal_agent.log
    tail -50 logs/sdk_agent.log
@@ -436,6 +456,7 @@ bash deployment/deploy_all.sh restart
 ### Database Issues
 
 **Terminal Agent memory database:**
+
 ```bash
 ls -lh agents/terminal_agent/agent_memory.db
 # If corrupted, delete and restart agent (will recreate)
@@ -443,6 +464,7 @@ rm agents/terminal_agent/agent_memory.db
 ```
 
 **SDK Agent knowledge database:**
+
 ```bash
 ls -lh agents/sdk_agent/sdk_knowledge.db
 # If needed, delete and restart (will recreate with default knowledge)
@@ -452,6 +474,7 @@ rm agents/sdk_agent/sdk_knowledge.db
 ### Connection Refused Errors
 
 **Orchestrator not running:**
+
 ```bash
 # Start orchestrator first
 python agents/orchestrator/master_orchestrator.py &
@@ -620,6 +643,7 @@ google-generativeai>=0.8.0
 **Web Interface:** http://localhost:8000 - Just ask naturally!
 
 **Documentation:**
+
 - This guide: `SETUP_AND_USAGE_GUIDE.md`
 - Deployment docs: `DEPLOYMENT_COMPLETE.md`
 - Platform overview: `VALIFI_INITIALIZATION_COMPLETE.md`
@@ -627,6 +651,7 @@ google-generativeai>=0.8.0
 **Logs:** `/teamspace/studios/this_studio/valifi/logs/`
 
 **API Docs:**
+
 - http://localhost:8001/docs (Terminal Agent)
 - http://localhost:8002/docs (SDK Agent)
 - http://localhost:8003/docs (Orchestrator)
@@ -645,6 +670,6 @@ google-generativeai>=0.8.0
 
 **Built with 🙏 in the Name of Jesus Christ**
 
-*"Ask, and it will be given to you; seek, and you will find" - Matthew 7:7*
+_"Ask, and it will be given to you; seek, and you will find" - Matthew 7:7_
 
 **Amen.** 🙏✨

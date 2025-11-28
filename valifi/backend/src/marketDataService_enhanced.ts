@@ -31,10 +31,7 @@ class MarketDataService {
   /**
    * Get cached data or fetch new data
    */
-  private async getCached<T>(
-    key: string,
-    fetchFn: () => Promise<T>
-  ): Promise<T> {
+  private async getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<T> {
     const cached = this.cache.get(key);
     const now = Date.now();
 
@@ -236,7 +233,7 @@ class MarketDataService {
    */
   private getMockStockData(symbol: string): MarketDataResponse {
     const basePrice = Math.random() * 500 + 50;
-    const change = (Math.random() * 20 - 10);
+    const change = Math.random() * 20 - 10;
     return {
       symbol: symbol.toUpperCase(),
       price: parseFloat(basePrice.toFixed(2)),
@@ -248,7 +245,7 @@ class MarketDataService {
 
   private getMockForexData(pair: string): MarketDataResponse {
     const basePrice = Math.random() * 2 + 0.5;
-    const change = (Math.random() * 0.02 - 0.01);
+    const change = Math.random() * 0.02 - 0.01;
     return {
       symbol: pair.toUpperCase(),
       price: parseFloat(basePrice.toFixed(4)),
@@ -285,8 +282,8 @@ class MarketDataService {
       { symbol: 'US30YEAR', price: 4.4 },
     ];
 
-    return maturities.map(m => {
-      const change = (Math.random() * 0.2 - 0.1);
+    return maturities.map((m) => {
+      const change = Math.random() * 0.2 - 0.1;
       return {
         symbol: m.symbol,
         price: parseFloat(m.price.toFixed(2)),

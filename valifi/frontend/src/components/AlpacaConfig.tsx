@@ -1,22 +1,30 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
-import { Check, AlertCircle, Loader2, ExternalLink, Key, Activity } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { queryClient } from '@/lib/queryClient';
+import { Check, AlertCircle, Loader2, ExternalLink, Key, Activity } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const alpacaConfigSchema = z.object({
-  apiKey: z.string().min(1, "API Key is required"),
-  secretKey: z.string().min(1, "Secret Key is required"),
+  apiKey: z.string().min(1, 'API Key is required'),
+  secretKey: z.string().min(1, 'Secret Key is required'),
   paper: z.boolean().default(true),
 });
 
@@ -26,14 +34,18 @@ export default function AlpacaConfig() {
   const { toast } = useToast();
   const [showKeys, setShowKeys] = useState(false);
 
-  const { data: account, isLoading: accountLoading, refetch: refetchAccount } = useQuery<any>({
-    queryKey: ["/api/broker/alpaca/account"],
+  const {
+    data: account,
+    isLoading: accountLoading,
+    refetch: refetchAccount,
+  } = useQuery<any>({
+    queryKey: ['/api/broker/alpaca/account'],
     retry: false,
     refetchInterval: false,
   });
 
   const { data: marketStatus } = useQuery<{ isOpen: boolean }>({
-    queryKey: ["/api/broker/alpaca/market-status"],
+    queryKey: ['/api/broker/alpaca/market-status'],
     retry: false,
     refetchInterval: 30000,
   });
@@ -41,18 +53,18 @@ export default function AlpacaConfig() {
   const form = useForm<AlpacaConfigForm>({
     resolver: zodResolver(alpacaConfigSchema),
     defaultValues: {
-      apiKey: "",
-      secretKey: "",
+      apiKey: '',
+      secretKey: '',
       paper: true,
     },
   });
 
   const initializeMutation = useMutation({
     mutationFn: async (data: AlpacaConfigForm) => {
-      const response = await fetch("/api/broker/alpaca/initialize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const response = await fetch('/api/broker/alpaca/initialize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           apiKey: data.apiKey,
           secretKey: data.secretKey,
@@ -61,26 +73,26 @@ export default function AlpacaConfig() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to initialize Alpaca");
+        throw new Error(error.message || 'Failed to initialize Alpaca');
       }
 
       return response.json();
     },
     onSuccess: async () => {
       toast({
-        title: "✅ Alpaca Connected",
-        description: "Your Alpaca broker is now connected and ready to trade!",
+        title: '✅ Alpaca Connected',
+        description: 'Your Alpaca broker is now connected and ready to trade!',
       });
       form.reset();
       await refetchAccount();
-      queryClient.invalidateQueries({ queryKey: ["/api/broker/alpaca/account"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/broker/alpaca/market-status"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/broker/alpaca/account'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/broker/alpaca/market-status'] });
     },
     onError: (error: any) => {
       toast({
-        title: "❌ Connection Failed",
-        description: error.message || "Failed to connect to Alpaca",
-        variant: "destructive",
+        title: '❌ Connection Failed',
+        description: error.message || 'Failed to connect to Alpaca',
+        variant: 'destructive',
       });
     },
   });
@@ -105,7 +117,11 @@ export default function AlpacaConfig() {
             </CardDescription>
           </div>
           {isConnected && (
-            <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400" data-testid="badge-connected">
+            <Badge
+              variant="outline"
+              className="bg-green-500/10 text-green-600 dark:text-green-400"
+              data-testid="badge-connected"
+            >
               <Check className="h-3 w-3 mr-1" />
               Connected
             </Badge>
@@ -116,10 +132,13 @@ export default function AlpacaConfig() {
       <CardContent className="space-y-4">
         {!isConnected ? (
           <>
-            <Alert className="border-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20" data-testid="alert-get-keys">
+            <Alert
+              className="border-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20"
+              data-testid="alert-get-keys"
+            >
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Get your free Alpaca Paper Trading API keys from{" "}
+                Get your free Alpaca Paper Trading API keys from{' '}
                 <a
                   href="https://alpaca.markets/docs/trading/getting-started/"
                   target="_blank"
@@ -169,7 +188,7 @@ export default function AlpacaConfig() {
                       <FormControl>
                         <Input
                           {...field}
-                          type={showKeys ? "text" : "password"}
+                          type={showKeys ? 'text' : 'password'}
                           placeholder="Enter your Alpaca API Key ID"
                           data-testid="input-api-key"
                         />
@@ -191,7 +210,7 @@ export default function AlpacaConfig() {
                       <FormControl>
                         <Input
                           {...field}
-                          type={showKeys ? "text" : "password"}
+                          type={showKeys ? 'text' : 'password'}
                           placeholder="Enter your Alpaca Secret Key"
                           data-testid="input-secret-key"
                         />
@@ -209,7 +228,7 @@ export default function AlpacaConfig() {
                     onClick={() => setShowKeys(!showKeys)}
                     data-testid="button-toggle-keys"
                   >
-                    {showKeys ? "Hide" : "Show"} Keys
+                    {showKeys ? 'Hide' : 'Show'} Keys
                   </Button>
                 </div>
 
@@ -225,7 +244,7 @@ export default function AlpacaConfig() {
                       Connecting...
                     </>
                   ) : (
-                    "Connect to Alpaca"
+                    'Connect to Alpaca'
                   )}
                 </Button>
               </form>
@@ -261,15 +280,21 @@ export default function AlpacaConfig() {
             </div>
 
             {marketStatus && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-white/50 dark:bg-gray-900/50" data-testid="market-status">
-                <div className={`h-2 w-2 rounded-full ${marketStatus.isOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                <p className="text-sm">
-                  Market is {marketStatus.isOpen ? 'OPEN' : 'CLOSED'}
-                </p>
+              <div
+                className="flex items-center gap-2 p-3 rounded-lg bg-white/50 dark:bg-gray-900/50"
+                data-testid="market-status"
+              >
+                <div
+                  className={`h-2 w-2 rounded-full ${marketStatus.isOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}
+                />
+                <p className="text-sm">Market is {marketStatus.isOpen ? 'OPEN' : 'CLOSED'}</p>
               </div>
             )}
 
-            <Alert className="border-green-500/20 bg-green-50/50 dark:bg-green-950/20" data-testid="alert-connected">
+            <Alert
+              className="border-green-500/20 bg-green-50/50 dark:bg-green-950/20"
+              data-testid="alert-connected"
+            >
               <Check className="h-4 w-4" />
               <AlertDescription>
                 ✅ Your Alpaca account is connected and ready for paper trading!

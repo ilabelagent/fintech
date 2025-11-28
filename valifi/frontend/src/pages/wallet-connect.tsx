@@ -1,29 +1,29 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  Wallet, 
-  Link2, 
-  AlertCircle, 
-  CheckCircle2, 
-  XCircle, 
-  Loader2, 
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Wallet,
+  Link2,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Loader2,
   Send,
   QrCode,
   Clock,
-  Network
-} from "lucide-react";
-import type { WalletConnectSession } from "@shared/schema";
-import { walletConnectService } from "@/lib/walletConnect";
-import { parseEther, formatEther } from "ethers";
+  Network,
+} from 'lucide-react';
+import type { WalletConnectSession } from '@shared/schema';
+import { walletConnectService } from '@/lib/walletConnect';
+import { parseEther, formatEther } from 'ethers';
 
 interface SessionInfo {
   peerName?: string;
@@ -38,13 +38,13 @@ export default function WalletConnect() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectedWallet, setConnectedWallet] = useState<any>(null);
   const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null);
-  const [balance, setBalance] = useState<string>("0");
+  const [balance, setBalance] = useState<string>('0');
   const [isSendingTx, setIsSendingTx] = useState(false);
-  const [txRecipient, setTxRecipient] = useState("");
-  const [txAmount, setTxAmount] = useState("");
+  const [txRecipient, setTxRecipient] = useState('');
+  const [txAmount, setTxAmount] = useState('');
 
   const { data: sessions, isLoading } = useQuery<WalletConnectSession[]>({
-    queryKey: ["/api/walletconnect/sessions"],
+    queryKey: ['/api/walletconnect/sessions'],
   });
 
   const connectMutation = useMutation({
@@ -55,40 +55,40 @@ export default function WalletConnect() {
       network: string;
       sessionData?: any;
     }) => {
-      return await apiRequest("POST", "/api/walletconnect/sessions", walletData);
+      return await apiRequest('POST', '/api/walletconnect/sessions', walletData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/walletconnect/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/walletconnect/sessions'] });
       toast({
-        title: "Wallet Connected",
-        description: "Your external wallet has been successfully connected via WalletConnect!",
+        title: 'Wallet Connected',
+        description: 'Your external wallet has been successfully connected via WalletConnect!',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Connection Failed",
+        title: 'Connection Failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 
   const disconnectMutation = useMutation({
     mutationFn: async (sessionId: string) => {
-      return await apiRequest("POST", `/api/walletconnect/sessions/${sessionId}/disconnect`);
+      return await apiRequest('POST', `/api/walletconnect/sessions/${sessionId}/disconnect`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/walletconnect/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/walletconnect/sessions'] });
       toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected successfully.",
+        title: 'Wallet Disconnected',
+        description: 'Your wallet has been disconnected successfully.',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Disconnect Failed",
+        title: 'Disconnect Failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -97,7 +97,7 @@ export default function WalletConnect() {
     setIsConnecting(true);
     try {
       const wallet = await walletConnectService.connect();
-      
+
       setConnectedWallet(wallet);
 
       const session = walletConnectService.getSession();
@@ -122,11 +122,11 @@ export default function WalletConnect() {
         sessionData: session,
       });
     } catch (error: any) {
-      console.error("Connection error:", error);
+      console.error('Connection error:', error);
       toast({
-        title: "Connection Error",
-        description: error.message || "Failed to connect wallet via WalletConnect",
-        variant: "destructive",
+        title: 'Connection Error',
+        description: error.message || 'Failed to connect wallet via WalletConnect',
+        variant: 'destructive',
       });
     } finally {
       setIsConnecting(false);
@@ -138,16 +138,16 @@ export default function WalletConnect() {
       await walletConnectService.disconnect();
       setConnectedWallet(null);
       setSessionInfo(null);
-      setBalance("0");
-      
+      setBalance('0');
+
       if (sessions && sessions.length > 0) {
         await disconnectMutation.mutateAsync(sessions[0].id);
       }
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to disconnect",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to disconnect',
+        variant: 'destructive',
       });
     }
   };
@@ -155,9 +155,9 @@ export default function WalletConnect() {
   const handleSendTransaction = async () => {
     if (!txRecipient || !txAmount) {
       toast({
-        title: "Invalid Input",
-        description: "Please enter recipient address and amount",
-        variant: "destructive",
+        title: 'Invalid Input',
+        description: 'Please enter recipient address and amount',
+        variant: 'destructive',
       });
       return;
     }
@@ -166,23 +166,23 @@ export default function WalletConnect() {
     try {
       const valueWei = parseEther(txAmount);
       const txHash = await walletConnectService.sendTransaction(txRecipient, valueWei.toString());
-      
+
       toast({
-        title: "Transaction Sent",
+        title: 'Transaction Sent',
         description: `Transaction hash: ${txHash.slice(0, 10)}...${txHash.slice(-8)}`,
       });
 
-      setTxRecipient("");
-      setTxAmount("");
+      setTxRecipient('');
+      setTxAmount('');
 
       const balanceWei = await walletConnectService.getBalance();
       const balanceEth = formatEther(balanceWei);
       setBalance(parseFloat(balanceEth).toFixed(6));
     } catch (error: any) {
       toast({
-        title: "Transaction Failed",
-        description: error.message || "Failed to send transaction",
-        variant: "destructive",
+        title: 'Transaction Failed',
+        description: error.message || 'Failed to send transaction',
+        variant: 'destructive',
       });
     } finally {
       setIsSendingTx(false);
@@ -213,37 +213,37 @@ export default function WalletConnect() {
 
   const getChainName = (chainId: number): string => {
     const chainNames: Record<number, string> = {
-      1: "Ethereum Mainnet",
-      137: "Polygon",
-      56: "BSC",
-      42161: "Arbitrum",
-      10: "Optimism"
+      1: 'Ethereum Mainnet',
+      137: 'Polygon',
+      56: 'BSC',
+      42161: 'Arbitrum',
+      10: 'Optimism',
     };
     return chainNames[chainId] || `Chain ${chainId}`;
   };
 
   const getWalletIcon = (walletType: string) => {
     const icons: Record<string, string> = {
-      metamask: "🦊",
-      trust: "⭐",
-      rainbow: "🌈",
-      coinbase: "💎",
-      walletconnect: "🔗",
+      metamask: '🦊',
+      trust: '⭐',
+      rainbow: '🌈',
+      coinbase: '💎',
+      walletconnect: '🔗',
     };
-    return icons[walletType.toLowerCase()] || "💼";
+    return icons[walletType.toLowerCase()] || '💼';
   };
 
   const formatExpiryTime = (expiry?: number): string => {
-    if (!expiry) return "Unknown";
+    if (!expiry) return 'Unknown';
     const expiryDate = new Date(expiry * 1000);
     const now = new Date();
     const diffMs = expiryDate.getTime() - now.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffDays > 0) return `${diffDays} days`;
     if (diffHours > 0) return `${diffHours} hours`;
-    return "Expired";
+    return 'Expired';
   };
 
   if (isLoading) {
@@ -267,7 +267,8 @@ export default function WalletConnect() {
         <Alert>
           <QrCode className="h-4 w-4" />
           <AlertDescription>
-            Click "Connect with WalletConnect" to open QR code modal. Scan with MetaMask, Trust Wallet, Rainbow, Coinbase Wallet, or any WalletConnect-compatible wallet.
+            Click "Connect with WalletConnect" to open QR code modal. Scan with MetaMask, Trust
+            Wallet, Rainbow, Coinbase Wallet, or any WalletConnect-compatible wallet.
           </AlertDescription>
         </Alert>
 
@@ -276,12 +277,12 @@ export default function WalletConnect() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="h-5 w-5" />
-                {connectedWallet ? "Connected Wallet" : "Connect Wallet"}
+                {connectedWallet ? 'Connected Wallet' : 'Connect Wallet'}
               </CardTitle>
               <CardDescription>
-                {connectedWallet 
-                  ? "Your wallet is connected via WalletConnect" 
-                  : "Scan QR code with your mobile wallet"}
+                {connectedWallet
+                  ? 'Your wallet is connected via WalletConnect'
+                  : 'Scan QR code with your mobile wallet'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -311,9 +312,13 @@ export default function WalletConnect() {
                       <div className="text-3xl">{getWalletIcon(connectedWallet.walletType)}</div>
                       <div>
                         <p className="font-medium text-sm" data-testid="text-connected-address">
-                          {connectedWallet.address.slice(0, 6)}...{connectedWallet.address.slice(-4)}
+                          {connectedWallet.address.slice(0, 6)}...
+                          {connectedWallet.address.slice(-4)}
                         </p>
-                        <p className="text-xs text-muted-foreground" data-testid="text-connected-chain">
+                        <p
+                          className="text-xs text-muted-foreground"
+                          data-testid="text-connected-chain"
+                        >
                           {getChainName(connectedWallet.chainId)}
                         </p>
                       </div>
@@ -327,11 +332,15 @@ export default function WalletConnect() {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="p-3 border rounded-lg">
                       <p className="text-muted-foreground text-xs mb-1">Balance</p>
-                      <p className="font-semibold" data-testid="text-balance">{balance} ETH</p>
+                      <p className="font-semibold" data-testid="text-balance">
+                        {balance} ETH
+                      </p>
                     </div>
                     <div className="p-3 border rounded-lg">
                       <p className="text-muted-foreground text-xs mb-1">Network</p>
-                      <p className="font-semibold capitalize" data-testid="text-network">{connectedWallet.network}</p>
+                      <p className="font-semibold capitalize" data-testid="text-network">
+                        {connectedWallet.network}
+                      </p>
                     </div>
                   </div>
 
@@ -340,7 +349,7 @@ export default function WalletConnect() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">Wallet App</span>
                         <span className="text-sm font-medium" data-testid="text-peer-name">
-                          {sessionInfo.peerName || "Unknown"}
+                          {sessionInfo.peerName || 'Unknown'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -382,8 +391,8 @@ export default function WalletConnect() {
               <CardTitle>Active Sessions</CardTitle>
               <CardDescription>
                 {sessions && sessions.length > 0
-                  ? `You have ${sessions.length} active wallet ${sessions.length === 1 ? "session" : "sessions"}`
-                  : "No active wallet sessions"}
+                  ? `You have ${sessions.length} active wallet ${sessions.length === 1 ? 'session' : 'sessions'}`
+                  : 'No active wallet sessions'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -398,20 +407,26 @@ export default function WalletConnect() {
                       <div className="flex items-center gap-3">
                         <div className="text-2xl">{getWalletIcon(session.walletType)}</div>
                         <div>
-                          <p className="font-medium text-sm" data-testid={`text-wallet-address-${session.id}`}>
+                          <p
+                            className="font-medium text-sm"
+                            data-testid={`text-wallet-address-${session.id}`}
+                          >
                             {session.walletAddress.slice(0, 6)}...{session.walletAddress.slice(-4)}
                           </p>
-                          <p className="text-xs text-muted-foreground" data-testid={`text-chain-${session.id}`}>
+                          <p
+                            className="text-xs text-muted-foreground"
+                            data-testid={`text-chain-${session.id}`}
+                          >
                             {getChainName(session.chainId)}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge
-                          variant={session.status === "active" ? "default" : "secondary"}
+                          variant={session.status === 'active' ? 'default' : 'secondary'}
                           data-testid={`badge-status-${session.id}`}
                         >
-                          {session.status === "active" ? (
+                          {session.status === 'active' ? (
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                           ) : (
                             <XCircle className="h-3 w-3 mr-1" />
@@ -501,7 +516,9 @@ export default function WalletConnect() {
         <Card>
           <CardHeader>
             <CardTitle>How WalletConnect Works</CardTitle>
-            <CardDescription>External wallet integration via WalletConnect protocol</CardDescription>
+            <CardDescription>
+              External wallet integration via WalletConnect protocol
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

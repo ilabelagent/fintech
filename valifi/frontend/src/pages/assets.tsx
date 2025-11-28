@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, Coins, TrendingUp, TrendingDown, Package, ShoppingCart } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Sparkles, Coins, TrendingUp, TrendingDown, Package, ShoppingCart } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface EtherealElement {
   id: string;
@@ -68,39 +68,42 @@ export default function AssetsPage() {
 
   // Fetch ethereal elements
   const { data: etherealElements = [] } = useQuery<EtherealElement[]>({
-    queryKey: ["/api/assets/ethereal"],
+    queryKey: ['/api/assets/ethereal'],
   });
 
   // Fetch precious metals
   const { data: metalOfferings = [] } = useQuery<MetalOffering[]>({
-    queryKey: ["/api/assets/metals"],
+    queryKey: ['/api/assets/metals'],
     refetchInterval: 60000, // Refresh every minute for live prices
   });
 
   // Fetch user assets
-  const { data: userAssets } = useQuery<{ individualAssets: IndividualAsset[], etherealAssets: any[] }>({
-    queryKey: ["/api/assets/user"],
+  const { data: userAssets } = useQuery<{
+    individualAssets: IndividualAsset[];
+    etherealAssets: any[];
+  }>({
+    queryKey: ['/api/assets/user'],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Purchase ethereal element
   const purchaseElementMutation = useMutation({
     mutationFn: async (data: { elementId: string; quantity: number; price: string }) =>
-      apiRequest("/api/assets/ethereal/buy", "POST", data),
+      apiRequest('/api/assets/ethereal/buy', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/assets/ethereal"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/assets/user"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/assets/ethereal'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/assets/user'] });
       toast({
-        title: "Purchase Successful",
-        description: "Divine element added to your collection!",
+        title: 'Purchase Successful',
+        description: 'Divine element added to your collection!',
       });
       setSelectedElement(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Purchase Failed",
-        description: error.message || "Failed to purchase element",
-        variant: "destructive",
+        title: 'Purchase Failed',
+        description: error.message || 'Failed to purchase element',
+        variant: 'destructive',
       });
     },
   });
@@ -108,31 +111,36 @@ export default function AssetsPage() {
   // Purchase precious metal
   const purchaseMetalMutation = useMutation({
     mutationFn: async (data: { metalId: string; quantity: number; paymentMethod: string }) =>
-      apiRequest("/api/assets/metals/buy", "POST", data),
+      apiRequest('/api/assets/metals/buy', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/assets/user"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/assets/user'] });
       toast({
-        title: "Purchase Successful",
-        description: "Precious metal added to your vault!",
+        title: 'Purchase Successful',
+        description: 'Precious metal added to your vault!',
       });
       setSelectedMetal(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Purchase Failed",
-        description: error.message || "Failed to purchase metal",
-        variant: "destructive",
+        title: 'Purchase Failed',
+        description: error.message || 'Failed to purchase metal',
+        variant: 'destructive',
       });
     },
   });
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
-      case "divine": return "bg-gradient-to-r from-yellow-400 to-orange-500";
-      case "legendary": return "bg-gradient-to-r from-purple-500 to-pink-500";
-      case "epic": return "bg-gradient-to-r from-purple-400 to-indigo-500";
-      case "rare": return "bg-gradient-to-r from-blue-400 to-cyan-500";
-      default: return "bg-gradient-to-r from-gray-400 to-gray-500";
+      case 'divine':
+        return 'bg-gradient-to-r from-yellow-400 to-orange-500';
+      case 'legendary':
+        return 'bg-gradient-to-r from-purple-500 to-pink-500';
+      case 'epic':
+        return 'bg-gradient-to-r from-purple-400 to-indigo-500';
+      case 'rare':
+        return 'bg-gradient-to-r from-blue-400 to-cyan-500';
+      default:
+        return 'bg-gradient-to-r from-gray-400 to-gray-500';
     }
   };
 
@@ -173,7 +181,11 @@ export default function AssetsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {etherealElements.map((element) => (
-                  <Card key={element.id} className="overflow-hidden hover:shadow-xl transition-shadow" data-testid={`card-element-${element.id}`}>
+                  <Card
+                    key={element.id}
+                    className="overflow-hidden hover:shadow-xl transition-shadow"
+                    data-testid={`card-element-${element.id}`}
+                  >
                     <div className="relative h-48 bg-gradient-to-br from-purple-600 to-blue-600">
                       {element.imageUrl && (
                         <img
@@ -197,7 +209,7 @@ export default function AssetsPage() {
                       </div>
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-xs text-muted-foreground">
-                          {element.mintedCount || 0} / {element.totalSupply || "∞"} minted
+                          {element.mintedCount || 0} / {element.totalSupply || '∞'} minted
                         </span>
                       </div>
                       <Dialog>
@@ -249,7 +261,9 @@ export default function AssetsPage() {
                               disabled={purchaseElementMutation.isPending}
                               data-testid="button-confirm-purchase-element"
                             >
-                              {purchaseElementMutation.isPending ? "Processing..." : "Confirm Purchase"}
+                              {purchaseElementMutation.isPending
+                                ? 'Processing...'
+                                : 'Confirm Purchase'}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
@@ -279,7 +293,11 @@ export default function AssetsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {metalOfferings.map((metal) => (
-                  <Card key={metal.id} className="overflow-hidden" data-testid={`card-metal-${metal.id}`}>
+                  <Card
+                    key={metal.id}
+                    className="overflow-hidden"
+                    data-testid={`card-metal-${metal.id}`}
+                  >
                     <div className="relative h-64 bg-gradient-to-br from-yellow-600 to-yellow-800">
                       <img
                         src={metal.imageUrl}
@@ -291,7 +309,9 @@ export default function AssetsPage() {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-2xl font-bold">{metal.name}</h3>
-                          <p className="text-sm text-muted-foreground">{metal.weight} • {metal.purity}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {metal.weight} • {metal.purity}
+                          </p>
                         </div>
                         <Badge variant="outline" className="text-lg px-3 py-1">
                           {metal.symbol}
@@ -308,11 +328,14 @@ export default function AssetsPage() {
                           ) : (
                             <TrendingDown className="w-4 h-4 text-red-500" />
                           )}
-                          <span className={metal.changePercent >= 0 ? "text-green-500" : "text-red-500"}>
-                            {metal.changePercent >= 0 ? "+" : ""}{metal.changePercent.toFixed(2)}%
+                          <span
+                            className={metal.changePercent >= 0 ? 'text-green-500' : 'text-red-500'}
+                          >
+                            {metal.changePercent >= 0 ? '+' : ''}
+                            {metal.changePercent.toFixed(2)}%
                           </span>
                           <span className="text-sm text-muted-foreground">
-                            ({metal.change >= 0 ? "+" : ""}${metal.change.toFixed(2)})
+                            ({metal.change >= 0 ? '+' : ''}${metal.change.toFixed(2)})
                           </span>
                         </div>
                       </div>
@@ -330,9 +353,7 @@ export default function AssetsPage() {
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>Purchase {metal.name}</DialogTitle>
-                            <DialogDescription>
-                              Add precious metal to your vault
-                            </DialogDescription>
+                            <DialogDescription>Add precious metal to your vault</DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
@@ -360,14 +381,16 @@ export default function AssetsPage() {
                                   purchaseMetalMutation.mutate({
                                     metalId: selectedMetal.id,
                                     quantity,
-                                    paymentMethod: "stripe",
+                                    paymentMethod: 'stripe',
                                   });
                                 }
                               }}
                               disabled={purchaseMetalMutation.isPending}
                               data-testid="button-confirm-purchase-metal"
                             >
-                              {purchaseMetalMutation.isPending ? "Processing..." : "Confirm Purchase"}
+                              {purchaseMetalMutation.isPending
+                                ? 'Processing...'
+                                : 'Confirm Purchase'}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
@@ -393,11 +416,14 @@ export default function AssetsPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {userAssets.etherealAssets.map((item: any) => (
-                      <Card key={item.ownership.id} data-testid={`card-owned-element-${item.ownership.id}`}>
+                      <Card
+                        key={item.ownership.id}
+                        data-testid={`card-owned-element-${item.ownership.id}`}
+                      >
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold">{item.element?.name}</h4>
-                            <Badge className={getRarityColor(item.element?.rarity || "common")}>
+                            <Badge className={getRarityColor(item.element?.rarity || 'common')}>
                               {item.element?.rarity}
                             </Badge>
                           </div>
@@ -430,7 +456,9 @@ export default function AssetsPage() {
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <h4 className="font-semibold text-lg">{asset.name}</h4>
-                              <Badge variant="outline" className="mb-2">{asset.assetType}</Badge>
+                              <Badge variant="outline" className="mb-2">
+                                {asset.assetType}
+                              </Badge>
                               <div className="grid grid-cols-2 gap-4 mt-3">
                                 <div>
                                   <p className="text-sm text-muted-foreground">Current Value</p>
@@ -442,8 +470,11 @@ export default function AssetsPage() {
                                       ) : (
                                         <TrendingDown className="w-3 h-3 text-red-500" />
                                       )}
-                                      <span className={`text-xs ${asset.changePercent >= 0 ? "text-green-500" : "text-red-500"}`}>
-                                        {asset.changePercent >= 0 ? "+" : ""}{asset.changePercent.toFixed(2)}%
+                                      <span
+                                        className={`text-xs ${asset.changePercent >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                                      >
+                                        {asset.changePercent >= 0 ? '+' : ''}
+                                        {asset.changePercent.toFixed(2)}%
                                       </span>
                                     </div>
                                   )}
@@ -454,7 +485,9 @@ export default function AssetsPage() {
                                 </div>
                                 <div>
                                   <p className="text-sm text-muted-foreground">Quantity</p>
-                                  <p className="text-lg">{asset.quantity} {asset.metadata?.weight || ""}</p>
+                                  <p className="text-lg">
+                                    {asset.quantity} {asset.metadata?.weight || ''}
+                                  </p>
                                 </div>
                                 {asset.livePrice && (
                                   <div>
@@ -480,13 +513,16 @@ export default function AssetsPage() {
               </Card>
             )}
 
-            {(!userAssets || (userAssets.individualAssets.length === 0 && userAssets.etherealAssets.length === 0)) && (
+            {(!userAssets ||
+              (userAssets.individualAssets.length === 0 &&
+                userAssets.etherealAssets.length === 0)) && (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-xl font-semibold mb-2">No Assets Yet</h3>
                   <p className="text-muted-foreground mb-4">
-                    Start building your kingdom's wealth by acquiring ethereal elements or precious metals
+                    Start building your kingdom's wealth by acquiring ethereal elements or precious
+                    metals
                   </p>
                 </CardContent>
               </Card>

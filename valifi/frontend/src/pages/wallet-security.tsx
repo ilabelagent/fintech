@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Wallet, Shield, Key, HardDrive, Eye} from "lucide-react";
-import { Link } from "wouter";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Wallet, Shield, Key, HardDrive, Eye } from 'lucide-react';
+import { Link } from 'wouter';
 
 export default function WalletSecurity() {
   return (
@@ -15,9 +15,12 @@ export default function WalletSecurity() {
               HD Wallets, Hardware Integration, Multisig & Privacy Tools
             </p>
           </div>
-          <Badge variant="default" className="flex items-center gap-1" data-testid="badge-wallet-count">
-            <Shield className="h-3 w-3" />
-            5 Features
+          <Badge
+            variant="default"
+            className="flex items-center gap-1"
+            data-testid="badge-wallet-count"
+          >
+            <Shield className="h-3 w-3" />5 Features
           </Badge>
         </div>
       </div>
@@ -31,7 +34,9 @@ export default function WalletSecurity() {
                   <Wallet className="h-4 w-4 text-primary" />
                   HD Wallet
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-hd-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-hd-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Hierarchical deterministic wallets</CardDescription>
             </CardHeader>
@@ -51,7 +56,9 @@ export default function WalletSecurity() {
                   <HardDrive className="h-4 w-4 text-primary" />
                   Hardware Wallet
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-hardware-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-hardware-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Ledger & Trezor integration</CardDescription>
             </CardHeader>
@@ -71,7 +78,9 @@ export default function WalletSecurity() {
                   <Shield className="h-4 w-4 text-primary" />
                   Multisig
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-multisig-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-multisig-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Multi-signature wallets</CardDescription>
             </CardHeader>
@@ -91,7 +100,9 @@ export default function WalletSecurity() {
                   <Key className="h-4 w-4 text-primary" />
                   Seed Management
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-seed-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-seed-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Secure mnemonic management</CardDescription>
             </CardHeader>
@@ -111,7 +122,9 @@ export default function WalletSecurity() {
                   <Eye className="h-4 w-4 text-primary" />
                   Privacy Tools
                 </CardTitle>
-                <Badge variant="default" data-testid="badge-privacy-status">Active</Badge>
+                <Badge variant="default" data-testid="badge-privacy-status">
+                  Active
+                </Badge>
               </div>
               <CardDescription>Coin mixing & stealth addresses</CardDescription>
             </CardHeader>

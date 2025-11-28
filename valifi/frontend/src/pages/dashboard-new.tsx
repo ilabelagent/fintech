@@ -1,86 +1,133 @@
-import { useState, useMemo, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Responsive, WidthProvider, Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Settings, Trash2, Layout as LayoutIcon, Save } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useState, useMemo, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Plus, Settings, Trash2, Layout as LayoutIcon, Save } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { queryClient, apiRequest } from '@/lib/queryClient';
 
-import PortfolioWidget from "@/components/widgets/PortfolioWidget";
-import MarketWidget from "@/components/widgets/MarketWidget";
-import BotPerformanceWidget from "@/components/widgets/BotPerformanceWidget";
-import TransactionsWidget from "@/components/widgets/TransactionsWidget";
-import NewsWidget from "@/components/widgets/NewsWidget";
-import NFTWidget from "@/components/widgets/NFTWidget";
-import P2POrdersWidget from "@/components/widgets/P2POrdersWidget";
+import AdvancedPortfolioWidget from '@/components/widgets/AdvancedPortfolioWidget';
+
+import AdvancedMarketWidget from '@/components/widgets/AdvancedMarketWidget';
+
+import BotPerformanceWidget from '@/components/widgets/BotPerformanceWidget';
+
+import TransactionsWidget from '@/components/widgets/TransactionsWidget';
+
+import NewsWidget from '@/components/widgets/NewsWidget';
+
+import NFTWidget from '@/components/widgets/NFTWidget';
+
+import P2POrdersWidget from '@/components/widgets/P2POrdersWidget';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const WIDGET_COMPONENTS: Record<string, React.ComponentType> = {
-  portfolio: PortfolioWidget,
-  market: MarketWidget,
+  portfolio: AdvancedPortfolioWidget,
+
+  market: AdvancedMarketWidget,
+
   bot_performance: BotPerformanceWidget,
+
   transactions: TransactionsWidget,
+
   news: NewsWidget,
+
   nft: NFTWidget,
+
   p2p_orders: P2POrdersWidget,
 };
 
 const DEFAULT_WIDGETS = [
-  { 
-    id: 'portfolio', 
-    name: 'Portfolio Value', 
+  {
+    id: 'portfolio',
+
+    name: 'Advanced Portfolio',
+
     type: 'portfolio',
-    defaultLayout: { x: 0, y: 0, w: 6, h: 4, minW: 4, minH: 3 }
+
+    defaultLayout: { x: 0, y: 0, w: 6, h: 4, minW: 4, minH: 3 },
   },
-  { 
-    id: 'market', 
-    name: 'Market Prices', 
+
+  {
+    id: 'market',
+
+    name: 'Advanced Market',
+
     type: 'market',
-    defaultLayout: { x: 6, y: 0, w: 6, h: 4, minW: 4, minH: 3 }
+
+    defaultLayout: { x: 6, y: 0, w: 6, h: 4, minW: 4, minH: 3 },
   },
-  { 
-    id: 'bot_performance', 
-    name: 'Bot Performance', 
+
+  {
+    id: 'bot_performance',
+
+    name: 'Bot Performance',
+
     type: 'bot_performance',
-    defaultLayout: { x: 0, y: 4, w: 6, h: 4, minW: 4, minH: 3 }
+
+    defaultLayout: { x: 0, y: 4, w: 6, h: 4, minW: 4, minH: 3 },
   },
-  { 
-    id: 'transactions', 
-    name: 'Recent Transactions', 
+
+  {
+    id: 'transactions',
+
+    name: 'Recent Transactions',
+
     type: 'transactions',
-    defaultLayout: { x: 6, y: 4, w: 6, h: 4, minW: 4, minH: 3 }
+
+    defaultLayout: { x: 6, y: 4, w: 6, h: 4, minW: 4, minH: 3 },
   },
-  { 
-    id: 'news', 
-    name: 'News Feed', 
+
+  {
+    id: 'news',
+
+    name: 'News Feed',
+
     type: 'news',
-    defaultLayout: { x: 0, y: 8, w: 6, h: 4, minW: 4, minH: 3 }
+
+    defaultLayout: { x: 0, y: 8, w: 6, h: 4, minW: 4, minH: 3 },
   },
-  { 
-    id: 'nft', 
-    name: 'NFT Gallery', 
+
+  {
+    id: 'nft',
+
+    name: 'NFT Gallery',
+
     type: 'nft',
-    defaultLayout: { x: 6, y: 8, w: 6, h: 4, minW: 4, minH: 3 }
+
+    defaultLayout: { x: 6, y: 8, w: 6, h: 4, minW: 4, minH: 3 },
   },
-  { 
-    id: 'p2p_orders', 
-    name: 'P2P Orders', 
+
+  {
+    id: 'p2p_orders',
+
+    name: 'P2P Orders',
+
     type: 'p2p_orders',
-    defaultLayout: { x: 0, y: 12, w: 12, h: 4, minW: 6, minH: 3 }
+
+    defaultLayout: { x: 0, y: 12, w: 12, h: 4, minW: 6, minH: 3 },
   },
 ];
 
 export default function DashboardNew() {
   const { toast } = useToast();
+
   const [isWidgetDialogOpen, setIsWidgetDialogOpen] = useState(false);
+
   const [activeWidgets, setActiveWidgets] = useState<string[]>(
-    DEFAULT_WIDGETS.slice(0, 4).map(w => w.id)
+    DEFAULT_WIDGETS.slice(0, 4).map((w) => w.id)
   );
 
   const { data: dashboardConfig } = useQuery({
@@ -88,19 +135,24 @@ export default function DashboardNew() {
   });
 
   const [layouts, setLayouts] = useState<{ lg: Layout[] }>({
-    lg: DEFAULT_WIDGETS.slice(0, 4).map(w => ({
+    lg: DEFAULT_WIDGETS.slice(0, 4).map((w) => ({
       i: w.id,
-      ...w.defaultLayout
-    }))
+
+      ...w.defaultLayout,
+    })),
   });
 
   // Set active widgets from saved config
+
   useEffect(() => {
     if (dashboardConfig && typeof dashboardConfig === 'object' && 'layout' in dashboardConfig) {
       const config = dashboardConfig as { layout: Layout[] };
+
       if (config.layout && config.layout.length > 0) {
         const savedWidgetIds = config.layout.map((item: any) => item.i);
+
         setActiveWidgets(savedWidgetIds);
+
         setLayouts({ lg: config.layout });
       }
     }
@@ -110,18 +162,24 @@ export default function DashboardNew() {
     mutationFn: async (layout: Layout[]) => {
       return await apiRequest('/api/dashboard/config', 'POST', { layout });
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/config'] });
+
       toast({
-        title: "Dashboard Saved",
-        description: "Your dashboard layout has been saved successfully.",
+        title: 'Dashboard Saved',
+
+        description: 'Your dashboard layout has been saved successfully.',
       });
     },
+
     onError: () => {
       toast({
-        title: "Save Failed",
-        description: "Failed to save dashboard layout. Please try again.",
-        variant: "destructive",
+        title: 'Save Failed',
+
+        description: 'Failed to save dashboard layout. Please try again.',
+
+        variant: 'destructive',
       });
     },
   });
@@ -135,45 +193,49 @@ export default function DashboardNew() {
   };
 
   const handleToggleWidget = (widgetId: string) => {
-    setActiveWidgets(prev => {
+    setActiveWidgets((prev) => {
       if (prev.includes(widgetId)) {
-        return prev.filter(id => id !== widgetId);
+        return prev.filter((id) => id !== widgetId);
       } else {
-        const widget = DEFAULT_WIDGETS.find(w => w.id === widgetId);
+        const widget = DEFAULT_WIDGETS.find((w) => w.id === widgetId);
+
         if (widget) {
-          setLayouts(prevLayouts => ({
-            lg: [
-              ...prevLayouts.lg,
-              { i: widgetId, ...widget.defaultLayout }
-            ]
+          setLayouts((prevLayouts) => ({
+            lg: [...prevLayouts.lg, { i: widgetId, ...widget.defaultLayout }],
           }));
         }
+
         return [...prev, widgetId];
       }
     });
   };
 
   const handleRemoveWidget = (widgetId: string) => {
-    setActiveWidgets(prev => prev.filter(id => id !== widgetId));
-    setLayouts(prev => ({
-      lg: prev.lg.filter(item => item.i !== widgetId)
+    setActiveWidgets((prev) => prev.filter((id) => id !== widgetId));
+
+    setLayouts((prev) => ({
+      lg: prev.lg.filter((item) => item.i !== widgetId),
     }));
   };
 
   const currentWidgets = useMemo(() => {
     return layouts.lg
-      .filter(item => activeWidgets.includes(item.i))
-      .map(item => {
-        const widget = DEFAULT_WIDGETS.find(w => w.id === item.i);
+
+      .filter((item) => activeWidgets.includes(item.i))
+
+      .map((item) => {
+        const widget = DEFAULT_WIDGETS.find((w) => w.id === item.i);
+
         return {
           ...item,
+
           widget: widget,
         };
       });
   }, [layouts.lg, activeWidgets]);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="bg-gray-900 text-white min-h-screen p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold" data-testid="text-dashboard-title">
@@ -183,7 +245,7 @@ export default function DashboardNew() {
             Personalize your Kingdom experience with drag-and-drop widgets
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Dialog open={isWidgetDialogOpen} onOpenChange={setIsWidgetDialogOpen}>
             <DialogTrigger asChild>
@@ -198,7 +260,7 @@ export default function DashboardNew() {
               </DialogHeader>
               <div className="space-y-3 mt-4">
                 {DEFAULT_WIDGETS.map((widget) => (
-                  <div 
+                  <div
                     key={widget.id}
                     className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                     data-testid={`widget-option-${widget.id}`}
@@ -222,7 +284,7 @@ export default function DashboardNew() {
             </DialogContent>
           </Dialog>
 
-          <Button 
+          <Button
             onClick={handleSaveLayout}
             disabled={saveMutation.isPending}
             data-testid="button-save-layout"
@@ -241,7 +303,10 @@ export default function DashboardNew() {
             <p className="text-muted-foreground mb-4">
               Start by adding widgets to customize your dashboard
             </p>
-            <Button onClick={() => setIsWidgetDialogOpen(true)} data-testid="button-add-first-widget">
+            <Button
+              onClick={() => setIsWidgetDialogOpen(true)}
+              data-testid="button-add-first-widget"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Your First Widget
             </Button>
@@ -263,10 +328,10 @@ export default function DashboardNew() {
         >
           {currentWidgets.map((item) => {
             const WidgetComponent = WIDGET_COMPONENTS[item.widget?.type || ''];
-            
+
             return (
-              <div 
-                key={item.i} 
+              <div
+                key={item.i}
                 className="relative group"
                 data-testid={`widget-container-${item.i}`}
               >

@@ -1,21 +1,65 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Users, Bot, TrendingUp, MessageSquare, Shield, Activity, Zap, Trophy, Heart, Sparkles, BrainCircuit } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import AgentChat from "@/components/agent-chat";
+import { useState, useContext } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import {
+  Users,
+  Bot,
+  TrendingUp,
+  MessageSquare,
+  Shield,
+  Activity,
+  Zap,
+  Trophy,
+  Heart,
+  Sparkles,
+  BrainCircuit,
+} from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import AgentChat from '@/components/agent-chat';
 
 export default function AdminPage() {
   const { toast } = useToast();
@@ -24,19 +68,18 @@ export default function AdminPage() {
   const [selectedBot, setSelectedBot] = useState<any>(null);
   const [broadcastDialog, setBroadcastDialog] = useState(false);
   const [trainingDialog, setTrainingDialog] = useState(false);
-  const [charityDialog, setCharityDialog] = useState(false);
-  const [selectedCharity, setSelectedCharity] = useState<any>(null);
   const [mintElementDialog, setMintElementDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState('agents');
   const [elementFormData, setElementFormData] = useState({
-    name: "",
-    description: "",
-    elementType: "spiritual",
+    name: '',
+    description: '',
+    elementType: 'spiritual',
     power: 100,
-    rarity: "common",
+    rarity: 'common',
     totalSupply: 100,
-    imageUrl: "",
-    animationUrl: "",
-    attributes: "{}"
+    imageUrl: '',
+    animationUrl: '',
+    attributes: '{}',
   });
 
   const usersPerPage = 10;
@@ -44,52 +87,47 @@ export default function AdminPage() {
 
   // Fetch analytics
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
-    queryKey: ["/api/admin/analytics"],
+    queryKey: ['/api/admin/analytics'],
   });
 
   // Fetch users
   const { data: usersData, isLoading: usersLoading } = useQuery({
-    queryKey: ["/api/admin/users", { limit: usersPerPage, offset: userPage * usersPerPage }],
+    queryKey: ['/api/admin/users', { limit: usersPerPage, offset: userPage * usersPerPage }],
   });
 
   // Fetch bots
   const { data: botsData, isLoading: botsLoading } = useQuery({
-    queryKey: ["/api/admin/bots", { limit: botsPerPage, offset: botPage * botsPerPage }],
+    queryKey: ['/api/admin/bots', { limit: botsPerPage, offset: botPage * botsPerPage }],
   });
 
   // Fetch bot training details
   const { data: trainingData } = useQuery({
-    queryKey: ["/api/admin/bots", selectedBot?.id, "training"],
+    queryKey: ['/api/admin/bots', selectedBot?.id, 'training'],
     enabled: !!selectedBot,
   });
 
   // Fetch audit logs
   const { data: auditLogs } = useQuery({
-    queryKey: ["/api/admin/audit-logs", { limit: 20 }],
-  });
-
-  // Fetch charities
-  const { data: charities, isLoading: charitiesLoading } = useQuery({
-    queryKey: ["/api/charities"],
+    queryKey: ['/api/admin/audit-logs', { limit: 20 }],
   });
 
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
-      return apiRequest("PATCH", `/api/admin/users/${userId}`, { isAdmin });
+      return apiRequest('PATCH', `/api/admin/users/${userId}`, { isAdmin });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({
-        title: "Success",
-        description: "User status updated successfully",
+        title: 'Success',
+        description: 'User status updated successfully',
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update user status",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to update user status',
+        variant: 'destructive',
       });
     },
   });
@@ -97,21 +135,21 @@ export default function AdminPage() {
   // Start training mutation
   const startTrainingMutation = useMutation({
     mutationFn: async ({ botId, sessionType, trainingDataset }: any) => {
-      return apiRequest("POST", `/api/admin/bots/${botId}/train`, { sessionType, trainingDataset });
+      return apiRequest('POST', `/api/admin/bots/${botId}/train`, { sessionType, trainingDataset });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/bots"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/bots'] });
       setTrainingDialog(false);
       toast({
-        title: "Success",
-        description: "Training session started successfully",
+        title: 'Success',
+        description: 'Training session started successfully',
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to start training session",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to start training session',
+        variant: 'destructive',
       });
     },
   });
@@ -119,67 +157,20 @@ export default function AdminPage() {
   // Send broadcast mutation
   const sendBroadcastMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/admin/chat/send", data);
+      return apiRequest('POST', '/api/admin/chat/send', data);
     },
     onSuccess: () => {
       setBroadcastDialog(false);
       toast({
-        title: "Success",
-        description: "Message broadcast sent successfully",
+        title: 'Success',
+        description: 'Message broadcast sent successfully',
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to send broadcast",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Create/Update charity mutation
-  const saveCharityMutation = useMutation({
-    mutationFn: async (data: any) => {
-      if (selectedCharity) {
-        return apiRequest("PUT", `/api/charities/${selectedCharity.id}`, data);
-      }
-      return apiRequest("POST", "/api/charities", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/charities"] });
-      setCharityDialog(false);
-      setSelectedCharity(null);
-      toast({
-        title: "Success",
-        description: selectedCharity ? "Charity updated successfully" : "Charity created successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to save charity",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete charity mutation
-  const deleteCharityMutation = useMutation({
-    mutationFn: async (charityId: string) => {
-      return apiRequest("DELETE", `/api/charities/${charityId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/charities"] });
-      toast({
-        title: "Success",
-        description: "Charity deleted successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete charity",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to send broadcast',
+        variant: 'destructive',
       });
     },
   });
@@ -187,32 +178,32 @@ export default function AdminPage() {
   // Mint ethereal element mutation
   const mintElementMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/assets/ethereal/mint", data);
+      return apiRequest('POST', '/api/assets/ethereal/mint', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/ethereal/marketplace"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/ethereal/marketplace'] });
       setMintElementDialog(false);
       setElementFormData({
-        name: "",
-        description: "",
-        elementType: "spiritual",
+        name: '',
+        description: '',
+        elementType: 'spiritual',
         power: 100,
-        rarity: "common",
+        rarity: 'common',
         totalSupply: 100,
-        imageUrl: "",
-        animationUrl: "",
-        attributes: "{}"
+        imageUrl: '',
+        animationUrl: '',
+        attributes: '{}',
       });
       toast({
-        title: "Success",
-        description: "Ethereal element minted successfully!",
+        title: 'Success',
+        description: 'Ethereal element minted successfully!',
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to mint element",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to mint element',
+        variant: 'destructive',
       });
     },
   });
@@ -221,10 +212,10 @@ export default function AdminPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     sendBroadcastMutation.mutate({
-      recipientType: formData.get("recipientType"),
-      message: formData.get("message"),
-      title: formData.get("title"),
-      priority: formData.get("priority"),
+      recipientType: formData.get('recipientType'),
+      message: formData.get('message'),
+      title: formData.get('title'),
+      priority: formData.get('priority'),
     });
   };
 
@@ -233,19 +224,8 @@ export default function AdminPage() {
     const formData = new FormData(e.currentTarget);
     startTrainingMutation.mutate({
       botId: selectedBot.id,
-      sessionType: formData.get("sessionType"),
-      trainingDataset: formData.get("trainingDataset"),
-    });
-  };
-
-  const handleCharitySubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    saveCharityMutation.mutate({
-      name: formData.get("name"),
-      description: formData.get("description"),
-      walletAddress: formData.get("walletAddress"),
-      taxID: formData.get("taxID"),
+      sessionType: formData.get('sessionType'),
+      trainingDataset: formData.get('trainingDataset'),
     });
   };
 
@@ -285,11 +265,19 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium">Title</label>
-                  <Input name="title" placeholder="Message title" data-testid="input-broadcast-title" />
+                  <Input
+                    name="title"
+                    placeholder="Message title"
+                    data-testid="input-broadcast-title"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium">Message</label>
-                  <Textarea name="message" placeholder="Enter your message" data-testid="textarea-broadcast-message" />
+                  <Textarea
+                    name="message"
+                    placeholder="Enter your message"
+                    data-testid="textarea-broadcast-message"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium">Priority</label>
@@ -307,7 +295,11 @@ export default function AdminPage() {
                 </div>
               </div>
               <DialogFooter className="mt-4">
-                <Button type="submit" disabled={sendBroadcastMutation.isPending} data-testid="button-send-broadcast">
+                <Button
+                  type="submit"
+                  disabled={sendBroadcastMutation.isPending}
+                  data-testid="button-send-broadcast"
+                >
                   Send Broadcast
                 </Button>
               </DialogFooter>
@@ -327,9 +319,21 @@ export default function AdminPage() {
             {analyticsLoading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold" data-testid="text-total-users">{(analytics as any)?.totalUsers || 0}</div>
+              <div className="text-2xl font-bold" data-testid="text-total-users">
+                {(analytics as any)?.totalUsers || 0}
+              </div>
             )}
           </CardContent>
+          <div className="p-4 pt-0">
+            <Button
+              size="sm"
+              className="w-full"
+              onClick={() => setActiveTab('users')}
+              data-testid="button-view-all-users"
+            >
+              View All Users
+            </Button>
+          </div>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -340,7 +344,9 @@ export default function AdminPage() {
             {analyticsLoading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold" data-testid="text-active-bots">{(analytics as any)?.activeBots || 0}</div>
+              <div className="text-2xl font-bold" data-testid="text-active-bots">
+                {(analytics as any)?.activeBots || 0}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -353,7 +359,9 @@ export default function AdminPage() {
             {analyticsLoading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold" data-testid="text-learning-sessions">{(analytics as any)?.totalLearningSessions || 0}</div>
+              <div className="text-2xl font-bold" data-testid="text-learning-sessions">
+                {(analytics as any)?.totalLearningSessions || 0}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -366,14 +374,16 @@ export default function AdminPage() {
             {analyticsLoading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold" data-testid="text-avg-win-rate">{(analytics as any)?.avgWinRate || 0}%</div>
+              <div className="text-2xl font-bold" data-testid="text-avg-win-rate">
+                {(analytics as any)?.avgWinRate || 0}%
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
 
       {/* Main Tabs */}
-      <Tabs defaultValue="agents" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="agents" data-testid="tab-agents">
             <BrainCircuit className="mr-2 h-4 w-4" />
@@ -390,10 +400,6 @@ export default function AdminPage() {
           <TabsTrigger value="activity" data-testid="tab-activity">
             <Activity className="mr-2 h-4 w-4" />
             Activity Logs
-          </TabsTrigger>
-          <TabsTrigger value="charities" data-testid="tab-charities">
-            <Heart className="mr-2 h-4 w-4" />
-            Charities
           </TabsTrigger>
           <TabsTrigger value="ethereal" data-testid="tab-ethereal">
             <Sparkles className="mr-2 h-4 w-4" />
@@ -441,25 +447,32 @@ export default function AdminPage() {
                           </TableCell>
                           <TableCell>{user.email}</TableCell>
                           <TableCell>
-                            <Badge variant={user.kycStatus === "approved" ? "default" : "secondary"}>
+                            <Badge
+                              variant={user.kycStatus === 'approved' ? 'default' : 'secondary'}
+                            >
                               {user.kycStatus}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={user.isAdmin ? "destructive" : "outline"}>
-                              {user.isAdmin ? "Yes" : "No"}
+                            <Badge variant={user.isAdmin ? 'destructive' : 'outline'}>
+                              {user.isAdmin ? 'Yes' : 'No'}
                             </Badge>
                           </TableCell>
                           <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                           <TableCell>
                             <Button
                               size="sm"
-                              variant={user.isAdmin ? "outline" : "default"}
-                              onClick={() => updateUserMutation.mutate({ userId: user.id, isAdmin: !user.isAdmin })}
+                              variant={user.isAdmin ? 'outline' : 'default'}
+                              onClick={() =>
+                                updateUserMutation.mutate({
+                                  userId: user.id,
+                                  isAdmin: !user.isAdmin,
+                                })
+                              }
                               disabled={updateUserMutation.isPending}
                               data-testid={`button-toggle-admin-${user.id}`}
                             >
-                              {user.isAdmin ? "Remove Admin" : "Make Admin"}
+                              {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -469,19 +482,22 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between mt-4">
                     <Button
                       variant="outline"
-                      onClick={() => setUserPage(p => Math.max(0, p - 1))}
+                      onClick={() => setUserPage((p) => Math.max(0, p - 1))}
                       disabled={userPage === 0}
                       data-testid="button-prev-users"
                     >
                       Previous
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      Page {userPage + 1} of {Math.ceil(((usersData as any)?.total || 0) / usersPerPage)}
+                      Page {userPage + 1} of{' '}
+                      {Math.ceil(((usersData as any)?.total || 0) / usersPerPage)}
                     </span>
                     <Button
                       variant="outline"
-                      onClick={() => setUserPage(p => p + 1)}
-                      disabled={userPage >= Math.ceil(((usersData as any)?.total || 0) / usersPerPage) - 1}
+                      onClick={() => setUserPage((p) => p + 1)}
+                      disabled={
+                        userPage >= Math.ceil(((usersData as any)?.total || 0) / usersPerPage) - 1
+                      }
                       data-testid="button-next-users"
                     >
                       Next
@@ -530,7 +546,7 @@ export default function AdminPage() {
                           <TableCell>
                             <Badge>{bot.strategy}</Badge>
                           </TableCell>
-                          <TableCell>{parseFloat(bot.winRate || "0").toFixed(2)}%</TableCell>
+                          <TableCell>{parseFloat(bot.winRate || '0').toFixed(2)}%</TableCell>
                           <TableCell>{bot.skillsCount || 0}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -551,6 +567,21 @@ export default function AdminPage() {
                               <Zap className="mr-1 h-3 w-3" />
                               Train
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="ml-2"
+                              onClick={() => {
+                                // Placeholder for edit action
+                                toast({
+                                  title: 'Edit Bot',
+                                  description: `Editing bot: ${bot.name}`,
+                                });
+                              }}
+                              data-testid={`button-edit-bot-${bot.id}`}
+                            >
+                              Edit
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -559,19 +590,22 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between mt-4">
                     <Button
                       variant="outline"
-                      onClick={() => setBotPage(p => Math.max(0, p - 1))}
+                      onClick={() => setBotPage((p) => Math.max(0, p - 1))}
                       disabled={botPage === 0}
                       data-testid="button-prev-bots"
                     >
                       Previous
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      Page {botPage + 1} of {Math.ceil(((botsData as any)?.total || 0) / botsPerPage)}
+                      Page {botPage + 1} of{' '}
+                      {Math.ceil(((botsData as any)?.total || 0) / botsPerPage)}
                     </span>
                     <Button
                       variant="outline"
-                      onClick={() => setBotPage(p => p + 1)}
-                      disabled={botPage >= Math.ceil(((botsData as any)?.total || 0) / botsPerPage) - 1}
+                      onClick={() => setBotPage((p) => p + 1)}
+                      disabled={
+                        botPage >= Math.ceil(((botsData as any)?.total || 0) / botsPerPage) - 1
+                      }
                       data-testid="button-next-bots"
                     >
                       Next
@@ -610,11 +644,13 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       {(trainingData as any)?.sessions?.slice(0, 5).map((session: any) => (
                         <div key={session.id} className="flex items-center justify-between text-sm">
-                          <Badge variant={session.status === "completed" ? "default" : "secondary"}>
+                          <Badge variant={session.status === 'completed' ? 'default' : 'secondary'}>
                             {session.sessionType}
                           </Badge>
                           <span className="text-muted-foreground">
-                            {session.improvementRate ? `+${session.improvementRate}%` : session.status}
+                            {session.improvementRate
+                              ? `+${session.improvementRate}%`
+                              : session.status}
                           </span>
                         </div>
                       ))}
@@ -660,157 +696,15 @@ export default function AdminPage() {
           </Card>
         </TabsContent>
 
-        {/* Charity Management */}
-        <TabsContent value="charities" className="space-y-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Charity Management</CardTitle>
-                <CardDescription>Manage approved charities for tithing</CardDescription>
-              </div>
-              <Dialog open={charityDialog} onOpenChange={(open) => {
-                setCharityDialog(open);
-                if (!open) setSelectedCharity(null);
-              }}>
-                <DialogTrigger asChild>
-                  <Button data-testid="button-add-charity">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Add Charity
-                  </Button>
-                </DialogTrigger>
-                <DialogContent data-testid="dialog-charity">
-                  <DialogHeader>
-                    <DialogTitle>{selectedCharity ? "Edit Charity" : "Add New Charity"}</DialogTitle>
-                    <DialogDescription>
-                      {selectedCharity ? "Update charity information" : "Add a new approved charity for tithing"}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleCharitySubmit}>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium">Charity Name</label>
-                        <Input
-                          name="name"
-                          placeholder="e.g., World Vision"
-                          defaultValue={selectedCharity?.name}
-                          required
-                          data-testid="input-charity-name"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Description</label>
-                        <Textarea
-                          name="description"
-                          placeholder="Brief description of the charity's mission"
-                          defaultValue={selectedCharity?.description}
-                          required
-                          data-testid="input-charity-description"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Wallet Address</label>
-                        <Input
-                          name="walletAddress"
-                          placeholder="0x..."
-                          defaultValue={selectedCharity?.walletAddress}
-                          required
-                          data-testid="input-wallet-address"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Tax ID (EIN)</label>
-                        <Input
-                          name="taxID"
-                          placeholder="XX-XXXXXXX"
-                          defaultValue={selectedCharity?.taxID}
-                          required
-                          data-testid="input-tax-id"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter className="mt-6">
-                      <Button type="submit" disabled={saveCharityMutation.isPending} data-testid="button-save-charity">
-                        {saveCharityMutation.isPending ? "Saving..." : (selectedCharity ? "Update" : "Create")}
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              {charitiesLoading ? (
-                <div className="space-y-2">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-20 w-full" />
-                  ))}
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Wallet Address</TableHead>
-                      <TableHead>Tax ID</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {(charities as any)?.map((charity: any) => (
-                      <TableRow key={charity.id} data-testid={`row-charity-${charity.id}`}>
-                        <TableCell className="font-medium">{charity.name}</TableCell>
-                        <TableCell className="max-w-xs truncate">{charity.description}</TableCell>
-                        <TableCell className="font-mono text-xs">{charity.walletAddress?.slice(0, 10)}...</TableCell>
-                        <TableCell>{charity.taxID}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedCharity(charity);
-                                setCharityDialog(true);
-                              }}
-                              data-testid={`button-edit-charity-${charity.id}`}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => {
-                                if (confirm(`Delete ${charity.name}?`)) {
-                                  deleteCharityMutation.mutate(charity.id);
-                                }
-                              }}
-                              disabled={deleteCharityMutation.isPending}
-                              data-testid={`button-delete-charity-${charity.id}`}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-              {(charities as any)?.length === 0 && !charitiesLoading && (
-                <div className="text-center py-8 text-muted-foreground">
-                  No charities added yet. Add your first approved charity to enable tithing.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         {/* Ethereal Elements */}
         <TabsContent value="ethereal" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Ethereal Elements Minting</CardTitle>
-                <CardDescription>Create divine collectible elements for the marketplace</CardDescription>
+                <CardDescription>
+                  Create divine collectible elements for the marketplace
+                </CardDescription>
               </div>
               <Dialog open={mintElementDialog} onOpenChange={setMintElementDialog}>
                 <DialogTrigger asChild>
@@ -830,7 +724,9 @@ export default function AdminPage() {
                         <label className="text-sm font-medium">Name</label>
                         <Input
                           value={elementFormData.name}
-                          onChange={(e) => setElementFormData({...elementFormData, name: e.target.value})}
+                          onChange={(e) =>
+                            setElementFormData({ ...elementFormData, name: e.target.value })
+                          }
                           placeholder="Divine Flame"
                           data-testid="input-element-name"
                         />
@@ -839,7 +735,9 @@ export default function AdminPage() {
                         <label className="text-sm font-medium">Element Type</label>
                         <Select
                           value={elementFormData.elementType}
-                          onValueChange={(value) => setElementFormData({...elementFormData, elementType: value})}
+                          onValueChange={(value) =>
+                            setElementFormData({ ...elementFormData, elementType: value })
+                          }
                         >
                           <SelectTrigger data-testid="select-element-type">
                             <SelectValue />
@@ -857,7 +755,9 @@ export default function AdminPage() {
                       <label className="text-sm font-medium">Description</label>
                       <Textarea
                         value={elementFormData.description}
-                        onChange={(e) => setElementFormData({...elementFormData, description: e.target.value})}
+                        onChange={(e) =>
+                          setElementFormData({ ...elementFormData, description: e.target.value })
+                        }
                         placeholder="A powerful divine element forged in the heavens..."
                         rows={3}
                         data-testid="textarea-element-description"
@@ -868,7 +768,9 @@ export default function AdminPage() {
                         <label className="text-sm font-medium">Rarity</label>
                         <Select
                           value={elementFormData.rarity}
-                          onValueChange={(value) => setElementFormData({...elementFormData, rarity: value})}
+                          onValueChange={(value) =>
+                            setElementFormData({ ...elementFormData, rarity: value })
+                          }
                         >
                           <SelectTrigger data-testid="select-element-rarity">
                             <SelectValue />
@@ -889,19 +791,31 @@ export default function AdminPage() {
                           min="0"
                           max="1000"
                           value={elementFormData.power}
-                          onChange={(e) => setElementFormData({...elementFormData, power: parseInt(e.target.value) || 0})}
+                          onChange={(e) =>
+                            setElementFormData({
+                              ...elementFormData,
+                              power: parseInt(e.target.value) || 0,
+                            })
+                          }
                           data-testid="input-element-power"
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium">Total Supply (0 for unlimited)</label>
+                        <label className="text-sm font-medium">
+                          Total Supply (0 for unlimited)
+                        </label>
                         <Input
                           type="number"
                           min="0"
                           value={elementFormData.totalSupply}
-                          onChange={(e) => setElementFormData({...elementFormData, totalSupply: parseInt(e.target.value) || 0})}
+                          onChange={(e) =>
+                            setElementFormData({
+                              ...elementFormData,
+                              totalSupply: parseInt(e.target.value) || 0,
+                            })
+                          }
                           data-testid="input-element-supply"
                         />
                       </div>
@@ -909,7 +823,9 @@ export default function AdminPage() {
                         <label className="text-sm font-medium">Image URL</label>
                         <Input
                           value={elementFormData.imageUrl}
-                          onChange={(e) => setElementFormData({...elementFormData, imageUrl: e.target.value})}
+                          onChange={(e) =>
+                            setElementFormData({ ...elementFormData, imageUrl: e.target.value })
+                          }
                           placeholder="https://example.com/image.png"
                           data-testid="input-element-image"
                         />
@@ -919,7 +835,9 @@ export default function AdminPage() {
                       <label className="text-sm font-medium">Animation URL (optional)</label>
                       <Input
                         value={elementFormData.animationUrl}
-                        onChange={(e) => setElementFormData({...elementFormData, animationUrl: e.target.value})}
+                        onChange={(e) =>
+                          setElementFormData({ ...elementFormData, animationUrl: e.target.value })
+                        }
                         placeholder="https://example.com/animation.mp4"
                         data-testid="input-element-animation"
                       />
@@ -928,7 +846,9 @@ export default function AdminPage() {
                       <label className="text-sm font-medium">Attributes (JSON)</label>
                       <Textarea
                         value={elementFormData.attributes}
-                        onChange={(e) => setElementFormData({...elementFormData, attributes: e.target.value})}
+                        onChange={(e) =>
+                          setElementFormData({ ...elementFormData, attributes: e.target.value })
+                        }
                         placeholder='{"element": "fire", "strength": 10}'
                         rows={3}
                         data-testid="textarea-element-attributes"
@@ -936,7 +856,11 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setMintElementDialog(false)} data-testid="button-cancel-mint">
+                    <Button
+                      variant="outline"
+                      onClick={() => setMintElementDialog(false)}
+                      data-testid="button-cancel-mint"
+                    >
                       Cancel
                     </Button>
                     <Button
@@ -957,19 +881,23 @@ export default function AdminPage() {
                           }
                         } catch (e) {
                           toast({
-                            title: "Error",
-                            description: "Invalid JSON in attributes field",
-                            variant: "destructive",
+                            title: 'Error',
+                            description: 'Invalid JSON in attributes field',
+                            variant: 'destructive',
                           });
                           return;
                         }
                         mintElementMutation.mutate(data);
                       }}
-                      disabled={mintElementMutation.isPending || !elementFormData.name || !elementFormData.description}
+                      disabled={
+                        mintElementMutation.isPending ||
+                        !elementFormData.name ||
+                        !elementFormData.description
+                      }
                       data-testid="button-confirm-mint"
                     >
                       <Sparkles className="mr-2 h-4 w-4" />
-                      {mintElementMutation.isPending ? "Minting..." : "Mint Element"}
+                      {mintElementMutation.isPending ? 'Minting...' : 'Mint Element'}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -1015,11 +943,19 @@ export default function AdminPage() {
               </div>
               <div>
                 <label className="text-sm font-medium">Training Dataset</label>
-                <Input name="trainingDataset" placeholder="Dataset name or path" data-testid="input-training-dataset" />
+                <Input
+                  name="trainingDataset"
+                  placeholder="Dataset name or path"
+                  data-testid="input-training-dataset"
+                />
               </div>
             </div>
             <DialogFooter className="mt-4">
-              <Button type="submit" disabled={startTrainingMutation.isPending} data-testid="button-start-training">
+              <Button
+                type="submit"
+                disabled={startTrainingMutation.isPending}
+                data-testid="button-start-training"
+              >
                 <Zap className="mr-2 h-4 w-4" />
                 Start Training
               </Button>

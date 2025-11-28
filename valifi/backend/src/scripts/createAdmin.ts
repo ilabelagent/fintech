@@ -2,22 +2,22 @@
 
 /**
  * VALIFI SUPER ADMIN PROVISIONING SCRIPT (SECURE)
- * 
+ *
  * Creates a Super Admin account with secure password hashing
- * 
+ *
  * SECURE USAGE:
  *   export ADMIN_EMAIL=your-email@example.com
  *   export ADMIN_PASSWORD=your-secure-password
  *   npx tsx backend/src/scripts/createAdmin.ts --role=SuperAdmin
- * 
+ *
  * ALTERNATIVE (prompts for password):
  *   npx tsx backend/src/scripts/createAdmin.ts --email=EMAIL --role=SuperAdmin
  */
 
-import bcrypt from "bcryptjs";
-import { db } from "../db";
-import { users } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import bcrypt from 'bcryptjs';
+import { db } from '../db';
+import { users } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 interface AdminConfig {
   email: string;
@@ -90,7 +90,7 @@ async function createSuperAdmin(config: AdminConfig) {
       console.log(`User ID: ${existingUser[0].id}`);
       console.log(`Email: ${existingUser[0].email}`);
       console.log(`Admin Status: ${existingUser[0].isAdmin ? 'YES' : 'NO'}`);
-      
+
       if (existingUser[0].isAdmin) {
         console.log('\n✅ Super Admin account already configured');
         return existingUser[0];
@@ -102,7 +102,7 @@ async function createSuperAdmin(config: AdminConfig) {
           .set({ isAdmin: true })
           .where(eq(users.email, config.email))
           .returning();
-        
+
         console.log('✅ User promoted to Super Admin');
         return updated[0];
       }
@@ -146,14 +146,10 @@ async function createSuperAdmin(config: AdminConfig) {
 
 async function verifyAdminAccess(email: string, password: string) {
   console.log('\n🧪 VERIFYING ADMIN ACCESS...');
-  
+
   try {
     // Fetch user
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!user.length) {
       throw new Error('User not found');
@@ -167,7 +163,7 @@ async function verifyAdminAccess(email: string, password: string) {
 
     console.log('✅ Password verification: PASSED');
     console.log('✅ Admin flag verification: ' + (user[0].isAdmin ? 'PASSED' : 'FAILED'));
-    
+
     if (!user[0].isAdmin) {
       throw new Error('User is not an admin');
     }
@@ -186,13 +182,13 @@ async function verifyAdminAccess(email: string, password: string) {
     const config = await parseArgs();
     const admin = await createSuperAdmin(config);
     await verifyAdminAccess(config.email, config.password);
-    
+
     console.log('\n🎉 SUPER ADMIN PROVISIONING COMPLETE');
     console.log('📋 Login Credentials:');
     console.log(`   Email: ${config.email}`);
     console.log(`   Password: [SECURELY HASHED IN DATABASE]`);
     console.log('\n✅ System ready for Super Admin login\n');
-    
+
     process.exit(0);
   } catch (error) {
     console.error('\n💥 Fatal error during admin provisioning');

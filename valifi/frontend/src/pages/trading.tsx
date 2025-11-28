@@ -1,46 +1,83 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, TrendingDown, Plus, Activity, DollarSign, BarChart3, RefreshCw, ShoppingCart } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  TrendingUp,
+  TrendingDown,
+  Plus,
+  Activity,
+  DollarSign,
+  BarChart3,
+  RefreshCw,
+  ShoppingCart,
+} from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 const exchanges = [
-  { value: "binance", label: "Binance" },
-  { value: "bybit", label: "Bybit" },
-  { value: "kucoin", label: "KuCoin" },
-  { value: "okx", label: "OKX" },
-  { value: "coinbase", label: "Coinbase" },
+  { value: 'binance', label: 'Binance' },
+  { value: 'bybit', label: 'Bybit' },
+  { value: 'kucoin', label: 'KuCoin' },
+  { value: 'okx', label: 'OKX' },
+  { value: 'coinbase', label: 'Coinbase' },
 ];
 
 const marketAssets = [
-  { symbol: "BTC/USDT", type: "crypto", name: "Bitcoin" },
-  { symbol: "ETH/USDT", type: "crypto", name: "Ethereum" },
-  { symbol: "AAPL", type: "stock", name: "Apple Inc." },
-  { symbol: "TSLA", type: "stock", name: "Tesla Inc." },
-  { symbol: "EUR/USD", type: "forex", name: "Euro/US Dollar" },
-  { symbol: "gold", type: "metal", name: "Gold" },
-  { symbol: "silver", type: "metal", name: "Silver" },
+  { symbol: 'BTC/USDT', type: 'crypto', name: 'Bitcoin' },
+  { symbol: 'ETH/USDT', type: 'crypto', name: 'Ethereum' },
+  { symbol: 'AAPL', type: 'stock', name: 'Apple Inc.' },
+  { symbol: 'TSLA', type: 'stock', name: 'Tesla Inc.' },
+  { symbol: 'EUR/USD', type: 'forex', name: 'Euro/US Dollar' },
+  { symbol: 'gold', type: 'metal', name: 'Gold' },
+  { symbol: 'silver', type: 'metal', name: 'Silver' },
 ];
 
 const tradeOrderSchema = z.object({
-  symbol: z.string().min(1, "Symbol is required"),
-  side: z.enum(["buy", "sell"]),
-  type: z.enum(["market", "limit"]),
-  quantity: z.string().min(1, "Quantity is required"),
+  symbol: z.string().min(1, 'Symbol is required'),
+  side: z.enum(['buy', 'sell']),
+  type: z.enum(['market', 'limit']),
+  quantity: z.string().min(1, 'Quantity is required'),
   price: z.string().optional(),
 });
 
@@ -48,12 +85,12 @@ type TradeOrderFormValues = z.infer<typeof tradeOrderSchema>;
 
 export default function TradingPage() {
   const { toast } = useToast();
-  const [selectedAsset, setSelectedAsset] = useState<string>("BTC/USDT");
+  const [selectedAsset, setSelectedAsset] = useState<string>('BTC/USDT');
   const [tradeDialogOpen, setTradeDialogOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const { data: exchangeOrders, isLoading: ordersLoading } = useQuery({
-    queryKey: ["/api/exchange/orders"],
+    queryKey: ['/api/exchange/orders'],
     refetchInterval: autoRefresh ? 5000 : false,
   });
 
@@ -61,17 +98,17 @@ export default function TradingPage() {
     resolver: zodResolver(tradeOrderSchema),
     defaultValues: {
       symbol: selectedAsset,
-      side: "buy",
-      type: "market",
-      quantity: "",
-      price: "",
+      side: 'buy',
+      type: 'market',
+      quantity: '',
+      price: '',
     },
   });
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: TradeOrderFormValues) => {
-      return apiRequest("/api/exchange/orders", {
-        method: "POST",
+      return apiRequest('/api/exchange/orders', {
+        method: 'POST',
         body: JSON.stringify({
           ...data,
           quantity: parseFloat(data.quantity),
@@ -80,39 +117,39 @@ export default function TradingPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/exchange/orders"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/exchange/orders'] });
       toast({
-        title: "Order Placed",
-        description: "Your trading order has been submitted successfully.",
+        title: 'Order Placed',
+        description: 'Your trading order has been submitted successfully.',
       });
       setTradeDialogOpen(false);
       tradeForm.reset();
     },
     onError: (error: Error) => {
       toast({
-        title: "Order Failed",
+        title: 'Order Failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 
   const cancelOrderMutation = useMutation({
     mutationFn: async (orderId: string) => {
-      return apiRequest(`/api/exchange/orders/${orderId}`, { method: "DELETE" });
+      return apiRequest(`/api/exchange/orders/${orderId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/exchange/orders"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/exchange/orders'] });
       toast({
-        title: "Order Cancelled",
-        description: "Your order has been cancelled successfully.",
+        title: 'Order Cancelled',
+        description: 'Your order has been cancelled successfully.',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Cancellation Failed",
+        title: 'Cancellation Failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -123,10 +160,14 @@ export default function TradingPage() {
 
   const getOrderStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-green-500";
-      case "pending": return "bg-yellow-500";
-      case "cancelled": return "bg-red-500";
-      default: return "bg-gray-500";
+      case 'completed':
+        return 'bg-green-500';
+      case 'pending':
+        return 'bg-yellow-500';
+      case 'cancelled':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
     }
   };
 
@@ -237,7 +278,7 @@ export default function TradingPage() {
                       </FormItem>
                     )}
                   />
-                  {tradeForm.watch("type") === "limit" && (
+                  {tradeForm.watch('type') === 'limit' && (
                     <FormField
                       control={tradeForm.control}
                       name="price"
@@ -254,7 +295,7 @@ export default function TradingPage() {
                   )}
                   <DialogFooter>
                     <Button type="submit" disabled={createOrderMutation.isPending}>
-                      {createOrderMutation.isPending ? "Placing..." : "Place Order"}
+                      {createOrderMutation.isPending ? 'Placing...' : 'Place Order'}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -282,7 +323,7 @@ export default function TradingPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {exchangeOrders?.filter((o: any) => o.status === "pending").length || 0}
+              {exchangeOrders?.filter((o: any) => o.status === 'pending').length || 0}
             </div>
             <p className="text-xs text-muted-foreground">Awaiting execution</p>
           </CardContent>
@@ -294,7 +335,7 @@ export default function TradingPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {exchangeOrders?.filter((o: any) => o.status === "completed").length || 0}
+              {exchangeOrders?.filter((o: any) => o.status === 'completed').length || 0}
             </div>
             <p className="text-xs text-muted-foreground">Successful trades</p>
           </CardContent>
@@ -334,19 +375,17 @@ export default function TradingPage() {
                       <Badge variant="outline">{order.orderType}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={order.side === "buy" ? "default" : "destructive"}>
+                      <Badge variant={order.side === 'buy' ? 'default' : 'destructive'}>
                         {order.side}
                       </Badge>
                     </TableCell>
                     <TableCell>{order.quantity}</TableCell>
-                    <TableCell>{order.price ? `$${order.price}` : "Market"}</TableCell>
+                    <TableCell>{order.price ? `$${order.price}` : 'Market'}</TableCell>
                     <TableCell>
-                      <Badge className={getOrderStatusColor(order.status)}>
-                        {order.status}
-                      </Badge>
+                      <Badge className={getOrderStatusColor(order.status)}>{order.status}</Badge>
                     </TableCell>
                     <TableCell>
-                      {order.status === "pending" && (
+                      {order.status === 'pending' && (
                         <Button
                           variant="ghost"
                           size="sm"

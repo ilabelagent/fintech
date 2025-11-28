@@ -1,24 +1,46 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import GridLayout, { Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Plus, Save, LayoutGrid, Trash2, Loader2, GripVertical, Wallet, TrendingUp, Image, Coins, Bot, ArrowRightLeft, Users, Gem } from "lucide-react";
-import { useLocation } from "wouter";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import GridLayout, { Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import {
+  Plus,
+  Save,
+  LayoutGrid,
+  Trash2,
+  Loader2,
+  GripVertical,
+  Wallet,
+  TrendingUp,
+  Image,
+  Coins,
+  Bot,
+  ArrowRightLeft,
+  Users,
+  Gem,
+} from 'lucide-react';
+import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-import { PortfolioOverview } from "@/components/dashboard-widgets/PortfolioOverview";
-import { LiveMarketPrices } from "@/components/dashboard-widgets/LiveMarketPrices";
-import { RecentTransactions } from "@/components/dashboard-widgets/RecentTransactions";
-import { NewsFeeds } from "@/components/dashboard-widgets/NewsFeeds";
-import { PerformanceCharts } from "@/components/dashboard-widgets/PerformanceCharts";
+import { PortfolioOverview } from '@/components/dashboard-widgets/PortfolioOverview';
+import { LiveMarketPrices } from '@/components/dashboard-widgets/LiveMarketPrices';
+import { RecentTransactions } from '@/components/dashboard-widgets/RecentTransactions';
+import { NewsFeeds } from '@/components/dashboard-widgets/NewsFeeds';
+import { PerformanceCharts } from '@/components/dashboard-widgets/PerformanceCharts';
 
 const WIDGET_COMPONENTS: Record<string, any> = {
   'portfolio-overview': PortfolioOverview,
@@ -29,45 +51,45 @@ const WIDGET_COMPONENTS: Record<string, any> = {
 };
 
 const DEFAULT_WIDGETS = [
-  { 
-    id: 'portfolio-overview', 
-    name: 'Portfolio Overview', 
+  {
+    id: 'portfolio-overview',
+    name: 'Portfolio Overview',
     type: 'stats',
     description: 'Total balance and profit/loss tracking',
     icon: 'wallet',
-    defaultSize: { w: 4, h: 2 }
+    defaultSize: { w: 4, h: 2 },
   },
-  { 
-    id: 'live-market-prices', 
-    name: 'Live Market Prices', 
+  {
+    id: 'live-market-prices',
+    name: 'Live Market Prices',
     type: 'market',
     description: 'Real-time crypto and stock prices',
     icon: 'trending-up',
-    defaultSize: { w: 4, h: 2 }
+    defaultSize: { w: 4, h: 2 },
   },
-  { 
-    id: 'recent-transactions', 
-    name: 'Recent Transactions', 
+  {
+    id: 'recent-transactions',
+    name: 'Recent Transactions',
     type: 'activity',
     description: 'Latest 10 transactions',
     icon: 'clock',
-    defaultSize: { w: 6, h: 3 }
+    defaultSize: { w: 6, h: 3 },
   },
-  { 
-    id: 'news-feeds', 
-    name: 'News Feeds', 
+  {
+    id: 'news-feeds',
+    name: 'News Feeds',
     type: 'news',
-    description: 'Jesus Cartel releases and market news',
+    description: 'Latest financial news and market updates',
     icon: 'newspaper',
-    defaultSize: { w: 6, h: 3 }
+    defaultSize: { w: 6, h: 3 },
   },
-  { 
-    id: 'performance-charts', 
-    name: 'Performance Charts', 
+  {
+    id: 'performance-charts',
+    name: 'Performance Charts',
     type: 'chart',
     description: 'Historical profit visualization',
     icon: 'activity',
-    defaultSize: { w: 12, h: 3 }
+    defaultSize: { w: 12, h: 3 },
   },
 ];
 
@@ -80,48 +102,48 @@ export default function Dashboard() {
   const [isWidgetLibraryOpen, setIsWidgetLibraryOpen] = useState(false);
 
   const { data: dashboardConfig, isLoading: configLoading } = useQuery({
-    queryKey: ["/api/dashboard/config"],
+    queryKey: ['/api/dashboard/config'],
   });
 
   const { data: preferences, isLoading: prefsLoading } = useQuery({
-    queryKey: ["/api/dashboard/preferences"],
+    queryKey: ['/api/dashboard/preferences'],
   });
 
   const saveConfigMutation = useMutation({
     mutationFn: async (config: any) => {
-      return await apiRequest("/api/dashboard/config", "POST", config);
+      return await apiRequest('/api/dashboard/config', 'POST', config);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/config"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/config'] });
       toast({
-        title: "Dashboard Saved",
-        description: "Your dashboard layout has been saved successfully.",
+        title: 'Dashboard Saved',
+        description: 'Your dashboard layout has been saved successfully.',
       });
     },
     onError: () => {
       toast({
-        title: "Save Failed",
-        description: "Failed to save dashboard configuration.",
-        variant: "destructive",
+        title: 'Save Failed',
+        description: 'Failed to save dashboard configuration.',
+        variant: 'destructive',
       });
     },
   });
 
   const savePreferenceMutation = useMutation({
     mutationFn: async (pref: any) => {
-      return await apiRequest("/api/dashboard/preferences", "POST", pref);
+      return await apiRequest('/api/dashboard/preferences', 'POST', pref);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/preferences"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/preferences'] });
     },
   });
 
   const deletePreferenceMutation = useMutation({
     mutationFn: async (widgetId: string) => {
-      return await apiRequest(`/api/dashboard/preferences/${widgetId}`, "DELETE");
+      return await apiRequest(`/api/dashboard/preferences/${widgetId}`, 'DELETE');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/preferences"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/preferences'] });
     },
   });
 
@@ -146,7 +168,7 @@ export default function Dashboard() {
         .filter(Boolean);
       setActiveWidgets(activeIds);
     } else {
-      setActiveWidgets(DEFAULT_WIDGETS.slice(0, 4).map(w => w.id));
+      setActiveWidgets(DEFAULT_WIDGETS.slice(0, 4).map((w) => w.id));
     }
   }, [dashboardConfig, preferences]);
 
@@ -157,7 +179,7 @@ export default function Dashboard() {
   const handleSaveLayout = () => {
     saveConfigMutation.mutate({
       layout,
-      theme: "dark",
+      theme: 'dark',
       preferences: { activeWidgets },
     });
   };
@@ -165,14 +187,14 @@ export default function Dashboard() {
   const handleAddWidget = (widgetId: string) => {
     if (activeWidgets.includes(widgetId)) {
       toast({
-        title: "Widget Already Added",
-        description: "This widget is already on your dashboard.",
-        variant: "destructive",
+        title: 'Widget Already Added',
+        description: 'This widget is already on your dashboard.',
+        variant: 'destructive',
       });
       return;
     }
 
-    const widget = DEFAULT_WIDGETS.find(w => w.id === widgetId);
+    const widget = DEFAULT_WIDGETS.find((w) => w.id === widgetId);
     if (!widget) return;
 
     const newLayout: Layout = {
@@ -195,19 +217,19 @@ export default function Dashboard() {
 
     setIsWidgetLibraryOpen(false);
     toast({
-      title: "Widget Added",
+      title: 'Widget Added',
       description: `${widget.name} has been added to your dashboard.`,
     });
   };
 
   const handleRemoveWidget = (widgetId: string) => {
-    setLayout(layout.filter(l => l.i !== widgetId));
-    setActiveWidgets(activeWidgets.filter(id => id !== widgetId));
+    setLayout(layout.filter((l) => l.i !== widgetId));
+    setActiveWidgets(activeWidgets.filter((id) => id !== widgetId));
     deletePreferenceMutation.mutate(widgetId);
 
     toast({
-      title: "Widget Removed",
-      description: "Widget has been removed from your dashboard.",
+      title: 'Widget Removed',
+      description: 'Widget has been removed from your dashboard.',
     });
   };
 
@@ -240,9 +262,7 @@ export default function Dashboard() {
               <SheetContent>
                 <SheetHeader>
                   <SheetTitle>Widget Library</SheetTitle>
-                  <SheetDescription>
-                    Add widgets to your dashboard
-                  </SheetDescription>
+                  <SheetDescription>Add widgets to your dashboard</SheetDescription>
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-8rem)] mt-6">
                   <div className="space-y-3">
@@ -259,13 +279,15 @@ export default function Dashboard() {
                                 </CardDescription>
                               </div>
                               {isActive && (
-                                <Badge variant="secondary" className="ml-2">Active</Badge>
+                                <Badge variant="secondary" className="ml-2">
+                                  Active
+                                </Badge>
                               )}
                             </div>
                           </CardHeader>
                           <CardContent>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               onClick={() => handleAddWidget(widget.id)}
                               disabled={isActive}
                               className="w-full"
@@ -282,7 +304,11 @@ export default function Dashboard() {
               </SheetContent>
             </Sheet>
 
-            <Button onClick={handleSaveLayout} disabled={saveConfigMutation.isPending} data-testid="button-save-layout">
+            <Button
+              onClick={handleSaveLayout}
+              disabled={saveConfigMutation.isPending}
+              data-testid="button-save-layout"
+            >
               <Save className="mr-2 h-4 w-4" />
               {saveConfigMutation.isPending ? 'Saving...' : 'Save Layout'}
             </Button>
@@ -300,7 +326,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/blockchain")}
+                onClick={() => setLocation('/blockchain')}
                 data-testid="button-dashboard-quick-wallet"
               >
                 <Wallet className="w-6 h-6" />
@@ -310,7 +336,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/trading")}
+                onClick={() => setLocation('/trading')}
                 data-testid="button-dashboard-quick-trade"
               >
                 <TrendingUp className="w-6 h-6" />
@@ -320,7 +346,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/blockchain")}
+                onClick={() => setLocation('/blockchain')}
                 data-testid="button-dashboard-quick-mint"
               >
                 <Image className="w-6 h-6" />
@@ -330,7 +356,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/spectrum-plans")}
+                onClick={() => setLocation('/spectrum-plans')}
                 data-testid="button-dashboard-quick-stake"
               >
                 <Coins className="w-6 h-6" />
@@ -340,7 +366,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/metals")}
+                onClick={() => setLocation('/metals')}
                 data-testid="button-dashboard-quick-gold"
               >
                 <Gem className="w-6 h-6" />
@@ -350,7 +376,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/trading-bots")}
+                onClick={() => setLocation('/trading-bots')}
                 data-testid="button-dashboard-quick-bot"
               >
                 <Bot className="w-6 h-6" />
@@ -360,7 +386,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/p2p")}
+                onClick={() => setLocation('/p2p')}
                 data-testid="button-dashboard-quick-p2p"
               >
                 <Users className="w-6 h-6" />
@@ -370,7 +396,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-auto flex-col gap-2 py-4"
-                onClick={() => setLocation("/exchange")}
+                onClick={() => setLocation('/exchange')}
                 data-testid="button-dashboard-quick-exchange"
               >
                 <ArrowRightLeft className="w-6 h-6" />
@@ -399,7 +425,11 @@ export default function Dashboard() {
               if (!WidgetComponent) return null;
 
               return (
-                <div key={widgetId} className="relative group" data-testid={`widget-container-${widgetId}`}>
+                <div
+                  key={widgetId}
+                  className="relative group"
+                  data-testid={`widget-container-${widgetId}`}
+                >
                   <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <Button
                       size="icon"
@@ -431,8 +461,13 @@ export default function Dashboard() {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <LayoutGrid className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-xl font-semibold mb-2">No Widgets Added</h3>
-              <p className="text-muted-foreground mb-4">Start by adding widgets to your dashboard</p>
-              <Button onClick={() => setIsWidgetLibraryOpen(true)} data-testid="button-add-first-widget">
+              <p className="text-muted-foreground mb-4">
+                Start by adding widgets to your dashboard
+              </p>
+              <Button
+                onClick={() => setIsWidgetLibraryOpen(true)}
+                data-testid="button-add-first-widget"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Your First Widget
               </Button>

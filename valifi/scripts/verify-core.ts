@@ -2,14 +2,14 @@
 
 /**
  * VALIFI CORE AUTHENTICATION FLOW VERIFICATION
- * 
+ *
  * This script tests the complete auth flow:
  * 1. Registration with valid credentials
  * 2. Login and session capture
  * 3. Authenticated data loading (user profile & wallet data)
  * 4. Logout and session destruction
  * 5. Re-login to verify credential persistence
- * 
+ *
  * Exit Codes:
  * 0 = All tests passed
  * 1 = Tests failed
@@ -51,10 +51,7 @@ class AuthFlowTester {
     lastName: 'Tester',
   };
 
-  private async fetch(
-    url: string,
-    options: RequestInit = {}
-  ): Promise<Response> {
+  private async fetch(url: string, options: RequestInit = {}): Promise<Response> {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...(options.headers || {}),
@@ -72,10 +69,7 @@ class AuthFlowTester {
     return response;
   }
 
-  private async runTest(
-    name: string,
-    testFn: () => Promise<void>
-  ): Promise<void> {
+  private async runTest(name: string, testFn: () => Promise<void>): Promise<void> {
     const start = Date.now();
     console.log(`\n🧪 Testing: ${name}...`);
 
@@ -86,8 +80,7 @@ class AuthFlowTester {
       console.log(`✅ PASSED (${duration}ms)`);
     } catch (error) {
       const duration = Date.now() - start;
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.results.push({
         name,
         passed: false,
@@ -108,9 +101,7 @@ class AuthFlowTester {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(
-          `Registration failed (${response.status}): ${errorText}`
-        );
+        throw new Error(`Registration failed (${response.status}): ${errorText}`);
       }
 
       const data = await response.json();
@@ -120,9 +111,7 @@ class AuthFlowTester {
       }
 
       if (data.user.email !== this.testUser.email) {
-        throw new Error(
-          `Email mismatch: expected ${this.testUser.email}, got ${data.user.email}`
-        );
+        throw new Error(`Email mismatch: expected ${this.testUser.email}, got ${data.user.email}`);
       }
 
       console.log(`   ✓ User created with ID: ${data.user.id}`);
@@ -171,9 +160,7 @@ class AuthFlowTester {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(
-          `Failed to load user (${response.status}): ${errorText}`
-        );
+        throw new Error(`Failed to load user (${response.status}): ${errorText}`);
       }
 
       const user: User = await response.json();
@@ -183,9 +170,7 @@ class AuthFlowTester {
       }
 
       if (user.email !== this.testUser.email) {
-        throw new Error(
-          `Email mismatch: expected ${this.testUser.email}, got ${user.email}`
-        );
+        throw new Error(`Email mismatch: expected ${this.testUser.email}, got ${user.email}`);
       }
 
       console.log(`   ✓ User ID: ${user.id}`);
@@ -205,9 +190,7 @@ class AuthFlowTester {
           return;
         }
         const errorText = await response.text();
-        throw new Error(
-          `Failed to load wallets (${response.status}): ${errorText}`
-        );
+        throw new Error(`Failed to load wallets (${response.status}): ${errorText}`);
       }
 
       const wallets: Wallet[] = await response.json();
@@ -235,9 +218,7 @@ class AuthFlowTester {
       const verifyResponse = await this.fetch(`${BASE_URL}/api/auth/user`);
 
       if (verifyResponse.ok) {
-        throw new Error(
-          'Token still valid after logout - token was not cleared'
-        );
+        throw new Error('Token still valid after logout - token was not cleared');
       }
 
       console.log(`   ✓ Session destroyed (verified)`);
@@ -304,9 +285,7 @@ class AuthFlowTester {
     this.results.forEach((result) => {
       const icon = result.passed ? '✅' : '❌';
       const status = result.passed ? 'PASS' : 'FAIL';
-      console.log(
-        `${icon} [${status}] ${result.name} (${result.duration}ms)`
-      );
+      console.log(`${icon} [${status}] ${result.name} (${result.duration}ms)`);
       if (result.error) {
         console.log(`   Error: ${result.error}`);
       }

@@ -1,19 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Newspaper, ExternalLink } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Newspaper, ExternalLink } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 export function NewsFeeds() {
   const { data: news, isLoading } = useQuery({
-    queryKey: ["/api/news"],
+    queryKey: ['/api/news'],
   });
 
   const { data: songs } = useQuery({
-    queryKey: ["/api/songs"],
+    queryKey: ['/api/songs'],
   });
 
-  const recentSongs = (songs && Array.isArray(songs)) ? songs.slice(0, 2) : [];
+  const recentSongs = songs && Array.isArray(songs) ? songs.slice(0, 2) : [];
 
   if (isLoading) {
     return (
@@ -42,7 +42,11 @@ export function NewsFeeds() {
             <div className="space-y-2">
               <h4 className="text-xs font-semibold text-primary">Jesus Cartel Releases</h4>
               {recentSongs.map((song: any) => (
-                <div key={song.id} className="p-2 rounded-lg bg-primary/10 border border-primary/20" data-testid={`song-${song.id}`}>
+                <div
+                  key={song.id}
+                  className="p-2 rounded-lg bg-primary/10 border border-primary/20"
+                  data-testid={`song-${song.id}`}
+                >
                   <p className="text-sm font-medium">{song.title}</p>
                   <p className="text-xs text-muted-foreground">{song.artist}</p>
                   {song.isPublished && <Badge className="mt-1 text-xs">Published</Badge>}
@@ -55,10 +59,10 @@ export function NewsFeeds() {
             <h4 className="text-xs font-semibold">Market News</h4>
             {news && Array.isArray(news) && news.length > 0 ? (
               news.slice(0, 3).map((item: any) => (
-                <a 
-                  key={item.id} 
-                  href={item.url || '#'} 
-                  target="_blank" 
+                <a
+                  key={item.id}
+                  href={item.url || '#'}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="block p-2 rounded-lg hover:bg-muted/50 transition-colors group"
                   data-testid={`news-${item.id}`}

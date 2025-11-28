@@ -1,7 +1,7 @@
-import Alpaca from "@alpacahq/alpaca-trade-api";
-import { storage } from "./storage";
-import { encryptionService } from "./encryptionService";
-import { botLearningService } from "./botLearningService";
+import Alpaca from '@alpacahq/alpaca-trade-api';
+import { storage } from './storage';
+import { encryptionService } from './encryptionService';
+import { botLearningService } from './botLearningService';
 import type {
   BrokerAccount,
   InsertBrokerAccount,
@@ -9,7 +9,7 @@ import type {
   InsertBrokerPosition,
   BrokerOrder,
   BrokerPosition,
-} from "@shared/schema";
+} from '@shared/schema';
 
 /**
  * Broker Integration Service
@@ -26,9 +26,9 @@ interface AlpacaCredentials {
 interface OrderRequest {
   symbol: string;
   qty: number;
-  side: "buy" | "sell";
-  type: "market" | "limit" | "stop" | "stop_limit" | "trailing_stop";
-  time_in_force?: "day" | "gtc" | "ioc" | "fok";
+  side: 'buy' | 'sell';
+  type: 'market' | 'limit' | 'stop' | 'stop_limit' | 'trailing_stop';
+  time_in_force?: 'day' | 'gtc' | 'ioc' | 'fok';
   limit_price?: number;
   stop_price?: number;
   trail_price?: number;
@@ -61,10 +61,10 @@ export class BrokerIntegrationService {
    */
   async connectBroker(
     userId: string,
-    provider: "alpaca" | "interactive_brokers" | "td_ameritrade" | "binance" | "bybit",
+    provider: 'alpaca' | 'interactive_brokers' | 'td_ameritrade' | 'binance' | 'bybit',
     apiKey: string,
     apiSecret: string,
-    accountType: "paper" | "live" = "paper"
+    accountType: 'paper' | 'live' = 'paper'
   ): Promise<BrokerAccount> {
     try {
       // Encrypt credentials with user-specific encryption
@@ -72,11 +72,11 @@ export class BrokerIntegrationService {
       const apiSecretEncrypted = encryptionService.encrypt(apiSecret, userId);
 
       // Validate credentials by attempting connection
-      if (provider === "alpaca") {
+      if (provider === 'alpaca') {
         const alpaca = new Alpaca({
           keyId: apiKey,
           secretKey: apiSecret,
-          paper: accountType === "paper",
+          paper: accountType === 'paper',
         });
 
         // Test connection and get account info
@@ -90,7 +90,7 @@ export class BrokerIntegrationService {
           apiKeyEncrypted,
           apiSecretEncrypted,
           accountId: accountInfo.id,
-          status: "active",
+          status: 'active',
           buyingPower: accountInfo.buying_power,
           cashBalance: accountInfo.cash,
           portfolioValue: accountInfo.portfolio_value,
@@ -134,10 +134,10 @@ export class BrokerIntegrationService {
     // Load from storage and decrypt credentials
     const account = await storage.getBrokerAccount(brokerAccountId);
     if (!account) {
-      throw new Error("Broker account not found");
+      throw new Error('Broker account not found');
     }
 
-    if (account.provider !== "alpaca") {
+    if (account.provider !== 'alpaca') {
       throw new Error(`Provider ${account.provider} not yet supported`);
     }
 
@@ -149,7 +149,7 @@ export class BrokerIntegrationService {
     const alpaca = new Alpaca({
       keyId: apiKey,
       secretKey: apiSecret,
-      paper: account.accountType === "paper",
+      paper: account.accountType === 'paper',
     });
 
     this.alpacaClients.set(brokerAccountId, alpaca);
@@ -220,7 +220,7 @@ export class BrokerIntegrationService {
         qty: orderRequest.qty,
         side: orderRequest.side,
         type: orderRequest.type,
-        time_in_force: orderRequest.time_in_force || "day",
+        time_in_force: orderRequest.time_in_force || 'day',
         limit_price: orderRequest.limit_price,
         stop_price: orderRequest.stop_price,
         trail_price: orderRequest.trail_price,
@@ -236,11 +236,11 @@ export class BrokerIntegrationService {
         symbol: alpacaOrder.symbol,
         orderType: orderRequest.type,
         orderSide: orderRequest.side,
-        timeInForce: (orderRequest.time_in_force || "day") as any,
+        timeInForce: (orderRequest.time_in_force || 'day') as any,
         quantity: alpacaOrder.qty.toString(),
         limitPrice: alpacaOrder.limit_price ? alpacaOrder.limit_price.toString() : null,
         stopPrice: alpacaOrder.stop_price ? alpacaOrder.stop_price.toString() : null,
-        filledQuantity: alpacaOrder.filled_qty ? alpacaOrder.filled_qty.toString() : "0",
+        filledQuantity: alpacaOrder.filled_qty ? alpacaOrder.filled_qty.toString() : '0',
         filledAvgPrice: alpacaOrder.filled_avg_price
           ? alpacaOrder.filled_avg_price.toString()
           : null,
@@ -265,7 +265,7 @@ export class BrokerIntegrationService {
       if (botExecutionId) {
         await storage.updateBotExecution(botExecutionId, {
           orderId: createdOrder.externalOrderId,
-          status: "running",
+          status: 'running',
         });
       }
 
@@ -335,22 +335,22 @@ export class BrokerIntegrationService {
   async getOrderHistory(
     brokerAccountId: string,
     options?: {
-      status?: "open" | "closed" | "all";
+      status?: 'open' | 'closed' | 'all';
       limit?: number;
       after?: string;
       until?: string;
-      direction?: "asc" | "desc";
+      direction?: 'asc' | 'desc';
     }
   ): Promise<BrokerOrder[]> {
     try {
       const alpaca = await this.getAlpacaClient(brokerAccountId);
 
       const alpacaOrders = await alpaca.getOrders({
-        status: options?.status || "all",
+        status: options?.status || 'all',
         limit: options?.limit || 100,
         after: options?.after,
         until: options?.until,
-        direction: options?.direction || "desc",
+        direction: options?.direction || 'desc',
       });
 
       // Sync orders to database
@@ -371,7 +371,7 @@ export class BrokerIntegrationService {
           quantity: order.qty.toString(),
           limitPrice: order.limit_price ? order.limit_price.toString() : null,
           stopPrice: order.stop_price ? order.stop_price.toString() : null,
-          filledQuantity: order.filled_qty ? order.filled_qty.toString() : "0",
+          filledQuantity: order.filled_qty ? order.filled_qty.toString() : '0',
           filledAvgPrice: order.filled_avg_price ? order.filled_avg_price.toString() : null,
           status: this.mapAlpacaOrderStatus(order.status),
           fees: null,
@@ -448,7 +448,7 @@ export class BrokerIntegrationService {
 
       const order = await storage.getBrokerOrder(orderId);
       if (!order || order.brokerAccountId !== brokerAccountId) {
-        throw new Error("Order not found or access denied");
+        throw new Error('Order not found or access denied');
       }
 
       // Cancel order on Alpaca
@@ -456,7 +456,7 @@ export class BrokerIntegrationService {
 
       // Update order status
       const updated = await storage.updateBrokerOrder(orderId, {
-        status: "cancelled",
+        status: 'cancelled',
         cancelledAt: new Date(),
       });
 
@@ -474,10 +474,10 @@ export class BrokerIntegrationService {
   async executeBotTrade(
     botId: string,
     botExecutionId: string,
-    action: "buy" | "sell",
+    action: 'buy' | 'sell',
     symbol: string,
     quantity: number,
-    orderType: "market" | "limit" | "stop" = "market",
+    orderType: 'market' | 'limit' | 'stop' = 'market',
     limitPrice?: number,
     stopPrice?: number
   ): Promise<BrokerOrder> {
@@ -485,17 +485,17 @@ export class BrokerIntegrationService {
       // Get bot's associated broker account
       const bot = await storage.getBot(botId);
       if (!bot) {
-        throw new Error("Bot not found");
+        throw new Error('Bot not found');
       }
 
       // Find user's broker account (get first active Alpaca account)
       const brokerAccounts = await storage.getUserBrokerAccounts(bot.userId);
       const alpacaAccount = brokerAccounts.find(
-        (acc) => acc.provider === "alpaca" && acc.status === "active"
+        (acc) => acc.provider === 'alpaca' && acc.status === 'active'
       );
 
       if (!alpacaAccount) {
-        throw new Error("No active Alpaca broker account found for user");
+        throw new Error('No active Alpaca broker account found for user');
       }
 
       // Place order through broker
@@ -506,7 +506,7 @@ export class BrokerIntegrationService {
           qty: quantity,
           side: action,
           type: orderType,
-          time_in_force: "day",
+          time_in_force: 'day',
           limit_price: limitPrice,
           stop_price: stopPrice,
         },
@@ -530,8 +530,8 @@ export class BrokerIntegrationService {
           externalOrderId: order.externalOrderId,
           status: order.status,
         },
-        order.status === "filled",
-        parseFloat(order.filledAvgPrice || "0") * quantity
+        order.status === 'filled',
+        parseFloat(order.filledAvgPrice || '0') * quantity
       );
 
       console.log(
@@ -551,31 +551,31 @@ export class BrokerIntegrationService {
   private mapAlpacaOrderStatus(
     alpacaStatus: string
   ):
-    | "pending"
-    | "submitted"
-    | "filled"
-    | "partially_filled"
-    | "cancelled"
-    | "rejected"
-    | "expired" {
+    | 'pending'
+    | 'submitted'
+    | 'filled'
+    | 'partially_filled'
+    | 'cancelled'
+    | 'rejected'
+    | 'expired' {
     const statusMap: Record<string, any> = {
-      new: "pending",
-      pending_new: "pending",
-      accepted: "submitted",
-      partial_fill: "partially_filled",
-      filled: "filled",
-      done_for_day: "filled",
-      canceled: "cancelled",
-      expired: "expired",
-      replaced: "cancelled",
-      pending_cancel: "cancelled",
-      pending_replace: "cancelled",
-      rejected: "rejected",
-      suspended: "rejected",
-      calculated: "pending",
+      new: 'pending',
+      pending_new: 'pending',
+      accepted: 'submitted',
+      partial_fill: 'partially_filled',
+      filled: 'filled',
+      done_for_day: 'filled',
+      canceled: 'cancelled',
+      expired: 'expired',
+      replaced: 'cancelled',
+      pending_cancel: 'cancelled',
+      pending_replace: 'cancelled',
+      rejected: 'rejected',
+      suspended: 'rejected',
+      calculated: 'pending',
     };
 
-    return statusMap[alpacaStatus] || "pending";
+    return statusMap[alpacaStatus] || 'pending';
   }
 
   /**
@@ -616,7 +616,7 @@ export class BrokerIntegrationService {
 
       dataStream.connect();
 
-      console.log(`[BrokerIntegration] Market data stream setup for ${symbols.join(", ")}`);
+      console.log(`[BrokerIntegration] Market data stream setup for ${symbols.join(', ')}`);
     } catch (error: any) {
       console.error(`[BrokerIntegration] Failed to setup market data stream:`, error);
       throw new Error(`Failed to setup market data stream: ${error.message}`);

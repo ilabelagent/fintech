@@ -1,33 +1,62 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowUpDown, MessageCircle, AlertTriangle, Send, ShieldCheck, DollarSign, Clock, CheckCircle, XCircle } from "lucide-react";
-import { io, Socket } from "socket.io-client";
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  ArrowUpDown,
+  MessageCircle,
+  AlertTriangle,
+  Send,
+  ShieldCheck,
+  DollarSign,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react';
+import { io, Socket } from 'socket.io-client';
 
 // Schema for creating offers
 const createOfferSchema = z.object({
-  type: z.enum(["buy", "sell"]),
-  cryptocurrency: z.string().min(1, "Required"),
-  amount: z.string().min(1, "Required"),
-  fiatCurrency: z.string().min(1, "Required"),
-  pricePerUnit: z.string().min(1, "Required"),
-  paymentMethods: z.array(z.string()).min(1, "Select at least one payment method"),
+  type: z.enum(['buy', 'sell']),
+  cryptocurrency: z.string().min(1, 'Required'),
+  amount: z.string().min(1, 'Required'),
+  fiatCurrency: z.string().min(1, 'Required'),
+  pricePerUnit: z.string().min(1, 'Required'),
+  paymentMethods: z.array(z.string()).min(1, 'Select at least one payment method'),
   minAmount: z.string().optional(),
   maxAmount: z.string().optional(),
   timeLimit: z.number().default(30),
@@ -49,13 +78,13 @@ const createOrderSchema = z.object({
 // Schema for chat messages
 const chatMessageSchema = z.object({
   orderId: z.string(),
-  message: z.string().min(1, "Message required"),
+  message: z.string().min(1, 'Message required'),
 });
 
 // Schema for disputes
 const disputeSchema = z.object({
   orderId: z.string(),
-  reason: z.string().min(10, "Provide detailed reason (min 10 characters)"),
+  reason: z.string().min(10, 'Provide detailed reason (min 10 characters)'),
 });
 
 // Schema for reviews
@@ -67,17 +96,17 @@ const reviewSchema = z.object({
 });
 
 export default function P2PTradingPage() {
-  const [activeTab, setActiveTab] = useState("browse");
+  const [activeTab, setActiveTab] = useState('browse');
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessage, setChatMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
   const { toast } = useToast();
 
   // Filters
-  const [cryptoFilter, setCryptoFilter] = useState<string>("");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>("");
+  const [cryptoFilter, setCryptoFilter] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('');
 
   // WebSocket connection
   useEffect(() => {
@@ -92,47 +121,47 @@ export default function P2PTradingPage() {
   // Subscribe to order updates
   useEffect(() => {
     if (socket && selectedOrder) {
-      socket.emit("subscribe:p2p", selectedOrder.id);
+      socket.emit('subscribe:p2p', selectedOrder.id);
 
-      socket.on("p2p:message", (message) => {
-        queryClient.invalidateQueries({ queryKey: ["/api/p2p/messages", selectedOrder.id] });
+      socket.on('p2p:message', (message) => {
+        queryClient.invalidateQueries({ queryKey: ['/api/p2p/messages', selectedOrder.id] });
       });
 
-      socket.on("p2p:order_update", (update) => {
-        queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders", selectedOrder.id] });
+      socket.on('p2p:order_update', (update) => {
+        queryClient.invalidateQueries({ queryKey: ['/api/p2p/orders'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/p2p/orders', selectedOrder.id] });
         toast({
-          title: "Order Updated",
+          title: 'Order Updated',
           description: `Order status changed to: ${update.status}`,
         });
       });
 
       return () => {
-        socket.emit("unsubscribe:p2p", selectedOrder.id);
-        socket.off("p2p:message");
-        socket.off("p2p:order_update");
+        socket.emit('unsubscribe:p2p', selectedOrder.id);
+        socket.off('p2p:message');
+        socket.off('p2p:order_update');
       };
     }
   }, [socket, selectedOrder]);
 
   // Fetch offers
   const { data: offers, isLoading: offersLoading } = useQuery({
-    queryKey: ["/api/p2p/offers", typeFilter],
+    queryKey: ['/api/p2p/offers', typeFilter],
     queryFn: () => {
       const params = new URLSearchParams();
-      if (typeFilter) params.append("type", typeFilter);
-      return fetch(`/api/p2p/offers?${params}`).then(res => res.json());
+      if (typeFilter) params.append('type', typeFilter);
+      return fetch(`/api/p2p/offers?${params}`).then((res) => res.json());
     },
   });
 
   // Fetch user orders
   const { data: orders = [], isLoading: ordersLoading } = useQuery<any[]>({
-    queryKey: ["/api/p2p/orders"],
+    queryKey: ['/api/p2p/orders'],
   });
 
   // Fetch chat messages for selected order
   const { data: messages = [] } = useQuery<any[]>({
-    queryKey: ["/api/p2p/messages", selectedOrder?.id],
+    queryKey: ['/api/p2p/messages', selectedOrder?.id],
     enabled: !!selectedOrder,
   });
 
@@ -140,46 +169,45 @@ export default function P2PTradingPage() {
   const createOfferForm = useForm<CreateOfferFormData>({
     resolver: zodResolver(createOfferSchema),
     defaultValues: {
-      type: "sell",
-      cryptocurrency: "BTC",
-      fiatCurrency: "USD",
+      type: 'sell',
+      cryptocurrency: 'BTC',
+      fiatCurrency: 'USD',
       paymentMethods: [],
       timeLimit: 30,
     },
   });
 
   const createOfferMutation = useMutation({
-    mutationFn: (data: CreateOfferFormData) => 
-      apiRequest("/api/p2p/offers", "POST", data),
+    mutationFn: (data: CreateOfferFormData) => apiRequest('/api/p2p/offers', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/p2p/offers"] });
-      toast({ title: "Success", description: "Offer created successfully!" });
+      queryClient.invalidateQueries({ queryKey: ['/api/p2p/offers'] });
+      toast({ title: 'Success', description: 'Offer created successfully!' });
       createOfferForm.reset();
-      setActiveTab("browse");
+      setActiveTab('browse');
     },
     onError: (error: any) => {
-      toast({ 
-        title: "Error", 
-        description: error.message || "Failed to create offer",
-        variant: "destructive" 
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create offer',
+        variant: 'destructive',
       });
     },
   });
 
   // Accept offer mutation
   const acceptOfferMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/p2p/orders", "POST", data),
+    mutationFn: (data: any) => apiRequest('/api/p2p/orders', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
-      toast({ title: "Success", description: "Order created! Funds are in escrow." });
+      queryClient.invalidateQueries({ queryKey: ['/api/p2p/orders'] });
+      toast({ title: 'Success', description: 'Order created! Funds are in escrow.' });
       setSelectedOffer(null);
-      setActiveTab("orders");
+      setActiveTab('orders');
     },
     onError: (error: any) => {
-      toast({ 
-        title: "Error", 
-        description: error.message || "Failed to create order",
-        variant: "destructive" 
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create order',
+        variant: 'destructive',
       });
     },
   });
@@ -187,48 +215,47 @@ export default function P2PTradingPage() {
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: (data: { orderId: string; message: string }) =>
-      apiRequest("/api/p2p/messages", "POST", data),
+      apiRequest('/api/p2p/messages', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/p2p/messages", selectedOrder?.id] });
-      setChatMessage("");
+      queryClient.invalidateQueries({ queryKey: ['/api/p2p/messages', selectedOrder?.id] });
+      setChatMessage('');
     },
   });
 
   // Mark as paid mutation
   const markPaidMutation = useMutation({
-    mutationFn: (orderId: string) => 
-      apiRequest(`/api/p2p/orders/${orderId}/mark-paid`, "POST", {}),
+    mutationFn: (orderId: string) => apiRequest(`/api/p2p/orders/${orderId}/mark-paid`, 'POST', {}),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
-      toast({ title: "Success", description: "Payment marked as sent!" });
+      queryClient.invalidateQueries({ queryKey: ['/api/p2p/orders'] });
+      toast({ title: 'Success', description: 'Payment marked as sent!' });
     },
   });
 
   // Release funds mutation
   const releaseFundsMutation = useMutation({
     mutationFn: (data: { orderId: string; txHash?: string }) =>
-      apiRequest(`/api/p2p/orders/${data.orderId}/release`, "POST", { txHash: data.txHash }),
+      apiRequest(`/api/p2p/orders/${data.orderId}/release`, 'POST', { txHash: data.txHash }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
-      toast({ title: "Success", description: "Funds released successfully!" });
+      queryClient.invalidateQueries({ queryKey: ['/api/p2p/orders'] });
+      toast({ title: 'Success', description: 'Funds released successfully!' });
     },
   });
 
   // Create dispute mutation
   const createDisputeMutation = useMutation({
     mutationFn: (data: { orderId: string; reason: string }) =>
-      apiRequest("/api/p2p/disputes", "POST", data),
+      apiRequest('/api/p2p/disputes', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/p2p/orders"] });
-      toast({ title: "Dispute Created", description: "Support will review your case." });
+      queryClient.invalidateQueries({ queryKey: ['/api/p2p/orders'] });
+      toast({ title: 'Dispute Created', description: 'Support will review your case.' });
     },
   });
 
   // Create review mutation
   const createReviewMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/p2p/reviews", "POST", data),
+    mutationFn: (data: any) => apiRequest('/api/p2p/reviews', 'POST', data),
     onSuccess: () => {
-      toast({ title: "Review Submitted", description: "Thank you for your feedback!" });
+      toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
     },
   });
 
@@ -241,13 +268,13 @@ export default function P2PTradingPage() {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, string> = {
-      created: "default",
-      escrowed: "secondary",
-      paid: "outline",
-      released: "default",
-      disputed: "destructive",
-      cancelled: "destructive",
-      completed: "default",
+      created: 'default',
+      escrowed: 'secondary',
+      paid: 'outline',
+      released: 'default',
+      disputed: 'destructive',
+      cancelled: 'destructive',
+      completed: 'default',
     };
 
     const icons: Record<string, any> = {
@@ -280,9 +307,15 @@ export default function P2PTradingPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3 mb-6" data-testid="tabs-p2p">
-          <TabsTrigger value="browse" data-testid="tab-browse">Browse Offers</TabsTrigger>
-          <TabsTrigger value="orders" data-testid="tab-orders">My Orders</TabsTrigger>
-          <TabsTrigger value="create" data-testid="tab-create">Create Offer</TabsTrigger>
+          <TabsTrigger value="browse" data-testid="tab-browse">
+            Browse Offers
+          </TabsTrigger>
+          <TabsTrigger value="orders" data-testid="tab-orders">
+            My Orders
+          </TabsTrigger>
+          <TabsTrigger value="create" data-testid="tab-create">
+            Create Offer
+          </TabsTrigger>
         </TabsList>
 
         {/* Browse Offers Tab */}
@@ -291,7 +324,7 @@ export default function P2PTradingPage() {
             <CardHeader>
               <CardTitle>Available Offers</CardTitle>
               <CardDescription>Find the best P2P trading offers</CardDescription>
-              
+
               {/* Filters */}
               <div className="flex gap-4 mt-4">
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -341,19 +374,23 @@ export default function P2PTradingPage() {
               ) : (
                 <div className="space-y-4">
                   {filteredOffers?.map((offer: any) => (
-                    <Card key={offer.id} className="hover:shadow-md transition-shadow" data-testid={`offer-card-${offer.id}`}>
+                    <Card
+                      key={offer.id}
+                      className="hover:shadow-md transition-shadow"
+                      data-testid={`offer-card-${offer.id}`}
+                    >
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <Badge variant={offer.type === "buy" ? "default" : "secondary"}>
+                              <Badge variant={offer.type === 'buy' ? 'default' : 'secondary'}>
                                 <ArrowUpDown className="h-3 w-3 mr-1" />
                                 {offer.type.toUpperCase()}
                               </Badge>
                               <span className="font-bold text-lg">{offer.cryptocurrency}</span>
                               <span className="text-gray-500">for {offer.fiatCurrency}</span>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
                                 <span className="text-gray-500">Price:</span>
@@ -361,26 +398,35 @@ export default function P2PTradingPage() {
                               </div>
                               <div>
                                 <span className="text-gray-500">Amount:</span>
-                                <span className="ml-2 font-semibold">{offer.amount} {offer.cryptocurrency}</span>
+                                <span className="ml-2 font-semibold">
+                                  {offer.amount} {offer.cryptocurrency}
+                                </span>
                               </div>
                               <div>
                                 <span className="text-gray-500">Min/Max:</span>
-                                <span className="ml-2">{offer.minAmount || '0'} - {offer.maxAmount || offer.amount}</span>
+                                <span className="ml-2">
+                                  {offer.minAmount || '0'} - {offer.maxAmount || offer.amount}
+                                </span>
                               </div>
                               <div>
                                 <span className="text-gray-500">Payment:</span>
-                                <span className="ml-2">{offer.paymentMethods?.join(", ")}</span>
+                                <span className="ml-2">{offer.paymentMethods?.join(', ')}</span>
                               </div>
                             </div>
 
                             {offer.terms && (
-                              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{offer.terms}</p>
+                              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                {offer.terms}
+                              </p>
                             )}
                           </div>
 
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button onClick={() => setSelectedOffer(offer)} data-testid={`button-trade-${offer.id}`}>
+                              <Button
+                                onClick={() => setSelectedOffer(offer)}
+                                data-testid={`button-trade-${offer.id}`}
+                              >
                                 Trade
                               </Button>
                             </DialogTrigger>
@@ -388,8 +434,8 @@ export default function P2PTradingPage() {
                               <DialogHeader>
                                 <DialogTitle>Accept Offer</DialogTitle>
                               </DialogHeader>
-                              <AcceptOfferDialog 
-                                offer={selectedOffer} 
+                              <AcceptOfferDialog
+                                offer={selectedOffer}
                                 onAccept={(data) => acceptOfferMutation.mutate(data)}
                                 isLoading={acceptOfferMutation.isPending}
                               />
@@ -422,7 +468,7 @@ export default function P2PTradingPage() {
                   <ScrollArea className="h-[500px]">
                     <div className="space-y-4">
                       {orders?.map((order: any) => (
-                        <Card 
+                        <Card
                           key={order.id}
                           className={`cursor-pointer transition-all ${selectedOrder?.id === order.id ? 'ring-2 ring-primary' : ''}`}
                           onClick={() => setSelectedOrder(order)}
@@ -431,7 +477,9 @@ export default function P2PTradingPage() {
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start mb-2">
                               <div>
-                                <span className="font-bold">{order.amount} {order.offer?.cryptocurrency}</span>
+                                <span className="font-bold">
+                                  {order.amount} {order.offer?.cryptocurrency}
+                                </span>
                                 <span className="text-gray-500 ml-2">${order.fiatAmount}</span>
                               </div>
                               {getStatusBadge(order.status)}
@@ -458,15 +506,24 @@ export default function P2PTradingPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <OrderDetails 
+                  <OrderDetails
                     order={selectedOrder}
                     messages={messages || []}
                     chatMessage={chatMessage}
                     setChatMessage={setChatMessage}
-                    onSendMessage={() => sendMessageMutation.mutate({ orderId: selectedOrder.id, message: chatMessage })}
+                    onSendMessage={() =>
+                      sendMessageMutation.mutate({
+                        orderId: selectedOrder.id,
+                        message: chatMessage,
+                      })
+                    }
                     onMarkPaid={() => markPaidMutation.mutate(selectedOrder.id)}
-                    onReleaseFunds={() => releaseFundsMutation.mutate({ orderId: selectedOrder.id })}
-                    onCreateDispute={(reason: string) => createDisputeMutation.mutate({ orderId: selectedOrder.id, reason })}
+                    onReleaseFunds={() =>
+                      releaseFundsMutation.mutate({ orderId: selectedOrder.id })
+                    }
+                    onCreateDispute={(reason: string) =>
+                      createDisputeMutation.mutate({ orderId: selectedOrder.id, reason })
+                    }
                     sendingMessage={sendMessageMutation.isPending}
                   />
                 </CardContent>
@@ -484,7 +541,12 @@ export default function P2PTradingPage() {
             </CardHeader>
             <CardContent>
               <Form {...createOfferForm}>
-                <form onSubmit={createOfferForm.handleSubmit((data) => createOfferMutation.mutate(data))} className="space-y-4">
+                <form
+                  onSubmit={createOfferForm.handleSubmit((data) =>
+                    createOfferMutation.mutate(data)
+                  )}
+                  className="space-y-4"
+                >
                   <FormField
                     control={createOfferForm.control}
                     name="type"
@@ -564,7 +626,13 @@ export default function P2PTradingPage() {
                         <FormItem>
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" step="0.00000001" placeholder="1.5" data-testid="input-amount" />
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.00000001"
+                              placeholder="1.5"
+                              data-testid="input-amount"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -578,7 +646,13 @@ export default function P2PTradingPage() {
                         <FormItem>
                           <FormLabel>Price per Unit</FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="45000" data-testid="input-price" />
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.01"
+                              placeholder="45000"
+                              data-testid="input-price"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -594,7 +668,13 @@ export default function P2PTradingPage() {
                         <FormItem>
                           <FormLabel>Min Amount (Optional)</FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" step="0.00000001" placeholder="0.1" data-testid="input-min-amount" />
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.00000001"
+                              placeholder="0.1"
+                              data-testid="input-min-amount"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -608,7 +688,13 @@ export default function P2PTradingPage() {
                         <FormItem>
                           <FormLabel>Max Amount (Optional)</FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" step="0.00000001" placeholder="1.0" data-testid="input-max-amount" />
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.00000001"
+                              placeholder="1.0"
+                              data-testid="input-max-amount"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -623,24 +709,26 @@ export default function P2PTradingPage() {
                       <FormItem>
                         <FormLabel>Payment Methods</FormLabel>
                         <div className="grid grid-cols-2 gap-2">
-                          {["bank_transfer", "paypal", "venmo", "cash_app", "zelle"].map((method) => (
-                            <label key={method} className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                value={method}
-                                checked={field.value?.includes(method)}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue = e.target.checked
-                                    ? [...(field.value || []), value]
-                                    : field.value?.filter((v) => v !== value) || [];
-                                  field.onChange(newValue);
-                                }}
-                                data-testid={`checkbox-${method}`}
-                              />
-                              <span className="capitalize">{method.replace("_", " ")}</span>
-                            </label>
-                          ))}
+                          {['bank_transfer', 'paypal', 'venmo', 'cash_app', 'zelle'].map(
+                            (method) => (
+                              <label key={method} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  value={method}
+                                  checked={field.value?.includes(method)}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    const newValue = e.target.checked
+                                      ? [...(field.value || []), value]
+                                      : field.value?.filter((v) => v !== value) || [];
+                                    field.onChange(newValue);
+                                  }}
+                                  data-testid={`checkbox-${method}`}
+                                />
+                                <span className="capitalize">{method.replace('_', ' ')}</span>
+                              </label>
+                            )
+                          )}
                         </div>
                         <FormMessage />
                       </FormItem>
@@ -654,7 +742,12 @@ export default function P2PTradingPage() {
                       <FormItem>
                         <FormLabel>Time Limit (minutes)</FormLabel>
                         <FormControl>
-                          <Input {...field} type="number" onChange={(e) => field.onChange(parseInt(e.target.value))} data-testid="input-time-limit" />
+                          <Input
+                            {...field}
+                            type="number"
+                            onChange={(e) => field.onChange(parseInt(e.target.value))}
+                            data-testid="input-time-limit"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -668,15 +761,24 @@ export default function P2PTradingPage() {
                       <FormItem>
                         <FormLabel>Terms & Conditions (Optional)</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Enter your trading terms..." data-testid="textarea-terms" />
+                          <Textarea
+                            {...field}
+                            placeholder="Enter your trading terms..."
+                            data-testid="textarea-terms"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <Button type="submit" className="w-full" disabled={createOfferMutation.isPending} data-testid="button-create-offer">
-                    {createOfferMutation.isPending ? "Creating..." : "Create Offer"}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={createOfferMutation.isPending}
+                    data-testid="button-create-offer"
+                  >
+                    {createOfferMutation.isPending ? 'Creating...' : 'Create Offer'}
                   </Button>
                 </form>
               </Form>
@@ -689,19 +791,27 @@ export default function P2PTradingPage() {
 }
 
 // Accept Offer Dialog Component
-function AcceptOfferDialog({ offer, onAccept, isLoading }: { offer: any; onAccept: (data: any) => void; isLoading: boolean }) {
-  const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+function AcceptOfferDialog({
+  offer,
+  onAccept,
+  isLoading,
+}: {
+  offer: any;
+  onAccept: (data: any) => void;
+  isLoading: boolean;
+}) {
+  const [amount, setAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   if (!offer) return null;
 
-  const fiatAmount = (parseFloat(amount || "0") * parseFloat(offer.pricePerUnit)).toFixed(2);
+  const fiatAmount = (parseFloat(amount || '0') * parseFloat(offer.pricePerUnit)).toFixed(2);
 
   const handleAccept = () => {
     onAccept({
       offerId: offer.id,
-      buyerId: offer.type === "sell" ? "current-user-id" : offer.userId,
-      sellerId: offer.type === "sell" ? offer.userId : "current-user-id",
+      buyerId: offer.type === 'sell' ? 'current-user-id' : offer.userId,
+      sellerId: offer.type === 'sell' ? offer.userId : 'current-user-id',
       amount,
       fiatAmount,
       paymentMethod,
@@ -712,8 +822,8 @@ function AcceptOfferDialog({ offer, onAccept, isLoading }: { offer: any; onAccep
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium mb-2">Amount ({offer.cryptocurrency})</label>
-        <Input 
-          type="number" 
+        <Input
+          type="number"
           step="0.00000001"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
@@ -730,7 +840,9 @@ function AcceptOfferDialog({ offer, onAccept, isLoading }: { offer: any; onAccep
           </SelectTrigger>
           <SelectContent>
             {offer.paymentMethods?.map((method: string) => (
-              <SelectItem key={method} value={method}>{method.replace("_", " ")}</SelectItem>
+              <SelectItem key={method} value={method}>
+                {method.replace('_', ' ')}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -738,27 +850,40 @@ function AcceptOfferDialog({ offer, onAccept, isLoading }: { offer: any; onAccep
 
       <Alert>
         <AlertDescription>
-          You will {offer.type === "sell" ? "pay" : "receive"}: <strong>${fiatAmount} {offer.fiatCurrency}</strong>
+          You will {offer.type === 'sell' ? 'pay' : 'receive'}:{' '}
+          <strong>
+            ${fiatAmount} {offer.fiatCurrency}
+          </strong>
         </AlertDescription>
       </Alert>
 
-      <Button 
-        onClick={handleAccept} 
-        disabled={!amount || !paymentMethod || isLoading} 
+      <Button
+        onClick={handleAccept}
+        disabled={!amount || !paymentMethod || isLoading}
         className="w-full"
         data-testid="button-confirm-accept"
       >
-        {isLoading ? "Processing..." : "Accept Offer"}
+        {isLoading ? 'Processing...' : 'Accept Offer'}
       </Button>
     </div>
   );
 }
 
 // Order Details Component
-function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSendMessage, onMarkPaid, onReleaseFunds, onCreateDispute, sendingMessage }: { 
-  order: any; 
-  messages: any[]; 
-  chatMessage: string; 
+function OrderDetails({
+  order,
+  messages = [],
+  chatMessage,
+  setChatMessage,
+  onSendMessage,
+  onMarkPaid,
+  onReleaseFunds,
+  onCreateDispute,
+  sendingMessage,
+}: {
+  order: any;
+  messages: any[];
+  chatMessage: string;
   setChatMessage: (msg: string) => void;
   onSendMessage: () => void;
   onMarkPaid: () => void;
@@ -766,7 +891,7 @@ function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSen
   onCreateDispute: (reason: string) => void;
   sendingMessage: boolean;
 }) {
-  const [disputeReason, setDisputeReason] = useState("");
+  const [disputeReason, setDisputeReason] = useState('');
   const [showDispute, setShowDispute] = useState(false);
 
   return (
@@ -775,17 +900,24 @@ function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSen
         <ShieldCheck className="h-4 w-4" />
         <AlertDescription>
           Status: {getStatusBadge(order.status)}
-          {order.status === "escrowed" && " - Funds are securely held in escrow"}
+          {order.status === 'escrowed' && ' - Funds are securely held in escrow'}
         </AlertDescription>
       </Alert>
 
       <ScrollArea className="h-[300px] border rounded-lg p-4">
         <div className="space-y-4">
           {messages?.map((msg: any) => (
-            <div key={msg.id} className={`flex ${msg.senderId === order.buyerId ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[70%] rounded-lg p-3 ${msg.senderId === order.buyerId ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+            <div
+              key={msg.id}
+              className={`flex ${msg.senderId === order.buyerId ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[70%] rounded-lg p-3 ${msg.senderId === order.buyerId ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+              >
                 <p className="text-sm">{msg.message}</p>
-                <span className="text-xs opacity-70">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                <span className="text-xs opacity-70">
+                  {new Date(msg.createdAt).toLocaleTimeString()}
+                </span>
               </div>
             </div>
           ))}
@@ -800,7 +932,12 @@ function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSen
           onKeyPress={(e) => e.key === 'Enter' && onSendMessage()}
           data-testid="input-chat-message"
         />
-        <Button onClick={onSendMessage} disabled={!chatMessage || sendingMessage} size="icon" data-testid="button-send-message">
+        <Button
+          onClick={onSendMessage}
+          disabled={!chatMessage || sendingMessage}
+          size="icon"
+          data-testid="button-send-message"
+        >
           <Send className="h-4 w-4" />
         </Button>
       </div>
@@ -808,24 +945,24 @@ function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSen
       <Separator />
 
       <div className="space-y-2">
-        {order.status === "escrowed" && (
+        {order.status === 'escrowed' && (
           <Button onClick={onMarkPaid} className="w-full" data-testid="button-mark-paid">
             <DollarSign className="h-4 w-4 mr-2" />
             Mark as Paid
           </Button>
         )}
 
-        {order.status === "paid" && (
+        {order.status === 'paid' && (
           <Button onClick={onReleaseFunds} className="w-full" data-testid="button-release-funds">
             <CheckCircle className="h-4 w-4 mr-2" />
             Release Funds
           </Button>
         )}
 
-        {["escrowed", "paid"].includes(order.status) && (
-          <Button 
-            variant="destructive" 
-            onClick={() => setShowDispute(true)} 
+        {['escrowed', 'paid'].includes(order.status) && (
+          <Button
+            variant="destructive"
+            onClick={() => setShowDispute(true)}
             className="w-full"
             data-testid="button-open-dispute"
           >
@@ -843,11 +980,11 @@ function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSen
             placeholder="Describe the issue in detail..."
             data-testid="textarea-dispute-reason"
           />
-          <Button 
+          <Button
             onClick={() => {
               onCreateDispute(disputeReason);
               setShowDispute(false);
-              setDisputeReason("");
+              setDisputeReason('');
             }}
             disabled={disputeReason.length < 10}
             className="w-full"
@@ -863,13 +1000,13 @@ function OrderDetails({ order, messages = [], chatMessage, setChatMessage, onSen
 
 function getStatusBadge(status: string) {
   const variants: Record<string, string> = {
-    created: "default",
-    escrowed: "secondary",
-    paid: "outline",
-    released: "default",
-    disputed: "destructive",
-    cancelled: "destructive",
-    completed: "default",
+    created: 'default',
+    escrowed: 'secondary',
+    paid: 'outline',
+    released: 'default',
+    disputed: 'destructive',
+    cancelled: 'destructive',
+    completed: 'default',
   };
 
   const icons: Record<string, any> = {

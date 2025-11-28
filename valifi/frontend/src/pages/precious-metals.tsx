@@ -1,31 +1,52 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { 
-  Coins, 
-  TrendingUp, 
-  Vault, 
-  Truck, 
-  ShieldCheck, 
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import {
+  Coins,
+  TrendingUp,
+  Vault,
+  Truck,
+  ShieldCheck,
   Loader2,
   ShoppingCart,
   Award,
   Package,
   Bitcoin,
-  Sparkles
-} from "lucide-react";
-import { useState, useEffect } from "react";
+  Sparkles,
+} from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface MetalPrice {
   symbol: string;
@@ -63,18 +84,18 @@ interface MetalOwnership {
 }
 
 const purchaseSchema = z.object({
-  productId: z.string().min(1, "Please select a product"),
-  quantity: z.coerce.number().int().positive("Quantity must be positive"),
-  location: z.enum(["vault", "delivery_pending"]),
+  productId: z.string().min(1, 'Please select a product'),
+  quantity: z.coerce.number().int().positive('Quantity must be positive'),
+  location: z.enum(['vault', 'delivery_pending']),
   deliveryAddress: z.string().optional(),
-  cryptoPaymentTx: z.string().min(1, "Crypto transaction hash is required"),
+  cryptoPaymentTx: z.string().min(1, 'Crypto transaction hash is required'),
 });
 
 type PurchaseForm = z.infer<typeof purchaseSchema>;
 
 const deliverySchema = z.object({
   ownershipId: z.string(),
-  deliveryAddress: z.string().min(10, "Please provide a valid delivery address"),
+  deliveryAddress: z.string().min(10, 'Please provide a valid delivery address'),
 });
 
 type DeliveryForm = z.infer<typeof deliverySchema>;
@@ -98,16 +119,16 @@ export default function PreciousMetalsPage() {
           }
           return null;
         });
-        
+
         const results = await Promise.all(pricePromises);
         const prices: Record<string, MetalPrice> = {};
-        results.forEach(result => {
+        results.forEach((result) => {
           if (result) prices[result.metal] = result.data;
         });
-        
+
         setMetalPrices(prices);
       } catch (error) {
-        console.error("Error fetching metal prices:", error);
+        console.error('Error fetching metal prices:', error);
       }
     };
 
@@ -117,49 +138,49 @@ export default function PreciousMetalsPage() {
   }, []);
 
   const { data: products, isLoading: productsLoading } = useQuery<MetalProduct[]>({
-    queryKey: ["/api/metals/products"],
+    queryKey: ['/api/metals/products'],
   });
 
   const { data: ownership, isLoading: ownershipLoading } = useQuery<MetalOwnership[]>({
-    queryKey: ["/api/metals/ownership"],
+    queryKey: ['/api/metals/ownership'],
   });
 
   const form = useForm<PurchaseForm>({
     resolver: zodResolver(purchaseSchema),
     defaultValues: {
-      productId: "",
+      productId: '',
       quantity: 1,
-      location: "vault",
-      deliveryAddress: "",
-      cryptoPaymentTx: "",
+      location: 'vault',
+      deliveryAddress: '',
+      cryptoPaymentTx: '',
     },
   });
 
   const deliveryForm = useForm<DeliveryForm>({
     resolver: zodResolver(deliverySchema),
     defaultValues: {
-      ownershipId: "",
-      deliveryAddress: "",
+      ownershipId: '',
+      deliveryAddress: '',
     },
   });
 
   const purchaseMutation = useMutation({
     mutationFn: async (data: PurchaseForm) => {
-      return apiRequest("POST", "/api/metals/purchase", data);
+      return apiRequest('POST', '/api/metals/purchase', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/metals/ownership"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/metals/ownership'] });
       toast({
-        title: "Purchase Successful",
-        description: "Your precious metal has been secured",
+        title: 'Purchase Successful',
+        description: 'Your precious metal has been secured',
       });
       setDialogOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "Purchase Failed",
+        variant: 'destructive',
+        title: 'Purchase Failed',
         description: error.message,
       });
     },
@@ -167,21 +188,21 @@ export default function PreciousMetalsPage() {
 
   const deliveryMutation = useMutation({
     mutationFn: async (data: DeliveryForm) => {
-      return apiRequest("POST", "/api/metals/delivery", data);
+      return apiRequest('POST', '/api/metals/delivery', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/metals/ownership"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/metals/ownership'] });
       toast({
-        title: "Delivery Requested",
-        description: "Your delivery request has been submitted",
+        title: 'Delivery Requested',
+        description: 'Your delivery request has been submitted',
       });
       setDeliveryDialogOpen(false);
       deliveryForm.reset();
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "Delivery Request Failed",
+        variant: 'destructive',
+        title: 'Delivery Request Failed',
         description: error.message,
       });
     },
@@ -191,18 +212,19 @@ export default function PreciousMetalsPage() {
     if (!product) return 0;
     const metalPrice = metalPrices[product.metal.toLowerCase()];
     if (!metalPrice) return 0;
-    const premiumMultiplier = 1 + (Number(product.premium) / 100);
+    const premiumMultiplier = 1 + Number(product.premium) / 100;
     return metalPrice.price * premiumMultiplier * Number(product.weight);
   };
 
-  const selectedProduct = products?.find(p => p.id === form.watch("productId"));
-  const totalPrice = calculatePrice(selectedProduct) * (form.watch("quantity") || 1);
+  const selectedProduct = products?.find((p) => p.id === form.watch('productId'));
+  const totalPrice = calculatePrice(selectedProduct) * (form.watch('quantity') || 1);
 
-  const totalHoldings = ownership?.reduce((sum, o) => {
-    const product = products?.find(p => p.id === o.productId);
-    const weight = Number(product?.weight || 0) * o.quantity;
-    return sum + weight;
-  }, 0) || 0;
+  const totalHoldings =
+    ownership?.reduce((sum, o) => {
+      const product = products?.find((p) => p.id === o.productId);
+      const weight = Number(product?.weight || 0) * o.quantity;
+      return sum + weight;
+    }, 0) || 0;
 
   const totalValue = ownership?.reduce((sum, o) => sum + Number(o.purchasePrice || 0), 0) || 0;
 
@@ -233,7 +255,10 @@ export default function PreciousMetalsPage() {
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((data) => purchaseMutation.mutate(data))} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit((data) => purchaseMutation.mutate(data))}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="productId"
@@ -267,12 +292,7 @@ export default function PreciousMetalsPage() {
                       <FormItem>
                         <FormLabel>Quantity</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            min="1"
-                            {...field}
-                            data-testid="input-quantity"
-                          />
+                          <Input type="number" min="1" {...field} data-testid="input-quantity" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -302,7 +322,7 @@ export default function PreciousMetalsPage() {
                   />
                 </div>
 
-                {form.watch("location") === "delivery_pending" && (
+                {form.watch('location') === 'delivery_pending' && (
                   <FormField
                     control={form.control}
                     name="deliveryAddress"
@@ -329,11 +349,7 @@ export default function PreciousMetalsPage() {
                     <FormItem>
                       <FormLabel>Crypto Payment Transaction Hash</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="0x..."
-                          {...field}
-                          data-testid="input-crypto-tx"
-                        />
+                        <Input placeholder="0x..." {...field} data-testid="input-crypto-tx" />
                       </FormControl>
                       <FormDescription>
                         Complete crypto payment first and paste transaction hash here
@@ -347,7 +363,12 @@ export default function PreciousMetalsPage() {
                   <div className="p-4 bg-muted rounded-lg space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Spot Price ({selectedProduct.metal}):</span>
-                      <span className="font-mono">${metalPrices[selectedProduct.metal.toLowerCase()]?.price.toFixed(2) || '...'}/oz</span>
+                      <span className="font-mono">
+                        $
+                        {metalPrices[selectedProduct.metal.toLowerCase()]?.price.toFixed(2) ||
+                          '...'}
+                        /oz
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Premium:</span>
@@ -355,7 +376,9 @@ export default function PreciousMetalsPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Price per Item:</span>
-                      <span className="font-mono">${calculatePrice(selectedProduct).toFixed(2)}</span>
+                      <span className="font-mono">
+                        ${calculatePrice(selectedProduct).toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between font-bold border-t pt-2">
                       <span>Total:</span>
@@ -395,8 +418,9 @@ export default function PreciousMetalsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center justify-between">
                 <span className="capitalize">{metal}</span>
-                <Badge variant={data.changePercent >= 0 ? "default" : "destructive"}>
-                  {data.changePercent >= 0 ? '+' : ''}{data.changePercent.toFixed(2)}%
+                <Badge variant={data.changePercent >= 0 ? 'default' : 'destructive'}>
+                  {data.changePercent >= 0 ? '+' : ''}
+                  {data.changePercent.toFixed(2)}%
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -431,7 +455,10 @@ export default function PreciousMetalsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold covenant-gradient-text" data-testid="text-total-value">
+            <div
+              className="text-2xl font-bold covenant-gradient-text"
+              data-testid="text-total-value"
+            >
               ${totalValue.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Purchase value</p>
@@ -454,8 +481,12 @@ export default function PreciousMetalsPage() {
 
       <Tabs defaultValue="products" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="products" data-testid="tab-products">Product Catalog</TabsTrigger>
-          <TabsTrigger value="ownership" data-testid="tab-ownership">My Holdings</TabsTrigger>
+          <TabsTrigger value="products" data-testid="tab-products">
+            Product Catalog
+          </TabsTrigger>
+          <TabsTrigger value="ownership" data-testid="tab-ownership">
+            My Holdings
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-4">
@@ -479,12 +510,19 @@ export default function PreciousMetalsPage() {
                 const price = calculatePrice(product);
                 const metalPrice = metalPrices[product.metal.toLowerCase()];
                 return (
-                  <Card key={product.id} className="hover-elevate" data-testid={`card-product-${product.id}`}>
+                  <Card
+                    key={product.id}
+                    className="hover-elevate"
+                    data-testid={`card-product-${product.id}`}
+                  >
                     <CardHeader>
-                      <CardTitle className="flex items-center justify-between" data-testid={`text-product-name-${product.id}`}>
+                      <CardTitle
+                        className="flex items-center justify-between"
+                        data-testid={`text-product-name-${product.id}`}
+                      >
                         <span>{product.productName}</span>
-                        <Badge variant={product.inStock ? "default" : "secondary"}>
-                          {product.inStock ? "In Stock" : "Out of Stock"}
+                        <Badge variant={product.inStock ? 'default' : 'secondary'}>
+                          {product.inStock ? 'In Stock' : 'Out of Stock'}
                         </Badge>
                       </CardTitle>
                       <CardDescription>{product.description}</CardDescription>
@@ -510,7 +548,10 @@ export default function PreciousMetalsPage() {
                       </div>
                       <div className="p-3 bg-muted rounded-lg">
                         <p className="text-xs text-muted-foreground mb-1">Price (incl. premium)</p>
-                        <p className="text-xl font-bold covenant-gradient-text" data-testid={`text-product-price-${product.id}`}>
+                        <p
+                          className="text-xl font-bold covenant-gradient-text"
+                          data-testid={`text-product-price-${product.id}`}
+                        >
                           ${price.toFixed(2)}
                         </p>
                         {metalPrice && (
@@ -540,27 +581,48 @@ export default function PreciousMetalsPage() {
               <CardContent className="p-12 text-center">
                 <ShieldCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">No metals owned yet</p>
-                <p className="text-xs text-muted-foreground mt-1">Purchase your first precious metal to start building your portfolio</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Purchase your first precious metal to start building your portfolio
+                </p>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-3">
               {ownership.map((item) => {
-                const product = products?.find(p => p.id === item.productId);
+                const product = products?.find((p) => p.id === item.productId);
                 const totalWeight = Number(product?.weight || 0) * item.quantity;
                 return (
-                  <Card key={item.id} className="hover-elevate" data-testid={`card-ownership-${item.id}`}>
+                  <Card
+                    key={item.id}
+                    className="hover-elevate"
+                    data-testid={`card-ownership-${item.id}`}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold" data-testid={`text-ownership-product-${item.id}`}>
+                            <h3
+                              className="font-semibold"
+                              data-testid={`text-ownership-product-${item.id}`}
+                            >
                               {product?.productName}
                             </h3>
                             <Badge variant="outline">
-                              {item.location === 'vault' && <><Vault className="h-3 w-3 mr-1" /> Vault</>}
-                              {item.location === 'delivery_pending' && <><Truck className="h-3 w-3 mr-1" /> Delivery Pending</>}
-                              {item.location === 'delivered' && <><ShieldCheck className="h-3 w-3 mr-1" /> Delivered</>}
+                              {item.location === 'vault' && (
+                                <>
+                                  <Vault className="h-3 w-3 mr-1" /> Vault
+                                </>
+                              )}
+                              {item.location === 'delivery_pending' && (
+                                <>
+                                  <Truck className="h-3 w-3 mr-1" /> Delivery Pending
+                                </>
+                              )}
+                              {item.location === 'delivered' && (
+                                <>
+                                  <ShieldCheck className="h-3 w-3 mr-1" /> Delivered
+                                </>
+                              )}
                             </Badge>
                           </div>
                           <div className="grid grid-cols-3 gap-4 text-sm mb-3">
@@ -578,7 +640,10 @@ export default function PreciousMetalsPage() {
                             </div>
                           </div>
                           {item.cryptoPaymentTx && (
-                            <p className="text-xs text-muted-foreground truncate" data-testid={`text-tx-${item.id}`}>
+                            <p
+                              className="text-xs text-muted-foreground truncate"
+                              data-testid={`text-tx-${item.id}`}
+                            >
                               <Bitcoin className="h-3 w-3 inline mr-1" />
                               Tx: {item.cryptoPaymentTx}
                             </p>
@@ -596,7 +661,7 @@ export default function PreciousMetalsPage() {
                             variant="outline"
                             onClick={() => {
                               setSelectedOwnership(item);
-                              deliveryForm.setValue("ownershipId", item.id);
+                              deliveryForm.setValue('ownershipId', item.id);
                               setDeliveryDialogOpen(true);
                             }}
                             data-testid={`button-request-delivery-${item.id}`}
@@ -625,7 +690,10 @@ export default function PreciousMetalsPage() {
             </DialogDescription>
           </DialogHeader>
           <Form {...deliveryForm}>
-            <form onSubmit={deliveryForm.handleSubmit((data) => deliveryMutation.mutate(data))} className="space-y-4">
+            <form
+              onSubmit={deliveryForm.handleSubmit((data) => deliveryMutation.mutate(data))}
+              className="space-y-4"
+            >
               <FormField
                 control={deliveryForm.control}
                 name="deliveryAddress"

@@ -1,14 +1,34 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, DollarSign, PiggyBank, Building2, BarChart3, Bitcoin, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
-import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  TrendingUp,
+  DollarSign,
+  PiggyBank,
+  Building2,
+  BarChart3,
+  Bitcoin,
+  ArrowUpRight,
+  ArrowDownRight,
+  Activity,
+} from 'lucide-react';
+import { Link } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 interface MarketData {
   symbol: string;
@@ -25,16 +45,16 @@ export default function FinancialServices() {
   // Initialize WebSocket for real-time updates
   useEffect(() => {
     const newSocket = io();
-    newSocket.on("connect", () => {
-      console.log("Connected to WebSocket");
-      newSocket.emit("subscribe:trading");
+    newSocket.on('connect', () => {
+      console.log('Connected to WebSocket');
+      newSocket.emit('subscribe:trading');
     });
 
-    newSocket.on("trading:event", (event: any) => {
-      if (event.type === "pnl_update" && event.data?.marketData) {
-        setPriceUpdates(prev => ({
+    newSocket.on('trading:event', (event: any) => {
+      if (event.type === 'pnl_update' && event.data?.marketData) {
+        setPriceUpdates((prev) => ({
           ...prev,
-          [event.data.marketData.symbol]: event.data.marketData
+          [event.data.marketData.symbol]: event.data.marketData,
         }));
       }
     });
@@ -131,7 +151,13 @@ export default function FinancialServices() {
     return value >= 0 ? `+${formatted}%` : `${formatted}%`;
   };
 
-  const PriceChangeIndicator = ({ change, changePercent }: { change: number; changePercent: number }) => {
+  const PriceChangeIndicator = ({
+    change,
+    changePercent,
+  }: {
+    change: number;
+    changePercent: number;
+  }) => {
     const isPositive = change >= 0;
     return (
       <div className={`flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
@@ -150,7 +176,11 @@ export default function FinancialServices() {
               Traditional finance bots: 401k, IRA, Stocks, Bonds, Forex, and more
             </p>
           </div>
-          <Badge variant="default" className="flex items-center gap-1" data-testid="badge-services-count">
+          <Badge
+            variant="default"
+            className="flex items-center gap-1"
+            data-testid="badge-services-count"
+          >
             <BarChart3 className="h-3 w-3" />
             13 Services
           </Badge>
@@ -160,10 +190,18 @@ export default function FinancialServices() {
       <div className="flex-1 overflow-auto p-6">
         <Tabs defaultValue="retirement" className="space-y-4" data-testid="tabs-financial">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="retirement" data-testid="tab-retirement">Retirement</TabsTrigger>
-            <TabsTrigger value="trading" data-testid="tab-trading">Trading</TabsTrigger>
-            <TabsTrigger value="investments" data-testid="tab-investments">Investments</TabsTrigger>
-            <TabsTrigger value="derivatives" data-testid="tab-derivatives">Derivatives</TabsTrigger>
+            <TabsTrigger value="retirement" data-testid="tab-retirement">
+              Retirement
+            </TabsTrigger>
+            <TabsTrigger value="trading" data-testid="tab-trading">
+              Trading
+            </TabsTrigger>
+            <TabsTrigger value="investments" data-testid="tab-investments">
+              Investments
+            </TabsTrigger>
+            <TabsTrigger value="derivatives" data-testid="tab-derivatives">
+              Derivatives
+            </TabsTrigger>
           </TabsList>
 
           {/* Retirement Accounts */}
@@ -177,7 +215,9 @@ export default function FinancialServices() {
                       <PiggyBank className="h-4 w-4 text-primary" />
                       401k Manager
                     </CardTitle>
-                    <Badge variant="default" data-testid="badge-401k-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-401k-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Retirement account management</CardDescription>
                 </CardHeader>
@@ -185,7 +225,9 @@ export default function FinancialServices() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Balance</span>
-                      <span className="font-semibold" data-testid="text-401k-balance">$0.00</span>
+                      <span className="font-semibold" data-testid="text-401k-balance">
+                        $0.00
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Contribution Rate</span>
@@ -208,7 +250,9 @@ export default function FinancialServices() {
                       <Building2 className="h-4 w-4 text-primary" />
                       IRA Account
                     </CardTitle>
-                    <Badge variant="default" data-testid="badge-ira-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-ira-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Individual retirement account</CardDescription>
                 </CardHeader>
@@ -239,7 +283,9 @@ export default function FinancialServices() {
                       <DollarSign className="h-4 w-4 text-primary" />
                       Pension Fund
                     </CardTitle>
-                    <Badge variant="default" data-testid="badge-pension-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-pension-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Pension benefit management</CardDescription>
                 </CardHeader>
@@ -277,15 +323,24 @@ export default function FinancialServices() {
               <CardContent>
                 {stocksLoading ? (
                   <div className="flex gap-4 overflow-x-auto">
-                    {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-12 w-32 flex-shrink-0" />)}
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Skeleton key={i} className="h-12 w-32 flex-shrink-0" />
+                    ))}
                   </div>
                 ) : (
                   <div className="flex gap-4 overflow-x-auto pb-2">
-                    {stocksData?.map(stock => (
-                      <div key={stock.symbol} className="flex-shrink-0 bg-muted/50 rounded-lg p-3 min-w-[140px]" data-testid={`ticker-${stock.symbol.toLowerCase()}`}>
+                    {stocksData?.map((stock) => (
+                      <div
+                        key={stock.symbol}
+                        className="flex-shrink-0 bg-muted/50 rounded-lg p-3 min-w-[140px]"
+                        data-testid={`ticker-${stock.symbol.toLowerCase()}`}
+                      >
                         <div className="text-xs text-muted-foreground">{stock.symbol}</div>
                         <div className="text-lg font-bold">{formatCurrency(stock.price)}</div>
-                        <PriceChangeIndicator change={stock.change} changePercent={stock.changePercent} />
+                        <PriceChangeIndicator
+                          change={stock.change}
+                          changePercent={stock.changePercent}
+                        />
                       </div>
                     ))}
                   </div>
@@ -323,26 +378,38 @@ export default function FinancialServices() {
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">SPY Price</span>
                         <span className="font-semibold" data-testid="text-stocks-value">
-                          {formatCurrency(stocksData.find(s => s.symbol === 'SPY')?.price || 0)}
+                          {formatCurrency(stocksData.find((s) => s.symbol === 'SPY')?.price || 0)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm items-center">
                         <span className="text-muted-foreground">Day Change</span>
-                        <PriceChangeIndicator 
-                          change={stocksData.find(s => s.symbol === 'SPY')?.change || 0} 
-                          changePercent={stocksData.find(s => s.symbol === 'SPY')?.changePercent || 0} 
+                        <PriceChangeIndicator
+                          change={stocksData.find((s) => s.symbol === 'SPY')?.change || 0}
+                          changePercent={
+                            stocksData.find((s) => s.symbol === 'SPY')?.changePercent || 0
+                          }
                         />
                       </div>
                       <div className="h-24 mt-2">
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={generateChartData(stocksData.find(s => s.symbol === 'SPY')?.price || 0)}>
+                          <AreaChart
+                            data={generateChartData(
+                              stocksData.find((s) => s.symbol === 'SPY')?.price || 0
+                            )}
+                          >
                             <defs>
                               <linearGradient id="stockGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                               </linearGradient>
                             </defs>
-                            <Area type="monotone" dataKey="price" stroke="#22c55e" fillOpacity={1} fill="url(#stockGradient)" />
+                            <Area
+                              type="monotone"
+                              dataKey="price"
+                              stroke="#22c55e"
+                              fillOpacity={1}
+                              fill="url(#stockGradient)"
+                            />
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>
@@ -383,20 +450,33 @@ export default function FinancialServices() {
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">EUR/USD</span>
                         <span className="font-semibold" data-testid="text-forex-pairs">
-                          {forexData.find(f => f.symbol === 'EUR/USD')?.price.toFixed(4) || '0.0000'}
+                          {forexData.find((f) => f.symbol === 'EUR/USD')?.price.toFixed(4) ||
+                            '0.0000'}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm items-center">
                         <span className="text-muted-foreground">24h Change</span>
-                        <PriceChangeIndicator 
-                          change={forexData.find(f => f.symbol === 'EUR/USD')?.change || 0} 
-                          changePercent={forexData.find(f => f.symbol === 'EUR/USD')?.changePercent || 0} 
+                        <PriceChangeIndicator
+                          change={forexData.find((f) => f.symbol === 'EUR/USD')?.change || 0}
+                          changePercent={
+                            forexData.find((f) => f.symbol === 'EUR/USD')?.changePercent || 0
+                          }
                         />
                       </div>
                       <div className="h-24 mt-2">
                         <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={generateChartData(forexData.find(f => f.symbol === 'EUR/USD')?.price || 1)}>
-                            <Line type="monotone" dataKey="price" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                          <LineChart
+                            data={generateChartData(
+                              forexData.find((f) => f.symbol === 'EUR/USD')?.price || 1
+                            )}
+                          >
+                            <Line
+                              type="monotone"
+                              dataKey="price"
+                              stroke="#3b82f6"
+                              strokeWidth={2}
+                              dot={false}
+                            />
                           </LineChart>
                         </ResponsiveContainer>
                       </div>
@@ -416,7 +496,9 @@ export default function FinancialServices() {
                       <BarChart3 className="h-4 w-4 text-primary" />
                       Options Trading
                     </CardTitle>
-                    <Badge variant="default" data-testid="badge-options-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-options-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Options strategies & Greeks</CardDescription>
                 </CardHeader>
@@ -449,10 +531,14 @@ export default function FinancialServices() {
                   <CardTitle className="text-sm">Bonds</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold" data-testid="text-bonds-value">$0.00</p>
+                  <p className="text-2xl font-bold" data-testid="text-bonds-value">
+                    $0.00
+                  </p>
                   <p className="text-xs text-muted-foreground">Portfolio value</p>
                   <Link href="/trading">
-                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-bonds">Manage</Button>
+                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-bonds">
+                      Manage
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -462,10 +548,14 @@ export default function FinancialServices() {
                   <CardTitle className="text-sm">REITs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold" data-testid="text-reit-value">$0.00</p>
+                  <p className="text-2xl font-bold" data-testid="text-reit-value">
+                    $0.00
+                  </p>
                   <p className="text-xs text-muted-foreground">Real estate trusts</p>
                   <Link href="/trading">
-                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-reit">Manage</Button>
+                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-reit">
+                      Manage
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -475,10 +565,14 @@ export default function FinancialServices() {
                   <CardTitle className="text-sm">Mutual Funds</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold" data-testid="text-funds-value">$0.00</p>
+                  <p className="text-2xl font-bold" data-testid="text-funds-value">
+                    $0.00
+                  </p>
                   <p className="text-xs text-muted-foreground">Fund holdings</p>
                   <Link href="/trading">
-                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-funds">Manage</Button>
+                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-funds">
+                      Manage
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -488,10 +582,18 @@ export default function FinancialServices() {
                   <CardTitle className="text-sm">Commodities</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold" data-testid="text-commodities-value">$0.00</p>
+                  <p className="text-2xl font-bold" data-testid="text-commodities-value">
+                    $0.00
+                  </p>
                   <p className="text-xs text-muted-foreground">Futures & physical</p>
                   <Link href="/metals">
-                    <Button size="sm" className="w-full mt-3" data-testid="button-manage-commodities">Manage</Button>
+                    <Button
+                      size="sm"
+                      className="w-full mt-3"
+                      data-testid="button-manage-commodities"
+                    >
+                      Manage
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -508,7 +610,9 @@ export default function FinancialServices() {
                       <Bitcoin className="h-4 w-4 text-primary" />
                       Crypto Derivatives
                     </CardTitle>
-                    <Badge variant="default" data-testid="badge-crypto-deriv-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-crypto-deriv-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Perpetuals & crypto futures</CardDescription>
                 </CardHeader>
@@ -523,7 +627,11 @@ export default function FinancialServices() {
                       <span data-testid="text-crypto-deriv-pnl">$0.00</span>
                     </div>
                     <Link href="/exchange">
-                      <Button size="sm" className="w-full mt-2" data-testid="button-trade-crypto-deriv">
+                      <Button
+                        size="sm"
+                        className="w-full mt-2"
+                        data-testid="button-trade-crypto-deriv"
+                      >
                         Trade Perpetuals
                       </Button>
                     </Link>
@@ -535,7 +643,9 @@ export default function FinancialServices() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-2">
                     <CardTitle className="text-base">Precious Metals</CardTitle>
-                    <Badge variant="default" data-testid="badge-metals-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-metals-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Gold, Silver, Platinum</CardDescription>
                 </CardHeader>
@@ -562,7 +672,9 @@ export default function FinancialServices() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-2">
                     <CardTitle className="text-base">Portfolio Manager</CardTitle>
-                    <Badge variant="default" data-testid="badge-portfolio-status">Active</Badge>
+                    <Badge variant="default" data-testid="badge-portfolio-status">
+                      Active
+                    </Badge>
                   </div>
                   <CardDescription>Cross-asset rebalancing</CardDescription>
                 </CardHeader>
@@ -570,14 +682,20 @@ export default function FinancialServices() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Total AUM</span>
-                      <span className="font-semibold" data-testid="text-portfolio-aum">$0.00</span>
+                      <span className="font-semibold" data-testid="text-portfolio-aum">
+                        $0.00
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Sharpe Ratio</span>
                       <span data-testid="text-portfolio-sharpe">0.00</span>
                     </div>
                     <Link href="/analytics-intelligence">
-                      <Button size="sm" className="w-full mt-2" data-testid="button-manage-portfolio">
+                      <Button
+                        size="sm"
+                        className="w-full mt-2"
+                        data-testid="button-manage-portfolio"
+                      >
                         Rebalance
                       </Button>
                     </Link>

@@ -1,43 +1,63 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { type payments, type cryptoPayments, insertCryptoPaymentSchema } from "@shared/schema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { 
-  CreditCard, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
-  DollarSign, 
-  Bitcoin, 
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { type payments, type cryptoPayments, insertCryptoPaymentSchema } from '@shared/schema';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  CreditCard,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Bitcoin,
   Wallet,
   ExternalLink,
   QrCode,
-  Copy
-} from "lucide-react";
-import { SiStripe, SiPaypal } from "react-icons/si";
-import { useState } from "react";
+  Copy,
+} from 'lucide-react';
+import { SiStripe, SiPaypal } from 'react-icons/si';
+import { useState } from 'react';
 
 type SelectPayment = typeof payments.$inferSelect;
 type SelectCryptoPayment = typeof cryptoPayments.$inferSelect;
 
 const cryptoPaymentFormSchema = z.object({
-  processor: z.enum(["bitpay", "binance_pay", "bybit", "kucoin", "luno"]),
-  amount: z.string().min(1, "Amount is required"),
-  currency: z.string().min(1, "Currency is required"),
+  processor: z.enum(['bitpay', 'binance_pay', 'bybit', 'kucoin', 'luno']),
+  amount: z.string().min(1, 'Amount is required'),
+  currency: z.string().min(1, 'Currency is required'),
 });
 
 type CryptoPaymentForm = z.infer<typeof cryptoPaymentFormSchema>;
@@ -48,42 +68,54 @@ export default function PaymentsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
 
-  const { data: fiatPayments, isLoading: loadingFiat, isError: errorFiat, error: fiatError, refetch: refetchFiat } = useQuery<SelectPayment[]>({
-    queryKey: ["/api/payments"],
+  const {
+    data: fiatPayments,
+    isLoading: loadingFiat,
+    isError: errorFiat,
+    error: fiatError,
+    refetch: refetchFiat,
+  } = useQuery<SelectPayment[]>({
+    queryKey: ['/api/payments'],
   });
 
-  const { data: cryptoPayments, isLoading: loadingCrypto, isError: errorCrypto, error: cryptoError, refetch: refetchCrypto } = useQuery<SelectCryptoPayment[]>({
-    queryKey: ["/api/crypto-payments"],
+  const {
+    data: cryptoPayments,
+    isLoading: loadingCrypto,
+    isError: errorCrypto,
+    error: cryptoError,
+    refetch: refetchCrypto,
+  } = useQuery<SelectCryptoPayment[]>({
+    queryKey: ['/api/crypto-payments'],
   });
 
   const form = useForm<CryptoPaymentForm>({
     resolver: zodResolver(cryptoPaymentFormSchema),
     defaultValues: {
-      processor: "bitpay",
-      amount: "",
-      currency: "BTC",
+      processor: 'bitpay',
+      amount: '',
+      currency: 'BTC',
     },
   });
 
   const createCryptoPaymentMutation = useMutation({
     mutationFn: async (data: CryptoPaymentForm) => {
-      const res = await apiRequest("POST", "/api/crypto-payments/create", data);
+      const res = await apiRequest('POST', '/api/crypto-payments/create', data);
       return await res.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crypto-payments"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/crypto-payments'] });
       setSelectedInvoice(data.invoice);
       form.reset();
       toast({
-        title: "Crypto payment created",
-        description: "Your crypto payment invoice has been generated.",
+        title: 'Crypto payment created',
+        description: 'Your crypto payment invoice has been generated.',
       });
     },
     onError: (error: any) => {
       toast({
-        variant: "destructive",
-        title: "Payment creation failed",
-        description: error.message || "Failed to create crypto payment",
+        variant: 'destructive',
+        title: 'Payment creation failed',
+        description: error.message || 'Failed to create crypto payment',
       });
     },
   });
@@ -94,34 +126,34 @@ export default function PaymentsPage() {
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status.toLowerCase()) {
-      case "succeeded":
-      case "paid":
-      case "confirmed":
-      case "completed":
-        return "default";
-      case "pending":
-      case "new":
-        return "secondary";
-      case "failed":
-      case "expired":
-        return "destructive";
+      case 'succeeded':
+      case 'paid':
+      case 'confirmed':
+      case 'completed':
+        return 'default';
+      case 'pending':
+      case 'new':
+        return 'secondary';
+      case 'failed':
+      case 'expired':
+        return 'destructive';
       default:
-        return "outline";
+        return 'outline';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case "succeeded":
-      case "paid":
-      case "confirmed":
-      case "completed":
+      case 'succeeded':
+      case 'paid':
+      case 'confirmed':
+      case 'completed':
         return <CheckCircle className="h-4 w-4" />;
-      case "pending":
-      case "new":
+      case 'pending':
+      case 'new':
         return <Clock className="h-4 w-4" />;
-      case "failed":
-      case "expired":
+      case 'failed':
+      case 'expired':
         return <AlertCircle className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
@@ -131,7 +163,7 @@ export default function PaymentsPage() {
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied to clipboard",
+      title: 'Copied to clipboard',
       description: `${label} copied successfully`,
     });
   };
@@ -152,7 +184,10 @@ export default function PaymentsPage() {
       <div className="p-6 border-b">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3" data-testid="heading-payments">
+            <h1
+              className="text-3xl font-bold flex items-center gap-3"
+              data-testid="heading-payments"
+            >
               <CreditCard className="h-8 w-8 text-primary" />
               Payments & Transactions
             </h1>
@@ -170,9 +205,7 @@ export default function PaymentsPage() {
             <DialogContent data-testid="dialog-create-crypto">
               <DialogHeader>
                 <DialogTitle>Create Crypto Payment</DialogTitle>
-                <DialogDescription>
-                  Generate a cryptocurrency payment invoice
-                </DialogDescription>
+                <DialogDescription>Generate a cryptocurrency payment invoice</DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -207,7 +240,13 @@ export default function PaymentsPage() {
                       <FormItem>
                         <FormLabel>Amount (USD)</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" placeholder="100.00" {...field} data-testid="input-amount" />
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="100.00"
+                            {...field}
+                            data-testid="input-amount"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -242,7 +281,7 @@ export default function PaymentsPage() {
                     disabled={createCryptoPaymentMutation.isPending}
                     data-testid="button-submit-crypto"
                   >
-                    {createCryptoPaymentMutation.isPending ? "Creating..." : "Create Payment"}
+                    {createCryptoPaymentMutation.isPending ? 'Creating...' : 'Create Payment'}
                   </Button>
                 </form>
               </Form>
@@ -254,51 +293,74 @@ export default function PaymentsPage() {
       <div className="p-6 flex-1 overflow-auto">
         {/* Payment Processors Overview */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4" data-testid="heading-processors">Payment Processors</h2>
+          <h2 className="text-xl font-semibold mb-4" data-testid="heading-processors">
+            Payment Processors
+          </h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Fiat Processors */}
             <Card className="hover-elevate" data-testid="card-processor-stripe">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-stripe">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-stripe"
+                  >
                     <SiStripe className="h-5 w-5" />
                     Stripe
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-stripe">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-stripe">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-stripe">Cards, ACH, Bank Transfers</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-stripe">
+                  Cards, ACH, Bank Transfers
+                </p>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate" data-testid="card-processor-paypal">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-paypal">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-paypal"
+                  >
                     <SiPaypal className="h-5 w-5" />
                     PayPal
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-paypal">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-paypal">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-paypal">PayPal, Venmo, Credit Cards</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-paypal">
+                  PayPal, Venmo, Credit Cards
+                </p>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate" data-testid="card-processor-plaid">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-plaid">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-plaid"
+                  >
                     <Wallet className="h-5 w-5" />
                     Plaid
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-plaid">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-plaid">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-plaid">Bank Account Linking, ACH</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-plaid">
+                  Bank Account Linking, ACH
+                </p>
               </CardContent>
             </Card>
 
@@ -306,75 +368,110 @@ export default function PaymentsPage() {
             <Card className="hover-elevate" data-testid="card-processor-bitpay">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-bitpay">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-bitpay"
+                  >
                     <Bitcoin className="h-5 w-5" />
                     BitPay
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-bitpay">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-bitpay">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-bitpay">BTC, BCH, ETH, USDC, more</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-bitpay">
+                  BTC, BCH, ETH, USDC, more
+                </p>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate" data-testid="card-processor-binance">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-binance">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-binance"
+                  >
                     <Bitcoin className="h-5 w-5" />
                     Binance Pay
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-binance">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-binance">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-binance">USDT, BUSD, BNB, Multi-crypto</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-binance">
+                  USDT, BUSD, BNB, Multi-crypto
+                </p>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate" data-testid="card-processor-bybit">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-bybit">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-bybit"
+                  >
                     <Bitcoin className="h-5 w-5" />
                     Bybit
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-bybit">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-bybit">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-bybit">Crypto Deposits & Withdrawals</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-bybit">
+                  Crypto Deposits & Withdrawals
+                </p>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate" data-testid="card-processor-kucoin">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-kucoin">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-kucoin"
+                  >
                     <Bitcoin className="h-5 w-4" />
                     KuCoin Pay
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-kucoin">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-kucoin">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-kucoin">Multi-chain Crypto Payments</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-kucoin">
+                  Multi-chain Crypto Payments
+                </p>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate" data-testid="card-processor-luno">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-luno">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-luno"
+                  >
                     <Bitcoin className="h-5 w-5" />
                     Luno
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-luno">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-luno">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-luno">BTC, ETH, XRP, LTC, more</p>
+                <p className="text-sm text-muted-foreground" data-testid="text-description-luno">
+                  BTC, ETH, XRP, LTC, more
+                </p>
               </CardContent>
             </Card>
 
@@ -382,15 +479,25 @@ export default function PaymentsPage() {
             <Card className="hover-elevate" data-testid="card-processor-blockchain">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2" data-testid="text-processor-blockchain">
+                  <CardTitle
+                    className="text-base flex items-center gap-2"
+                    data-testid="text-processor-blockchain"
+                  >
                     <Wallet className="h-5 w-5" />
                     Direct Blockchain
                   </CardTitle>
-                  <Badge variant="default" data-testid="badge-status-blockchain">Active</Badge>
+                  <Badge variant="default" data-testid="badge-status-blockchain">
+                    Active
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground" data-testid="text-description-blockchain">ETH, MATIC, BNB, ARB, OP</p>
+                <p
+                  className="text-sm text-muted-foreground"
+                  data-testid="text-description-blockchain"
+                >
+                  ETH, MATIC, BNB, ARB, OP
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -424,8 +531,15 @@ export default function PaymentsPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   <div className="flex items-center justify-between">
-                    <span>Failed to load fiat payments: {(fiatError as any)?.message || "Unknown error"}</span>
-                    <Button variant="outline" size="sm" onClick={() => refetchFiat()} data-testid="button-retry-fiat">
+                    <span>
+                      Failed to load fiat payments: {(fiatError as any)?.message || 'Unknown error'}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => refetchFiat()}
+                      data-testid="button-retry-fiat"
+                    >
                       Retry
                     </Button>
                   </div>
@@ -446,7 +560,11 @@ export default function PaymentsPage() {
                       <div className="flex items-start justify-between">
                         <div className="space-y-2 flex-1">
                           <div className="flex items-center gap-2">
-                            <Badge variant={getStatusBadgeVariant(payment.status)} className="gap-1" data-testid={`badge-status-${payment.id}`}>
+                            <Badge
+                              variant={getStatusBadgeVariant(payment.status)}
+                              className="gap-1"
+                              data-testid={`badge-status-${payment.id}`}
+                            >
                               {getStatusIcon(payment.status)}
                               {payment.status.toUpperCase()}
                             </Badge>
@@ -458,7 +576,8 @@ export default function PaymentsPage() {
                             )}
                           </div>
                           <CardTitle className="text-lg" data-testid={`text-amount-${payment.id}`}>
-                            ${parseFloat(payment.amount).toFixed(2)} {payment.currency?.toUpperCase()}
+                            ${parseFloat(payment.amount).toFixed(2)}{' '}
+                            {payment.currency?.toUpperCase()}
                           </CardTitle>
                           {payment.description && (
                             <CardDescription data-testid={`text-description-${payment.id}`}>
@@ -470,23 +589,33 @@ export default function PaymentsPage() {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {payment.stripePaymentId && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`text-stripe-id-${payment.id}`}>
+                        <div
+                          className="flex items-center gap-2 text-sm text-muted-foreground"
+                          data-testid={`text-stripe-id-${payment.id}`}
+                        >
                           <CreditCard className="h-4 w-4" />
                           <span className="font-mono">{payment.stripePaymentId}</span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => copyToClipboard(payment.stripePaymentId as string, "Stripe ID")}
+                            onClick={() =>
+                              copyToClipboard(payment.stripePaymentId as string, 'Stripe ID')
+                            }
                             data-testid={`button-copy-stripe-${payment.id}`}
                           >
                             <Copy className="h-3 w-3" />
                           </Button>
                         </div>
                       )}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`text-created-${payment.id}`}>
+                      <div
+                        className="flex items-center gap-2 text-sm text-muted-foreground"
+                        data-testid={`text-created-${payment.id}`}
+                      >
                         <Clock className="h-4 w-4" />
-                        <span>{new Date(payment.createdAt as string | number | Date).toLocaleString()}</span>
+                        <span>
+                          {new Date(payment.createdAt as string | number | Date).toLocaleString()}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -504,9 +633,9 @@ export default function PaymentsPage() {
                     <p className="font-semibold">Payment Invoice Created</p>
                     <div className="flex flex-col gap-2">
                       {selectedInvoice.paymentUrl && (
-                        <a 
-                          href={selectedInvoice.paymentUrl} 
-                          target="_blank" 
+                        <a
+                          href={selectedInvoice.paymentUrl}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-sm hover-elevate p-2 rounded"
                           data-testid="link-payment-url"
@@ -516,9 +645,9 @@ export default function PaymentsPage() {
                         </a>
                       )}
                       {selectedInvoice.qrCode && (
-                        <a 
-                          href={selectedInvoice.qrCode} 
-                          target="_blank" 
+                        <a
+                          href={selectedInvoice.qrCode}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-sm hover-elevate p-2 rounded"
                           data-testid="link-qr-code"
@@ -528,9 +657,9 @@ export default function PaymentsPage() {
                         </a>
                       )}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setSelectedInvoice(null)}
                       data-testid="button-dismiss-invoice"
                     >
@@ -556,8 +685,16 @@ export default function PaymentsPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   <div className="flex items-center justify-between">
-                    <span>Failed to load crypto payments: {(cryptoError as any)?.message || "Unknown error"}</span>
-                    <Button variant="outline" size="sm" onClick={() => refetchCrypto()} data-testid="button-retry-crypto">
+                    <span>
+                      Failed to load crypto payments:{' '}
+                      {(cryptoError as any)?.message || 'Unknown error'}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => refetchCrypto()}
+                      data-testid="button-retry-crypto"
+                    >
                       Retry
                     </Button>
                   </div>
@@ -578,19 +715,27 @@ export default function PaymentsPage() {
                       <div className="flex items-start justify-between">
                         <div className="space-y-2 flex-1">
                           <div className="flex items-center gap-2">
-                            <Badge variant={getStatusBadgeVariant(payment.status)} className="gap-1" data-testid={`badge-crypto-status-${payment.id}`}>
+                            <Badge
+                              variant={getStatusBadgeVariant(payment.status)}
+                              className="gap-1"
+                              data-testid={`badge-crypto-status-${payment.id}`}
+                            >
                               {getStatusIcon(payment.status)}
                               {payment.status.toUpperCase()}
                             </Badge>
                             <Badge variant="outline">{payment.processor}</Badge>
                             <Badge variant="outline">{payment.currency}</Badge>
                           </div>
-                          <CardTitle className="text-lg" data-testid={`text-crypto-amount-${payment.id}`}>
+                          <CardTitle
+                            className="text-lg"
+                            data-testid={`text-crypto-amount-${payment.id}`}
+                          >
                             {parseFloat(payment.amount).toFixed(8)} {payment.currency}
                           </CardTitle>
                           {payment.fiatAmount && (
                             <CardDescription data-testid={`text-fiat-amount-${payment.id}`}>
-                              ≈ ${parseFloat(payment.fiatAmount).toFixed(2)} {payment.fiatCurrency?.toUpperCase()}
+                              ≈ ${parseFloat(payment.fiatAmount).toFixed(2)}{' '}
+                              {payment.fiatCurrency?.toUpperCase()}
                             </CardDescription>
                           )}
                         </div>
@@ -598,14 +743,19 @@ export default function PaymentsPage() {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {payment.processorInvoiceId && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`text-invoice-id-${payment.id}`}>
+                        <div
+                          className="flex items-center gap-2 text-sm text-muted-foreground"
+                          data-testid={`text-invoice-id-${payment.id}`}
+                        >
                           <Wallet className="h-4 w-4" />
                           <span className="font-mono text-xs">{payment.processorInvoiceId}</span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => copyToClipboard(payment.processorInvoiceId as string, "Invoice ID")}
+                            onClick={() =>
+                              copyToClipboard(payment.processorInvoiceId as string, 'Invoice ID')
+                            }
                             data-testid={`button-copy-invoice-${payment.id}`}
                           >
                             <Copy className="h-3 w-3" />
@@ -613,14 +763,19 @@ export default function PaymentsPage() {
                         </div>
                       )}
                       {payment.txHash && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`text-txhash-${payment.id}`}>
+                        <div
+                          className="flex items-center gap-2 text-sm text-muted-foreground"
+                          data-testid={`text-txhash-${payment.id}`}
+                        >
                           <Bitcoin className="h-4 w-4" />
                           <span className="font-mono text-xs">{payment.txHash}</span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => copyToClipboard(payment.txHash as string, "Transaction Hash")}
+                            onClick={() =>
+                              copyToClipboard(payment.txHash as string, 'Transaction Hash')
+                            }
                             data-testid={`button-copy-txhash-${payment.id}`}
                           >
                             <Copy className="h-3 w-3" />
@@ -628,9 +783,9 @@ export default function PaymentsPage() {
                         </div>
                       )}
                       {payment.paymentUrl && (
-                        <a 
-                          href={payment.paymentUrl} 
-                          target="_blank" 
+                        <a
+                          href={payment.paymentUrl}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-sm text-primary hover-elevate p-2 rounded"
                           data-testid={`link-payment-${payment.id}`}
@@ -639,9 +794,14 @@ export default function PaymentsPage() {
                           View Payment Page
                         </a>
                       )}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`text-crypto-created-${payment.id}`}>
+                      <div
+                        className="flex items-center gap-2 text-sm text-muted-foreground"
+                        data-testid={`text-crypto-created-${payment.id}`}
+                      >
                         <Clock className="h-4 w-4" />
-                        <span>{new Date(payment.createdAt as string | number | Date).toLocaleString()}</span>
+                        <span>
+                          {new Date(payment.createdAt as string | number | Date).toLocaleString()}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
