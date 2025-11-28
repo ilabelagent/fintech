@@ -14,6 +14,39 @@ This is a comprehensive standalone fintech application providing banking, invest
 - **Payment Processing**: Stripe, crypto payment processors
 - **Real-time**: Socket.IO for WebSocket connections
 
+## Project Structure
+
+```
+/
+├── frontend/          # React frontend application
+│   ├── src/
+│   │   ├── components/   # Reusable UI components
+│   │   ├── pages/        # Page components
+│   │   ├── hooks/        # Custom React hooks
+│   │   └── lib/          # Utilities and helpers
+│   └── index.html
+│
+├── backend/           # Node.js backend application
+│   └── src/
+│       ├── routes.ts     # API endpoints
+│       ├── db.ts         # Database connection
+│       └── services/     # Business logic services
+│
+├── shared/            # Shared schema and types
+│   └── schema.ts      # Database schema
+│
+├── drizzle/           # Database migrations
+│
+├── scripts/           # Utility scripts
+│
+├── public/            # Static assets
+│
+├── package.json       # Dependencies
+├── tsconfig.json      # TypeScript configuration
+├── vite.config.ts     # Vite configuration
+└── drizzle.config.ts  # Database configuration
+```
+
 ## Building and Running
 
 To run this project, you will need to have Node.js and PostgreSQL installed.
@@ -28,4 +61,4 @@ The application will be available at `http://localhost:5000`.
 
 ## Development Conventions
 
-The project uses TypeScript for both the frontend and backend. The database schema is defined in `shared/schema.ts` using Drizzle ORM, and Zod is used for validation. The frontend uses React with Vite, and the backend is a Node.js application with Express. The project is well-organized, with a clear separation of concerns between the frontend, backend, and shared code.
+The project uses TypeScript for both the frontend and backend. The database schema is defined in `shared/schema.ts` using Drizzle ORM, and Zod is used for validation. The frontend uses React with Vite, and the backend is a Node.js application with Express. The project is well-organized, with a clear separation of concerns between the frontend, backend, and shared code. The project also includes a `scripts` directory for utility scripts and a `public` directory for static assets.
