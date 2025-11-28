@@ -94,6 +94,11 @@ Successfully transformed the multi-system monorepo into a focused standalone fin
 
 ```
 valifi/
+├── backend/               # Node.js backend
+│   └── src/
+│       ├── routes.ts      # API endpoints
+│       ├── db.ts          # Database connection
+│       └── services/      # Business logic services
 ├── frontend/              # React frontend (fintech features only)
 │   └── src/
 │       ├── components/    # UI components
@@ -101,16 +106,14 @@ valifi/
 │       ├── hooks/         # React hooks
 │       └── lib/           # Utilities
 │
-├── backend/               # Node.js backend
-│   └── src/
-│       ├── routes.ts      # API endpoints
-│       ├── db.ts          # Database connection
-│       └── storage.ts     # Data access layer
-│
 ├── shared/                # Shared types
-│   └── schema.ts          # Database schema (768 lines, 49 tables)
+│   └── schema.ts          # Database schema
 │
 ├── drizzle/               # Database migrations
+│
+├── scripts/               # Utility scripts
+│
+├── public/                # Static assets
 │
 ├── README.md              # Setup instructions
 ├── CHANGELOG.md           # Refactor details
