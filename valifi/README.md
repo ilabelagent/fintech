@@ -63,7 +63,7 @@ A comprehensive standalone fintech application providing banking, investment, an
 ├── frontend/          # React frontend application
 │   ├── src/
 │   │   ├── components/   # Reusable UI components
-│   │   ├── pages/        # Page components (26 fintech pages)
+│   │   ├── pages/        # Page components
 │   │   ├── hooks/        # Custom React hooks
 │   │   └── lib/          # Utilities and helpers
 │   └── index.html
@@ -72,12 +72,16 @@ A comprehensive standalone fintech application providing banking, investment, an
 │   └── src/
 │       ├── routes.ts     # API endpoints
 │       ├── db.ts         # Database connection
-│       └── storage.ts    # Database access layer
+│       └── services/     # Business logic services
 │
 ├── shared/            # Shared schema and types
-│   └── schema.ts      # Database schema (768 lines, 49 tables)
+│   └── schema.ts      # Database schema
 │
 ├── drizzle/           # Database migrations
+│
+├── scripts/           # Utility scripts
+│
+├── public/            # Static assets
 │
 ├── package.json       # Dependencies
 ├── tsconfig.json      # TypeScript configuration
