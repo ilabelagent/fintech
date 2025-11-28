@@ -114,10 +114,11 @@ valifi/
 │       ├── storage.ts    # Local storage wrapper
 │       └── walletConnect.ts # WalletConnect integration
 ├── shared/
-│   └── schema.ts         # Drizzle ORM schema (1399 lines, 81 tables)
+│   └── schema.ts         # Drizzle ORM schema
 ├── drizzle/              # Database migrations
 ├── scripts/              # Utility scripts
 │   └── verify-core.ts    # Core auth flow verification
+├── public/               # Static assets
 ├── package.json          # Dependencies
 ├── tsconfig.json         # TypeScript configuration
 ├── vite.config.ts        # Vite configuration
