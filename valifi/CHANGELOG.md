@@ -95,8 +95,34 @@ Complete transformation from multi-system monorepo to standalone banking and fin
 #### New Structure
 
 ```
-/backend/src/     # Server code
-/frontend/src/    # Client code
+/
+├── frontend/          # React frontend application
+│   ├── src/
+│   │   ├── components/   # Reusable UI components
+│   │   ├── pages/        # Page components
+│   │   ├── hooks/        # Custom React hooks
+│   │   └── lib/          # Utilities and helpers
+│   └── index.html
+│
+├── backend/           # Node.js backend application
+│   └── src/
+│       ├── routes.ts     # API endpoints
+│       ├── db.ts         # Database connection
+│       └── services/     # Business logic services
+│
+├── shared/            # Shared schema and types
+│   └── schema.ts      # Database schema
+│
+├── drizzle/           # Database migrations
+│
+├── scripts/           # Utility scripts
+│
+├── public/            # Static assets
+│
+├── package.json       # Dependencies
+├── tsconfig.json      # TypeScript configuration
+├── vite.config.ts     # Vite configuration
+└── drizzle.config.ts  # Database configuration
 ```
 
 #### Database Schema
