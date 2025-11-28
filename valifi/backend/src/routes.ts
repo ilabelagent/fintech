@@ -27,6 +27,9 @@ interface AuthenticatedRequest extends Request {
 // Temp admin check middleware
 const isAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const userId = req.user.claims.sub;
     console.log('isAdmin middleware, userId:', userId);
     const adminUser = await storage.getAdminUser(userId);
@@ -36,9 +39,8 @@ const isAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunct
       return res.status(403).json({ message: 'Forbidden: Admins only' });
     }
 
-    // Attach the full user object to the request for downstream use
-    const user = await storage.getUser(userId);
-    req.user = { ...user, admin: adminUser };
+    // Attach the admin user to the request for downstream use
+    req.user.admin = adminUser;
     next();
   } catch (error) {
     console.error('Error in isAdmin middleware:', error);
@@ -50,6 +52,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/auth/user - Get current authenticated user
   app.get('/api/auth/user', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
 
@@ -67,6 +72,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/wallets - Get user's wallets
   app.get('/api/wallets', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       const userId = req.user.claims.sub;
       const wallets = await storage.getUserWallets(userId);
       res.json(wallets || []);
@@ -97,7 +105,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     validateQuery(paginationSchema),
     async (req: Request, res: Response) => {
       try {
-        const { limit, offset } = req.query as { limit: number; offset: number };
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = parseInt(req.query.offset as string) || 0;
         const data = await storage.getUsers(limit, offset);
       res.json(data);
     } catch (error) {
@@ -230,6 +239,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/dashboard/config
   app.get('/api/dashboard/config', isAuthenticated, async (req: any, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       const userId = req.user.claims.sub;
       const config = await storage.getDashboardConfig(userId);
       res.json(config);
@@ -242,6 +254,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/dashboard/preferences
   app.get('/api/dashboard/preferences', isAuthenticated, async (req: any, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       const userId = req.user.claims.sub;
       const preferences = await storage.getDashboardPreferences(userId);
       res.json(preferences);
@@ -254,6 +269,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/dashboard/config
   app.post('/api/dashboard/config', isAuthenticated, async (req: any, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       const userId = req.user.claims.sub;
       const newConfig = await storage.saveDashboardConfig(userId, req.body);
       res.status(201).json(newConfig);
@@ -266,6 +284,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/dashboard/preferences
   app.post('/api/dashboard/preferences', isAuthenticated, async (req: any, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       const userId = req.user.claims.sub;
       const newPref = await storage.saveDashboardPreference(userId, req.body);
       res.status(201).json(newPref);
@@ -281,6 +302,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     isAuthenticated,
     async (req: any, res: Response) => {
       try {
+        if (!req.user) {
+          return res.status(401).json({ message: 'Unauthorized' });
+        }
         const userId = req.user.claims.sub;
         const { widgetId } = req.params;
         await storage.deleteDashboardPreference(userId, widgetId);

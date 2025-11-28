@@ -6,4 +6,5 @@ export default {
     '^@shared/(.*)$': '<rootDir>/shared/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/backend/src/__mocks__/setup.ts'],
+  testMatch: ['<rootDir>/backend/src/__tests__/**/*.test.ts'],
 };

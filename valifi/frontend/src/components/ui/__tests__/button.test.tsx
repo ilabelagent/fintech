@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Button } from '../button'; // Adjust the import path as needed
 
@@ -11,7 +12,7 @@ describe('Button', () => {
     render(<Button variant="destructive">Destructive Button</Button>);
     expect(screen.getByText('Destructive Button')).toBeInTheDocument();
     // You can add more specific assertions for classes if needed
-    expect(screen.getByText('Destructive Button')).toHaveClass('destructive');
+    expect(screen.getByText('Destructive Button')).toHaveClass('bg-destructive');
   });
 
   it('handles click events', () => {

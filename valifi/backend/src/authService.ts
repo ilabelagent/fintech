@@ -34,7 +34,12 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     // Extend Request type with userId and user
     interface AuthRequest extends Request {
       userId?: string;
-      user?: { claims: { sub: string } };
+      user?: {
+        claims: {
+          sub: string;
+        };
+        [key: string]: unknown;
+      };
     }
 
     // Set both formats for compatibility
